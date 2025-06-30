@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+const posts = await getCollection('blog');
+
+const mostViewed = [...posts]
+  .sort((a, b) => (b.data.views ?? 0) - (a.data.views ?? 0))
+  .slice(0, 5);
+const mostLiked = [...posts]
+  .sort((a, b) => (b.data.likes ?? 0) - (a.data.likes ?? 0))
+  .slice(0, 3);
+const newest = [...posts]
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+
+<aside class="sidebar">
+  <section>
+    <h3>Top 5 wyświetleń</h3>
+    <ul>
+      {mostViewed.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <span class="count">{post.data.views}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+  <section>
+    <h3>Najwięcej polubień</h3>
+    <ul>
+      {mostLiked.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <span class="count">{post.data.likes}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+  <section>
+    <h3>Najnowsze artykuły</h3>
+    <ul>
+      {newest.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <FormattedDate date={post.data.pubDate} />
+        </li>
+      ))}
+    </ul>
+  </section>
+</aside>
+
+<style>
+  .sidebar {
+    padding: 1em;
+    background: rgb(var(--gray-light));
+    border-radius: 12px;
+    width: 280px;
+  }
+  h3 {
+    margin-top: 0;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  li {
+    margin-bottom: 0.5em;
+  }
+  a {
+    text-decoration: none;
+  }
+  .count {
+    margin-left: 0.5em;
+    color: rgb(var(--gray));
+  }
+</style>
