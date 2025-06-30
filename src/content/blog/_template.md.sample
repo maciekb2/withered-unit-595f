@@ -1,0 +1,10 @@
+---
+title: "Title of Your Post"
+description: "Short description"
+pubDate: "yyyy-mm-dd"
+# Optional fields
+updatedDate: "yyyy-mm-dd"
+heroImage: "/path/to/image.jpg"
+---
+
+Write your article content here using Markdown or MDX.
