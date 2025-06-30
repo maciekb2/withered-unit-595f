@@ -2,7 +2,7 @@
   "name": "pseudointelekt2137-blog",
   "compatibility_date": "2024-11-01",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "./dist/_worker.js/index.js",
+  "main": "./dist/worker.js",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
