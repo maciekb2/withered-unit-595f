@@ -1,0 +1,27 @@
+---
+interface NavProps {
+    prev?: { id: string; data: { title: string } };
+    next?: { id: string; data: { title: string } };
+}
+const { prev, next } = Astro.props as NavProps;
+---
+<nav class="post-nav">
+    {prev && (
+        <a href={`/blog/${prev.id}/`} class="prev">\u00ab {prev.data.title}</a>
+    )}
+    {next && (
+        <a href={`/blog/${next.id}/`} class="next">{next.data.title} \u00bb</a>
+    )}
+</nav>
+<style>
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    margin: 2em 0;
+    padding: 0 1em;
+}
+.post-nav a {
+    color: var(--accent);
+    text-decoration: none;
+}
+</style>
