@@ -86,6 +86,12 @@ on:
 
 GitHub will execute the workflow according to the cron expression after the change is pushed.
 
+### Customizing the AI post prompt
+
+The worker uses the text in `src/prompt/blog-post.txt` when requesting a new
+post from OpenAI. Edit this file to change the prompt and redeploy the project
+for your changes to take effect.
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

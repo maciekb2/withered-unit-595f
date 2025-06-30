@@ -1,0 +1,1 @@
+Generate a short blog post in Markdown with YAML front matter containing a title and pubDate set to ${date}. Return only the Markdown.
