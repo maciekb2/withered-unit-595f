@@ -6,45 +6,99 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
+                <main>
+                        <section class="hero">
+                                <h1 id="hero-text">Analiza globalnej geopolityki</h1>
+                                <div class="globe"></div>
+                                <p class="subtitle">Wnikliwe spojrzenie na siły kształtujące świat.</p>
+                                <a class="cta" href="/blog">Zapraszamy na bloga</a>
+                        </section>
+                        <script>
+                                const messages = [
+                                        "Analiza globalnej geopolityki",
+                                        "Śledzimy zmiany potęgi państw",
+                                        "Zrozumieć stosunki międzynarodowe",
+                                ];
+                                let index = 0;
+                                setInterval(() => {
+                                        index = (index + 1) % messages.length;
+                                        document.getElementById('hero-text').textContent = messages[index];
+                                }, 3000);
+                        </script>
+                        <style>
+                                .hero {
+                                        text-align: center;
+                                        padding: 4em 1em;
+                                        background: var(--royal-green);
+                                        color: var(--ivory);
+                                        animation: fadeIn 1.5s ease-in-out;
+                                }
+                                .hero h1 {
+                                        font-size: 2.5em;
+                                        margin: 0;
+                                        color: var(--gold-accent);
+                                }
+                                .subtitle {
+                                        font-size: 1.25em;
+                                        margin: 1em 0;
+                                }
+                                .cta {
+                                        display: inline-block;
+                                        margin-top: 1em;
+                                        padding: 0.75em 2em;
+                                        background: var(--diplomatic-blue);
+                                        color: var(--ivory);
+                                        border-radius: 4px;
+                                        text-decoration: none;
+                                }
+                                .cta:hover {
+                                        background: var(--gold-accent);
+                                        color: var(--charcoal);
+                                }
+                                .globe {
+                                        width: 150px;
+                                        height: 150px;
+                                        border-radius: 50%;
+                                        border: 4px solid var(--gold-accent);
+                                        margin: 2em auto;
+                                        position: relative;
+                                        animation: spin 20s linear infinite;
+                                }
+                                .globe::before {
+                                        content: '';
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        width: 120px;
+                                        height: 60px;
+                                        border: 3px dotted var(--gold-accent);
+                                        border-radius: 50%;
+                                        transform: translate(-50%, -50%);
+                                }
+                                @keyframes spin {
+                                        from {
+                                                transform: rotate(0deg);
+                                        }
+                                        to {
+                                                transform: rotate(360deg);
+                                        }
+                                }
+                                @keyframes fadeIn {
+                                        from {
+                                                opacity: 0;
+                                        }
+                                        to {
+                                                opacity: 1;
+                                        }
+                                }
+                        </style>
+                </main>
 		<Footer />
 	</body>
 </html>

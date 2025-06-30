@@ -3,7 +3,12 @@ const today = new Date();
 ---
 
 <footer>
+	<div class="copyright">
 	&copy; {today.getFullYear()} Your name here. All rights reserved.
+	</div>
+	<div class="privacy">
+	<a href="/privacy">Privacy Policy</a>
+	</div>
 	<div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
 			<span class="sr-only">Follow Astro on Mastodon</span>
@@ -57,6 +62,17 @@ const today = new Date();
 		color: rgb(var(--gray));
 	}
 	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+	color: rgb(var(--gray-dark));
+	}
+	.privacy {
+	margin-top: 0.5em;
+	}
+	.privacy a {
+	text-decoration: none;
+	color: rgb(var(--gray));
+	}
+	.privacy a:hover {
+	color: rgb(var(--gray-dark));
+	text-decoration: underline;
 	}
 </style>
