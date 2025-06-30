@@ -4,10 +4,12 @@
         <div class="particle"></div>
         <div class="particle"></div>
     </div>
-    <h1 id="hero-text">Analiza globalnej geopolityki</h1>
-    <div class="globe"></div>
-    <p class="subtitle">Wnikliwe spojrzenie na siły kształtujące świat.</p>
-    <a class="cta" href="/blog">Zapraszamy na bloga</a>
+    <div class="hero-content">
+        <h1 id="hero-text">Analiza globalnej geopolityki</h1>
+        <div class="globe"></div>
+        <p class="subtitle">Wnikliwe spojrzenie na siły kształtujące świat.</p>
+        <a class="cta" href="/blog">Zapraszamy na bloga</a>
+    </div>
 </section>
 <script>
     const messages = [
@@ -22,7 +24,17 @@
     }, 3000);
 
     const hero = document.querySelector('.hero');
+    const header = document.querySelector('header');
+    const footer = document.querySelector('footer');
     const particles = document.querySelectorAll('.particle');
+    function setHeroHeight() {
+        const headerH = header ? header.offsetHeight : 0;
+        const footerH = footer ? footer.offsetHeight : 0;
+        hero.style.minHeight = `calc(100vh - ${headerH + footerH}px)`;
+    }
+    window.addEventListener('resize', setHeroHeight);
+    setHeroHeight();
+
     function updateParticles(x = window.innerWidth / 2, y = window.innerHeight / 2) {
         const rect = hero.getBoundingClientRect();
         const relX = x - rect.left;
@@ -54,6 +66,18 @@
         color: var(--ivory);
         overflow: hidden;
         animation: fadeIn 1.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     .hero h1 {
         font-size: 2.5em;
