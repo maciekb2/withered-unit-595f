@@ -4,6 +4,8 @@ export interface Env {
   GITHUB_REPO: string; // owner/repo
 }
 
+import blogPostPrompt from "./prompt/blog-post.txt?raw";
+
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
@@ -11,6 +13,8 @@ function slugify(text: string) {
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
     const date = new Date(event.scheduledTime).toISOString().split("T")[0];
+
+    const prompt = blogPostPrompt.replace("${date}", date);
 
     const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -23,7 +27,7 @@ export default {
         messages: [
           {
             role: "user",
-            content: `Generate a short blog post in Markdown with YAML front matter containing a title and pubDate set to ${date}. Return only the Markdown.`,
+            content: prompt,
           },
         ],
       }),
