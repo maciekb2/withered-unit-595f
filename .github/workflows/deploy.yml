@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  # Automatically deploy every day at 03:00 UTC when scheduling is enabled
+  schedule:
+    - cron: '0 3 * * *'
 
 jobs:
   deploy:
