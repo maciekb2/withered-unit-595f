@@ -1,14 +1,11 @@
 ---
+import { SITE_TITLE } from '../consts';
 const today = new Date();
 ---
 
 <footer>
-	<div class="copyright">
-	&copy; {today.getFullYear()} Your name here. All rights reserved.
-	</div>
-	<div class="privacy">
-	<a href="/privacy">Privacy Policy</a>
-	</div>
+        &copy; {today.getFullYear()} {SITE_TITLE}. Wszelkie prawa zastrzeżone.
+
 	<div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
 			<span class="sr-only">Follow Astro on Mastodon</span>
