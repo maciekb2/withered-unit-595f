@@ -26,7 +26,7 @@
   },
   "scripts": {
     "astro": "astro",
-    "build": "astro build",
+    "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --external:./_worker.js --outfile=dist/worker.js",
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "astro build && wrangler deploy",
     "dev": "astro dev",
