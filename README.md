@@ -86,6 +86,19 @@ on:
 
 GitHub will execute the workflow according to the cron expression after the change is pushed.
 
+### Worker secrets
+
+`src/cron-worker.ts` calls the OpenAI and GitHub APIs. Before deploying,
+set the `OPENAI_API_KEY`, `GITHUB_TOKEN`, and `GITHUB_REPO` secrets using
+`wrangler secret put`:
+
+```bash
+wrangler secret put OPENAI_API_KEY
+wrangler secret put GITHUB_TOKEN
+wrangler secret put GITHUB_REPO
+```
+
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
