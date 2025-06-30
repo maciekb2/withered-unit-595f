@@ -58,6 +58,34 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 | `npm run deploy`          | Deploy your production site to Cloudflare        |
 
+## Continuous deployment
+
+This repo contains a GitHub Actions workflow (`.github/workflows/deploy.yml`) that
+builds and deploys the site whenever changes are pushed to the `main` branch.
+
+### Secrets configuration
+
+Create the following repository secrets under **Settings → Secrets and variables → Actions**:
+
+- `CF_API_TOKEN` – a Cloudflare API token with Workers deploy permissions.
+- `CF_ACCOUNT_ID` – your Cloudflare account ID.
+
+These values are provided to `wrangler` during deployment.
+
+### Enabling the schedule
+
+To run deployments on a schedule, add a `schedule` block to the workflow. For example:
+
+```yaml
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * *'
+```
+
+GitHub will execute the workflow according to the cron expression after the change is pushed.
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
