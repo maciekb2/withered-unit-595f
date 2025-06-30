@@ -37,6 +37,13 @@ The `src/content/` directory contains "collections" of related Markdown and MDX 
 
 Any static assets, like images, can be placed in the `public/` directory.
 
+### Adding new articles
+
+To publish a blog post, copy the file `src/content/blog/_template.md.sample` and rename
+it to something like `your-title.md`. Fill in the front matter fields (use
+`YYYY-MM-DD` dates) and write your content in Markdown or MDX. Once committed,
+the article will appear on your site.
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
