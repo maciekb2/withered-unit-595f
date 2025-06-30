@@ -22,15 +22,15 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250204.0",
-    "wrangler": "3.107.3"
+    "wrangler": "^4.22.0"
   },
   "scripts": {
     "astro": "astro",
     "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --external:./_worker.js --outfile=dist/worker.js",
-    "check": "astro build && tsc && wrangler deploy --dry-run",
-    "deploy": "astro build && wrangler deploy",
+    "check": "npm run build && tsc && wrangler deploy --dry-run",
+    "deploy": "npm run build && wrangler deploy",
     "dev": "astro dev",
-    "preview": "astro build && wrangler dev",
+    "preview": "npm run build && wrangler dev",
     "types": "wrangler types"
   },
   "type": "module"
