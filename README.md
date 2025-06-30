@@ -72,19 +72,16 @@ Create the following repository secrets under **Settings → Secrets and variabl
 
 These values are provided to `wrangler` during deployment.
 
-### Enabling the schedule
+### Scheduled deployments
 
-To run deployments on a schedule, add a `schedule` block to the workflow. For example:
+The deployment workflow includes a `schedule` trigger:
 
 ```yaml
-on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: '0 3 * * *'
+schedule:
+  - cron: '0 3 * * *'
 ```
 
-GitHub will execute the workflow according to the cron expression after the change is pushed.
+GitHub will run the workflow automatically every day at **03:00&nbsp;UTC** when scheduled workflows are enabled for the repository.
 
 ### Worker secrets
 
