@@ -1,6 +1,6 @@
 ---
-import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+import Menu from './Menu.astro';
 ---
 
 <header>
@@ -9,11 +9,7 @@ import { SITE_TITLE } from '../consts';
                 <a href="/" class="logo">
                         <img src="/logo.svg" alt={SITE_TITLE} width="40" height="40" />
                 </a>
-                <div class="internal-links">
-                        <HeaderLink href="/">Strona główna</HeaderLink>
-                        <HeaderLink href="/blog">Blog</HeaderLink>
-                        <HeaderLink href="/about">O mnie</HeaderLink>
-                </div>
+                <Menu />
         </nav>
 </header>
 <style>
