@@ -22,13 +22,20 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        messages: [
-          { role: 'user', content: prompt },
-        ],
+        messages: [{ role: 'user', content: prompt }],
       }),
     });
 
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
+    }
+
     const data: any = await res.json();
+    if (!data.choices || !data.choices[0]) {
+      throw new Error('OpenAI response missing choices');
+    }
+
     const text = data.choices[0].message.content.trim();
 
     try {
