@@ -17,12 +17,74 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                                 margin: 0;
                                 padding: 0;
                         }
+                        .intro {
+                                max-width: 720px;
+                                margin: 0 auto;
+                                padding: 3em 1em;
+                                text-align: center;
+                        }
+                        .intro .buttons {
+                                display: flex;
+                                justify-content: center;
+                                flex-wrap: wrap;
+                                gap: 1rem;
+                                margin-top: 2rem;
+                        }
+                        .intro .buttons a {
+                                padding: 0.75em 1.5em;
+                                text-decoration: none;
+                                border-radius: 4px;
+                                border: 2px solid var(--diplomatic-blue);
+                        }
+                        .intro .buttons a.primary {
+                                background: var(--diplomatic-blue);
+                                color: var(--ivory);
+                        }
+                        .intro .buttons a.primary:hover {
+                                background: var(--gold-accent);
+                                color: var(--charcoal);
+                        }
+                        .intro .buttons a.secondary {
+                                background: transparent;
+                                color: var(--diplomatic-blue);
+                        }
+                        .intro .buttons a.secondary:hover {
+                                background: var(--dusty-beige);
+                        }
                 </style>
         </head>
         <body>
                 <Header />
                 <main class="full-width-banner">
                         <Hero />
+                        <section class="intro">
+                                <h2>🧠 Co to za pseudointelekt?</h2>
+                                <p>
+                                        Pseudointelekt.pl to blog dla tych, którzy mają dość suchych analiz,
+                                        nadętych ekspertów i przewidywalnych wniosków z „mainstreamu”. U nas
+                                        geopolityka, konflikty, dyplomacja i cała światowa scena polityczna
+                                        dostają nieco inny filtr – filtr absurdu, ironii i zdrowego dystansu.
+                                </p>
+                                <p>
+                                        Nie udajemy, że wiemy wszystko. Ale też nie udajemy, że nie wiemy nic.
+                                        Gdzieś pośrodku między think-tankiem a memem z Putinem – tam jesteśmy.
+                                        Czasem przewidujemy przyszłość, czasem śmiejemy się z teraźniejszości.
+                                        Jedno jest pewne: nie będziesz się nudzić.
+                                </p>
+                                <h2>👀 Dla kogo to wszystko?</h2>
+                                <p>
+                                        Dla tych, którzy interesują się światem, ale niekoniecznie chcą go
+                                        czytać jak encyklopedię. Dla sceptyków, śmieszków, paranoików,
+                                        konspiratorów niedzielnych i fanów spisków (ale z umiarem). A także
+                                        dla każdego, kto lubi spojrzeć na sprawy globalne z lokalnej kanapy –
+                                        z piwem lub yerbą w ręku.
+                                </p>
+                                <div class="buttons">
+                                        <a href="/about" class="secondary">O mnie</a>
+                                        <a href="/blog" class="primary">Blog</a>
+                                        <a href="/contact" class="secondary">Kontakt</a>
+                                </div>
+                        </section>
                 </main>
                 <Footer />
 	</body>
