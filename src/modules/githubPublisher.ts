@@ -1,4 +1,5 @@
 import { slugify } from '../utils/slugify';
+import { logEvent, logError } from '../utils/logger';
 import type { ArticleResult } from './articleGenerator';
 
 export interface PublishOptions {
@@ -9,6 +10,7 @@ export interface PublishOptions {
 }
 
 export async function publishArticleToGitHub({ env, article, heroImage, date }: PublishOptions): Promise<void> {
+  logEvent({ type: 'github-publish-start', title: article.title });
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
   const repoUrl = `https://api.github.com/repos/${env.GITHUB_REPO}`;
@@ -35,26 +37,33 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     article.content,
   ].join('\n');
 
-  await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `Add post for ${postDate}`,
-      content: btoa(markdown),
-      branch,
-    }),
-  });
+  try {
+    await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: `Add post for ${postDate}`,
+        content: btoa(markdown),
+        branch,
+      }),
+    });
 
   const heroBase64 = heroImage.toString('base64');
-  await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `Add hero image for ${postDate}`,
-      content: heroBase64,
-      branch,
-    }),
-  });
+    await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: `Add hero image for ${postDate}`,
+        content: heroBase64,
+        branch,
+      }),
+    });
+
+    logEvent({ type: 'github-publish-complete', post: postName, image: imageName });
+  } catch (err) {
+    logError(err, { type: 'github-publish-error' });
+    throw err;
+  }
 
   // Files are committed directly to the default branch
 }
