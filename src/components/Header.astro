@@ -6,7 +6,7 @@ import Menu from './Menu.astro';
 <header>
         <nav>
                 <a href="/" class="logo">
-                        <img src="/pseudointelekt_logo_tekstura.svg" alt={SITE_TITLE} width="40" height="40" />
+                        <img src="/pseudointelekt_logo_tekstura.svg" alt={SITE_TITLE} />
                 </a>
                 <Menu />
         </nav>
@@ -14,15 +14,26 @@ import Menu from './Menu.astro';
 <script>
         const header = document.querySelector('header');
         let lastScroll = window.scrollY;
-        window.addEventListener('scroll', () => {
+
+        function updateHeader() {
                 const current = window.scrollY;
+
+                if (current <= 0) {
+                        header.classList.add('expanded');
+                } else {
+                        header.classList.remove('expanded');
+                }
+
                 if (current > lastScroll && current > header.offsetHeight) {
                         header.classList.add('hidden');
                 } else {
                         header.classList.remove('hidden');
                 }
                 lastScroll = current;
-        });
+        }
+
+        updateHeader();
+        window.addEventListener('scroll', updateHeader);
 </script>
 <style>
         header {
@@ -35,7 +46,16 @@ import Menu from './Menu.astro';
                 left: 0;
                 right: 0;
                 z-index: 10;
-                transition: top 0.3s ease;
+                transition: top 0.3s ease, height 0.3s ease;
+                height: 60px;
+                display: flex;
+                align-items: center;
+        }
+        header.expanded {
+                height: 100px;
+        }
+        header.expanded .logo img {
+                animation: bump 0.3s ease;
         }
         header.hidden {
                 top: -100%;
@@ -43,21 +63,34 @@ import Menu from './Menu.astro';
         .logo {
                 display: flex;
                 align-items: center;
+                padding: 0;
+                height: 100%;
         }
         .logo img {
                 display: block;
+                height: 100%;
+                width: auto;
+        }
+        @keyframes bump {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
         }
         nav {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                height: 100%;
         }
         nav a {
                 position: relative;
-                padding: 1em 0.75em;
+                padding: 0 0.75em;
                 color: var(--black);
                 text-decoration: none;
                 transition: color 0.3s, transform 0.2s;
+                display: flex;
+                align-items: center;
+                height: 100%;
         }
         nav a:hover {
                 color: var(--accent);
