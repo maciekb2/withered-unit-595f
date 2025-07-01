@@ -15,7 +15,7 @@
     }
   ],
   "vars": {
-    "SLACK_WEBHOOK_URL": "https://hooks.slack.com/services/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"
+    "SLACK_WEBHOOK_URL": "https://hooks.slack.com/services/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"
   },
   "observability": {
     "enabled": true
