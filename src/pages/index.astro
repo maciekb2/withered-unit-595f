@@ -10,12 +10,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 <html lang="pl">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-                <main>
+                <style>
+                        main.full-width-banner {
+                                width: 100%;
+                                max-width: none;
+                                margin: 0;
+                                padding: 0;
+                        }
+                </style>
+        </head>
+        <body>
+                <Header />
+                <main class="full-width-banner">
                         <Hero />
                 </main>
-		<Footer />
+                <Footer />
 	</body>
 </html>
