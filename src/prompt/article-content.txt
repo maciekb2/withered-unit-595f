@@ -1,0 +1,1 @@
+Napisz ironiczny artykuł na blog geopolityczny w formacie JSON zawierającym pola "title", "description" i "content". Używaj lekkiego języka i wpleć ciekawostki z bieżącej polityki. Zwróć tylko JSON bez dodatkowych komentarzy.
