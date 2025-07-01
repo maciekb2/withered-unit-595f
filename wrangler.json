@@ -10,12 +10,12 @@
   "kv_namespaces": [
     {
       "binding": "pseudointelekt_contact_form",
-      "id": "<YOUR_NAMESPACE_ID>",
-      "preview_id": "<YOUR_PREVIEW_ID>"
+      "id": "b71f33f4cc0e48aaa96cf9aa53092882",
+      "preview_id": "b71f33f4cc0e48aaa96cf9aa53092882"
     }
   ],
   "vars": {
-    "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>"
+    "SLACK_WEBHOOK_URL": "https://hooks.slack.com/services/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"
   },
   "observability": {
     "enabled": true
