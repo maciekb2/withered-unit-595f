@@ -15,7 +15,7 @@
     }
   ],
   "vars": {
-    "SLACK_WEBHOOK_URL": ""
+    "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>"
   },
   "observability": {
     "enabled": true

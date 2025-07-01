@@ -54,5 +54,13 @@ wrangler kv:namespace create pseudointelekt_contact_form
 ```
 Następnie w pliku `wrangler.json` dodaj uzyskany `id` i `preview_id` w sekcji `kv_namespaces` pod nazwą `pseudointelekt_contact_form`.
 
+Dodatkowo w sekcji `vars` umieść adres swojego webhooka Slack:
+
+```json
+  "vars": {
+    "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>"
+  }
+```
+
 ### Personalizacja promptu
 Plik `src/prompt/blog-post.txt` definiuje prompt dla OpenAI. Edytuj go, aby dostosować generowane wpisy.
