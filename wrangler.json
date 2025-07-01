@@ -7,6 +7,16 @@
     "directory": "./dist",
     "binding": "ASSETS"
   },
+  "kv_namespaces": [
+    {
+      "binding": "pseudointelekt_contact_form",
+      "id": "<YOUR_NAMESPACE_ID>",
+      "preview_id": "<YOUR_PREVIEW_ID>"
+    }
+  ],
+  "vars": {
+    "SLACK_WEBHOOK_URL": ""
+  },
   "observability": {
     "enabled": true
   },

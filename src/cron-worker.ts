@@ -2,6 +2,8 @@ export interface Env {
   OPENAI_API_KEY: string;
   GITHUB_TOKEN: string;
   GITHUB_REPO: string; // owner/repo
+  SLACK_WEBHOOK_URL: string;
+  pseudointelekt_contact_form: KVNamespace;
 }
 
 import blogPostPrompt from "./prompt/blog-post.txt?raw";

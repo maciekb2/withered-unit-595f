@@ -43,7 +43,16 @@ Przed deployem skonfiguruj sekrety dla `wrangler secret`:
 wrangler secret put OPENAI_API_KEY
 wrangler secret put GITHUB_TOKEN
 wrangler secret put GITHUB_REPO
+wrangler secret put SLACK_WEBHOOK_URL
 ```
+
+### Konfiguracja bazy kontaktów
+Utwórz przestrzeń Cloudflare KV do przechowywania wysłanych formularzy:
+
+```bash
+wrangler kv:namespace create pseudointelekt_contact_form
+```
+Następnie w pliku `wrangler.json` dodaj uzyskany `id` i `preview_id` w sekcji `kv_namespaces` pod nazwą `pseudointelekt_contact_form`.
 
 ### Personalizacja promptu
 Plik `src/prompt/blog-post.txt` definiuje prompt dla OpenAI. Edytuj go, aby dostosować generowane wpisy.
