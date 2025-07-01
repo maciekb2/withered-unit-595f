@@ -22,7 +22,15 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
       }),
     });
 
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(`OpenAI image request failed: ${res.status} ${msg}`);
+    }
+
     const data: any = await res.json();
+    if (!data.data || !data.data[0]) {
+      throw new Error('OpenAI image response missing data');
+    }
     const b64 = data.data[0].b64_json as string;
     logEvent({ type: 'generate-hero-complete' });
     return Buffer.from(b64, 'base64');
