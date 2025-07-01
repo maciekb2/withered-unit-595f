@@ -7,6 +7,7 @@ export interface Env {
 }
 
 import blogPostPrompt from "./prompt/blog-post.txt?raw";
+import { logEvent, logError } from './utils/logger';
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -14,6 +15,7 @@ function slugify(text: string) {
 
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+    logEvent({ type: 'cron-start', time: event.scheduledTime });
     const date = new Date(event.scheduledTime).toISOString().split("T")[0];
 
     const prompt = blogPostPrompt.replace("${date}", date);
@@ -58,31 +60,37 @@ export default {
     const refData: any = await refRes.json();
     const branch = `auto-${date.replace(/-/g, "")}`;
 
-    await fetch(`${repoUrl}/git/refs`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
-    });
+    try {
+      await fetch(`${repoUrl}/git/refs`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
+      });
 
-    await fetch(`${repoUrl}/contents/${encodeURIComponent(path)}`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({
-        message: `Add post for ${date}`,
-        content: btoa(markdown),
-        branch,
-      }),
-    });
+      await fetch(`${repoUrl}/contents/${encodeURIComponent(path)}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          message: `Add post for ${date}`,
+          content: btoa(markdown),
+          branch,
+        }),
+      });
 
-    await fetch(`${repoUrl}/pulls`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        title: `Automated post for ${date}`,
-        head: branch,
-        base: repo.default_branch,
-        body: "This PR was created automatically by a scheduled Cloudflare Worker.",
-      }),
-    });
+      await fetch(`${repoUrl}/pulls`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          title: `Automated post for ${date}`,
+          head: branch,
+          base: repo.default_branch,
+          body: "This PR was created automatically by a scheduled Cloudflare Worker.",
+        }),
+      });
+      logEvent({ type: 'cron-complete', branch });
+    } catch (err) {
+      logError(err, { type: 'cron-error' });
+      throw err;
+    }
   },
 };

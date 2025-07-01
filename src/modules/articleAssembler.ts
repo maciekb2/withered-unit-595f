@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { slugify } from '../utils/slugify';
+import { logEvent, logError } from '../utils/logger';
 import type { ArticleResult } from './articleGenerator';
 
 export interface AssembleOptions {
@@ -18,6 +19,7 @@ export async function assembleArticle({
   publicDir = 'public/blog-images',
   date,
 }: AssembleOptions): Promise<{ postPath: string; imagePath: string }> {
+  logEvent({ type: 'assemble-start', title: article.title });
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
 
@@ -40,7 +42,12 @@ export async function assembleArticle({
 
   const postName = `${postDate}-${slug}.md`;
   const postPath = path.join(blogDir, postName);
-  await fs.writeFile(postPath, fm + article.content);
-
-  return { postPath, imagePath };
+  try {
+    await fs.writeFile(postPath, fm + article.content);
+    logEvent({ type: 'assemble-complete', postPath, imagePath });
+    return { postPath, imagePath };
+  } catch (err) {
+    logError(err, { type: 'assemble-error' });
+    throw err;
+  }
 }
