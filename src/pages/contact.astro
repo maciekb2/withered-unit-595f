@@ -34,7 +34,7 @@ import { CONTACT_EMAIL } from '../consts';
     <main>
       <h1>Kontakt</h1>
       <p>Jeśli masz pytania, napisz na <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> lub skorzystaj z formularza poniżej.</p>
-      <form action={`mailto:${CONTACT_EMAIL}`} method="post" enctype="text/plain">
+      <form id="contact-form" action="/api/contact" method="post">
         <label>
           Imię
           <input type="text" name="name" required />
@@ -49,7 +49,43 @@ import { CONTACT_EMAIL } from '../consts';
         </label>
         <button type="submit">Wyślij</button>
       </form>
+      <p id="status"></p>
     </main>
     <Footer />
+    <script type="module">
+      const form = document.getElementById('contact-form');
+      const status = document.getElementById('status');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const name = data.get('name').trim();
+        const email = data.get('email').trim();
+        const message = data.get('message').trim();
+        if (!name) {
+          status.textContent = 'Halo! Jak mamy Cię zawołać?';
+          status.style.color = 'red';
+          return;
+        }
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          status.textContent = 'Podaj prawidłowy email – gołębie pocztowe nie obsługują tego formatu.';
+          status.style.color = 'red';
+          return;
+        }
+        if (!message) {
+          status.textContent = 'Serio nic nie napiszesz? Bez treści nie damy rady!';
+          status.style.color = 'red';
+          return;
+        }
+        const res = await fetch('/api/contact', { method: 'POST', body: data });
+        if (res.ok) {
+          status.textContent = 'Wiadomość wysłana';
+          status.style.color = 'green';
+          form.reset();
+        } else {
+          status.textContent = 'Błąd wysyłania';
+          status.style.color = 'red';
+        }
+      });
+    </script>
   </body>
 </html>
