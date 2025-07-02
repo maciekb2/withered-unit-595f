@@ -46,6 +46,7 @@ async function handleContact(request: Request, env: Env) {
 
 async function handleGenerateArticle(request: Request, env: Env) {
   logEvent({ type: 'generate-article-endpoint-start' });
+  logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
   try {
     const article = await generateArticle({ apiKey: env.OPENAI_API_KEY, prompt: articlePrompt });
     const heroPrompt = heroTemplate.replace('{title}', article.title);
