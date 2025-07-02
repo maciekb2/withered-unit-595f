@@ -18,7 +18,7 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
       body: JSON.stringify({
         prompt,
         n: 1,
-        size: '1024x512',
+        size: '1024x1024',
         response_format: 'b64_json',
       }),
     });
