@@ -19,9 +19,10 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     'User-Agent': 'article-publisher',
     'Content-Type': 'application/json',
   };
-
+  logEvent({ type: 'github-request-repo' });
   const repoRes = await fetch(repoUrl, { headers });
   const repo: any = await repoRes.json();
+  logEvent({ type: 'github-response-repo', status: repoRes.status });
   const branch = repo.default_branch;
 
   const imageName = `${postDate}-${slug}.png`;
@@ -38,6 +39,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   ].join('\n');
 
   try {
+    logEvent({ type: 'github-upload-post', file: postName });
     await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
       method: 'PUT',
       headers,
@@ -49,6 +51,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     });
 
   const heroBase64 = heroImage.toString('base64');
+    logEvent({ type: 'github-upload-image', file: imageName });
     await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
       method: 'PUT',
       headers,

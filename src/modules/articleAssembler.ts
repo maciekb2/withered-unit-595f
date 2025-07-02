@@ -20,11 +20,13 @@ export async function assembleArticle({
   date,
 }: AssembleOptions): Promise<{ postPath: string; imagePath: string }> {
   logEvent({ type: 'assemble-start', title: article.title });
+  logEvent({ type: 'assemble-paths', blogDir, publicDir });
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
 
   await fs.mkdir(publicDir, { recursive: true });
   await fs.mkdir(blogDir, { recursive: true });
+  logEvent({ type: 'assemble-dirs-ready' });
 
   const imageName = `${postDate}-${slug}.png`;
   const imagePath = path.join(publicDir, imageName);
@@ -44,6 +46,7 @@ export async function assembleArticle({
   const postPath = path.join(blogDir, postName);
   try {
     await fs.writeFile(postPath, fm + article.content);
+    logEvent({ type: 'assemble-files-written', postPath, imagePath });
     logEvent({ type: 'assemble-complete', postPath, imagePath });
     return { postPath, imagePath };
   } catch (err) {

@@ -7,6 +7,7 @@ export interface GenerateHeroOptions {
 
 export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
+  logEvent({ type: 'openai-image-request', promptSnippet: prompt.slice(0, 100) });
   try {
     const res = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -22,12 +23,15 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
       }),
     });
 
+    logEvent({ type: 'openai-image-response-status', status: res.status });
+
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(`OpenAI image request failed: ${res.status} ${msg}`);
     }
 
     const data: any = await res.json();
+    logEvent({ type: 'openai-image-response-received' });
     if (!data.data || !data.data[0]) {
       throw new Error('OpenAI image response missing data');
     }

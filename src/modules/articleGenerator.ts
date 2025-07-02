@@ -13,6 +13,11 @@ export interface GenerateArticleOptions {
 
 export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions): Promise<ArticleResult> {
   logEvent({ type: 'generate-article-start' });
+  logEvent({
+    type: 'openai-request',
+    model: 'gpt-4o',
+    promptSnippet: prompt.slice(0, 100),
+  });
   try {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -26,12 +31,15 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
       }),
     });
 
+    logEvent({ type: 'openai-response-status', status: res.status });
+
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
     }
 
     const data: any = await res.json();
+    logEvent({ type: 'openai-response-received' });
     if (!data.choices || !data.choices[0]) {
       throw new Error('OpenAI response missing choices');
     }
@@ -40,6 +48,7 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
 
     try {
       const json: ArticleResult = JSON.parse(text);
+      logEvent({ type: 'parse-json-success', title: json.title });
       logEvent({ type: 'generate-article-complete', title: json.title });
       return json;
     } catch (_) {
@@ -48,6 +57,7 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
       const title = titleLine.replace(/^#+\s*/, '').trim();
       const content = text;
       const result = { title, description: '', content };
+      logEvent({ type: 'parse-json-fallback', title });
       logEvent({ type: 'generate-article-complete', title });
       return result;
     }
