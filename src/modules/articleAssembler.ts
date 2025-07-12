@@ -38,6 +38,8 @@ export async function assembleArticle({
     `description: "${article.description}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
+    'views: 0',
+    'likes: 0',
     '---',
     '',
   ].join('\n');

@@ -49,6 +49,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     `description: "${article.description}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
+    'views: 0',
+    'likes: 0',
     '---',
     '',
     article.content,
