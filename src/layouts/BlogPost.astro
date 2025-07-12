@@ -114,7 +114,7 @@ const {
                                         const el = document.getElementById('view-count');
                                         if (el) el.textContent = d.views;
                                 });
-                        fetch('/api/likes')
+                        fetch(`/api/likes?slugs=${slug}`)
                                 .then((r) => r.ok ? r.json() : {})
                                 .then((d) => {
                                         const el = document.getElementById('like-count');
