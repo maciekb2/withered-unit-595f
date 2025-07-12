@@ -103,18 +103,6 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       retryDelayMs: 1000,
     });
 
-    await retryFetch(`${repoUrl}/pulls`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        title: `Automated post for ${postDate}`,
-        head: branch,
-        base: repo.default_branch,
-        body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
-      }),
-      retries: 2,
-      retryDelayMs: 1000,
-    });
     logEvent({ type: 'github-upload-image-status', status: imgRes.status });
     if (!imgRes.ok) {
       const msg = await imgRes.text();
@@ -138,6 +126,24 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     if (!prRes.ok) {
       const msg = await prRes.text();
       throw new Error(`GitHub PR creation failed: ${prRes.status} ${msg}`);
+    }
+    const prData: any = await prRes.json();
+
+    logEvent({ type: 'github-merge-pr', number: prData.number });
+    const mergeRes = await retryFetch(`${repoUrl}/pulls/${prData.number}/merge`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        commit_title: `Auto merge for ${postDate}`,
+        merge_method: 'squash',
+      }),
+      retries: 2,
+      retryDelayMs: 1000,
+    });
+    logEvent({ type: 'github-merge-pr-status', status: mergeRes.status });
+    if (!mergeRes.ok) {
+      const msg = await mergeRes.text();
+      throw new Error(`GitHub PR merge failed: ${mergeRes.status} ${msg}`);
     }
 
     logEvent({ type: 'github-publish-complete', post: postName, image: imageName, branch });

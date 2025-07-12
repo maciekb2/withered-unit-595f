@@ -120,6 +120,22 @@ export default {
         const msg = await prRes.text();
         throw new Error(`GitHub PR creation failed: ${prRes.status} ${msg}`);
       }
+      const prData: any = await prRes.json();
+
+      logEvent({ type: 'cron-github-merge-pr', number: prData.number });
+      const mergeRes = await fetch(`${repoUrl}/pulls/${prData.number}/merge`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          commit_title: `Auto merge for ${date}`,
+          merge_method: "squash",
+        }),
+      });
+      logEvent({ type: 'cron-github-merge-pr-status', status: mergeRes.status });
+      if (!mergeRes.ok) {
+        const msg = await mergeRes.text();
+        throw new Error(`GitHub PR merge failed: ${mergeRes.status} ${msg}`);
+      }
 
       logEvent({ type: 'cron-complete', branch });
     } catch (err) {
