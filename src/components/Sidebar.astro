@@ -18,9 +18,9 @@ const newest = [...posts]
 <aside class="sidebar">
   <section>
     <h3>Top 5 wyświetleń</h3>
-    <ul>
+    <ul id="most-viewed-list">
       {mostViewed.map((post) => (
-        <li>
+        <li data-slug={post.id} data-views={post.data.views}>
           <a href={`/blog/${post.id}/`}>{post.data.title}</a>
           <span class="count">{post.data.views}</span>
         </li>
@@ -50,6 +50,28 @@ const newest = [...posts]
     </ul>
   </section>
 </aside>
+<script type="module">
+  const list = document.getElementById('most-viewed-list');
+  if (list) {
+    const items = Array.from(list.querySelectorAll('li'));
+    fetch('/api/views')
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data) => {
+        items.forEach((li) => {
+          const slug = li.dataset.slug;
+          if (slug && data[slug] != null) {
+            li.dataset.views = data[slug];
+            const span = li.querySelector('.count');
+            if (span) span.textContent = data[slug];
+          }
+        });
+        items.sort(
+          (a, b) => parseInt(b.dataset.views || '0') - parseInt(a.dataset.views || '0')
+        );
+        items.forEach((li) => list.appendChild(li));
+      });
+  }
+</script>
 
 <style>
   .sidebar {

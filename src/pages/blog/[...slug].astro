@@ -22,6 +22,6 @@ const prev = index > 0 ? allPosts[index - 1] : undefined;
 const next = index < allPosts.length - 1 ? allPosts[index + 1] : undefined;
 ---
 
-<BlogPost {...post.data} prev={prev} next={next}>
+<BlogPost {...post.data} slug={post.id} prev={prev} next={next}>
         <Content />
 </BlogPost>
