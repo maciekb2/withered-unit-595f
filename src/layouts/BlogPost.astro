@@ -7,12 +7,22 @@ import FormattedDate from '../components/FormattedDate.astro';
 import PostNavigation from '../components/PostNavigation.astro';
 
 type Props = CollectionEntry<'blog'>['data'] & {
+    slug: string;
     prev?: { id: string; data: { title: string } };
     next?: { id: string; data: { title: string } };
 };
 
-const { title, description, pubDate, updatedDate, heroImage, prev, next } =
-    Astro.props as Props;
+const {
+    slug,
+    title,
+    description,
+    pubDate,
+    updatedDate,
+    heroImage,
+    views,
+    prev,
+    next,
+} = Astro.props as Props;
 ---
 
 <html lang="en">
@@ -53,10 +63,13 @@ const { title, description, pubDate, updatedDate, heroImage, prev, next } =
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
+                        .last-updated-on {
+                                font-style: italic;
+                        }
+                        .views {
+                                font-size: 0.9em;
+                        }
+                </style>
 	</head>
 
 	<body>
@@ -68,16 +81,17 @@ const { title, description, pubDate, updatedDate, heroImage, prev, next } =
 				</div>
 				<div class="prose">
 					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
+                                                <div class="date">
+                                                        <FormattedDate date={pubDate} />
+                                                        {
+                                                                updatedDate && (
+                                                                        <div class="last-updated-on">
+                                                                               Last updated on <FormattedDate date={updatedDate} />
+                                                                        </div>
+                                                                )
+                                                        }
+                                                        <div class="views">Wyświetlenia: <span id="view-count">{views ?? 0}</span></div>
+                                                </div>
 						<h1>{title}</h1>
 						<hr />
 					</div>
@@ -86,6 +100,15 @@ const { title, description, pubDate, updatedDate, heroImage, prev, next } =
                                 </div>
                         </article>
                 </main>
-		<Footer />
-	</body>
+                <Footer />
+                <script type="module">
+                        const slug = {JSON.stringify(slug)};
+                        fetch(`/api/views/${slug}`, { method: 'POST' })
+                                .then((r) => r.ok ? r.json() : { views: 0 })
+                                .then((d) => {
+                                        const el = document.getElementById('view-count');
+                                        if (el) el.textContent = d.views;
+                                });
+                </script>
+        </body>
 </html>

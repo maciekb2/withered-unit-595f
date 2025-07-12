@@ -12,6 +12,11 @@
       "binding": "pseudointelekt_contact_form",
       "id": "b71f33f4cc0e48aaa96cf9aa53092882",
       "preview_id": "b71f33f4cc0e48aaa96cf9aa53092882"
+    },
+    {
+      "binding": "pseudointelekt_views",
+      "id": "REPLACE_WITH_ID",
+      "preview_id": "REPLACE_WITH_PREVIEW_ID"
     }
   ],
   "observability": {

@@ -7,4 +7,5 @@ interface Env {
         GITHUB_REPO: string;
         SLACK_WEBHOOK_URL: string;
         pseudointelekt_contact_form: KVNamespace;
+        pseudointelekt_views: KVNamespace;
 }
