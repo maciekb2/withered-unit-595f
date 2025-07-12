@@ -5,6 +5,8 @@ pubDate: "yyyy-mm-dd"
 # Optional fields
 updatedDate: "yyyy-mm-dd"
 heroImage: "/path/to/image.jpg"
+views: 0
+likes: 0
 ---
 
 Write your article content here using Markdown or MDX.
