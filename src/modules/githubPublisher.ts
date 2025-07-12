@@ -21,7 +21,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     'Content-Type': 'application/json',
   };
   logEvent({ type: 'github-request-repo' });
-  const repoRes = await fetch(repoUrl, { headers });
+  const repoRes = await retryFetch(repoUrl, { headers, retries: 2, retryDelayMs: 1000 });
   logEvent({ type: 'github-response-repo', status: repoRes.status });
   if (!repoRes.ok) {
     const msg = await repoRes.text();
@@ -56,11 +56,13 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
 
   try {
     logEvent({ type: 'github-create-branch', branch });
-    const createRes = await fetch(`${repoUrl}/git/refs`, {
+    const createRes = await retryFetch(`${repoUrl}/git/refs`, {
 
       method: 'POST',
       headers,
       body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
     logEvent({ type: 'github-create-branch-status', status: createRes.status });
     if (!createRes.ok) {
@@ -69,7 +71,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     }
 
     logEvent({ type: 'github-upload-post', file: postName });
-    const postRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
+    const postRes = await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
 
       method: 'PUT',
       headers,
@@ -89,7 +91,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
 
     const heroBase64 = heroImage.toString('base64');
     logEvent({ type: 'github-upload-image', file: imageName });
-    const imgRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
+    const imgRes = await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -101,7 +103,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       retryDelayMs: 1000,
     });
 
-    await fetch(`${repoUrl}/pulls`, {
+    await retryFetch(`${repoUrl}/pulls`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -110,6 +112,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         base: repo.default_branch,
         body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
     logEvent({ type: 'github-upload-image-status', status: imgRes.status });
     if (!imgRes.ok) {
@@ -118,7 +122,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     }
 
     logEvent({ type: 'github-create-pr', branch });
-    const prRes = await fetch(`${repoUrl}/pulls`, {
+    const prRes = await retryFetch(`${repoUrl}/pulls`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -127,6 +131,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         base: repo.default_branch,
         body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
     logEvent({ type: 'github-create-pr-status', status: prRes.status });
     if (!prRes.ok) {
