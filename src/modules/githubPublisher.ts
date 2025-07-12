@@ -23,7 +23,12 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   const repoRes = await fetch(repoUrl, { headers });
   const repo: any = await repoRes.json();
   logEvent({ type: 'github-response-repo', status: repoRes.status });
-  const branch = repo.default_branch;
+
+  const refRes = await fetch(`${repoUrl}/git/ref/heads/${repo.default_branch}`, {
+    headers,
+  });
+  const refData: any = await refRes.json();
+  const branch = `auto-${postDate.replace(/-/g, '')}`;
 
   const imageName = `${postDate}-${slug}.png`;
   const postName = `${postDate}-${slug}.md`;
@@ -39,6 +44,13 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   ].join('\n');
 
   try {
+    logEvent({ type: 'github-create-branch', branch });
+    await fetch(`${repoUrl}/git/refs`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
+    });
+
     logEvent({ type: 'github-upload-post', file: postName });
     await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
       method: 'PUT',
@@ -62,11 +74,20 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       }),
     });
 
-    logEvent({ type: 'github-publish-complete', post: postName, image: imageName });
+    await fetch(`${repoUrl}/pulls`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        title: `Automated post for ${postDate}`,
+        head: branch,
+        base: repo.default_branch,
+        body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
+      }),
+    });
+
+    logEvent({ type: 'github-publish-complete', post: postName, image: imageName, branch });
   } catch (err) {
     logError(err, { type: 'github-publish-error' });
     throw err;
   }
-
-  // Files are committed directly to the default branch
 }
