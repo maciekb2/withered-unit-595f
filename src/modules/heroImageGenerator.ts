@@ -1,4 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
+import { retryFetch } from '../utils/retryFetch';
 
 export interface GenerateHeroOptions {
   apiKey: string;
@@ -9,7 +10,7 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
   logEvent({ type: 'generate-hero-start' });
   logEvent({ type: 'openai-image-request', promptSnippet: prompt.slice(0, 100) });
   try {
-    const res = await fetch('https://api.openai.com/v1/images/generations', {
+    const res = await retryFetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,6 +22,8 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
         size: '1024x1024',
         response_format: 'b64_json',
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
 
     logEvent({ type: 'openai-image-response-status', status: res.status });

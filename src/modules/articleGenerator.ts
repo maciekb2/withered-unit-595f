@@ -1,4 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
+import { retryFetch } from '../utils/retryFetch';
 
 export interface ArticleResult {
   title: string;
@@ -19,7 +20,7 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
     promptSnippet: prompt.slice(0, 100),
   });
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,6 +30,8 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
         model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
 
     logEvent({ type: 'openai-response-status', status: res.status });

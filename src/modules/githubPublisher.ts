@@ -1,5 +1,6 @@
 import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
+import { retryFetch } from '../utils/retryFetch';
 import type { ArticleResult } from './articleGenerator';
 
 export interface PublishOptions {
@@ -20,7 +21,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     'Content-Type': 'application/json',
   };
   logEvent({ type: 'github-request-repo' });
-  const repoRes = await fetch(repoUrl, { headers });
+  const repoRes = await retryFetch(repoUrl, { headers, retries: 2, retryDelayMs: 1000 });
   const repo: any = await repoRes.json();
   logEvent({ type: 'github-response-repo', status: repoRes.status });
   const branch = repo.default_branch;
@@ -40,7 +41,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
 
   try {
     logEvent({ type: 'github-upload-post', file: postName });
-    await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
+    await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -48,11 +49,13 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         content: btoa(markdown),
         branch,
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
 
   const heroBase64 = heroImage.toString('base64');
     logEvent({ type: 'github-upload-image', file: imageName });
-    await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
+    await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -60,6 +63,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         content: heroBase64,
         branch,
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
 
     logEvent({ type: 'github-publish-complete', post: postName, image: imageName });
