@@ -51,7 +51,13 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
     logEvent({ type: 'openai-response-text', text });
 
     try {
-      const json: ArticleResult = JSON.parse(text);
+      let jsonText = text;
+      // Strip ```json fences if the model included them
+      const match = /^```(?:json)?\n([\s\S]*?)\n```$/.exec(text);
+      if (match) {
+        jsonText = match[1];
+      }
+      const json: ArticleResult = JSON.parse(jsonText);
       logEvent({ type: 'parse-json-success', title: json.title });
       logEvent({ type: 'generate-article-complete', title: json.title });
       return json;
