@@ -72,6 +72,14 @@ async function handleView(request: Request, env: Env, slug: string) {
   });
 }
 
+async function handleGetView(env: Env, slug: string) {
+  const key = `view-${slug}`;
+  const current = parseInt((await env.pseudointelekt_views.get(key)) || '0');
+  return new Response(JSON.stringify({ views: current }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 async function handleGetViews(env: Env) {
   const list = await env.pseudointelekt_views.list();
   const data: Record<string, number> = {};
@@ -123,9 +131,14 @@ export default {
       if (request.method === 'GET' && url.pathname === '/api/generate-article') {
         return await handleGenerateArticle(request, env);
       }
-      if (request.method === 'POST' && url.pathname.startsWith('/api/views/')) {
+      if (url.pathname.startsWith('/api/views/')) {
         const slug = url.pathname.substring('/api/views/'.length);
-        return await handleView(request, env, slug);
+        if (request.method === 'POST') {
+          return await handleView(request, env, slug);
+        }
+        if (request.method === 'GET') {
+          return await handleGetView(env, slug);
+        }
       }
       if (request.method === 'GET' && url.pathname === '/api/views') {
         return await handleGetViews(env);
