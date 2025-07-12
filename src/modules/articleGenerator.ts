@@ -48,6 +48,7 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
     }
 
     const text = data.choices[0].message.content.trim();
+    logEvent({ type: 'openai-response-text', text });
 
     try {
       const json: ArticleResult = JSON.parse(text);
