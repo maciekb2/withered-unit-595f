@@ -36,6 +36,11 @@ export default {
         ],
       }),
     });
+    logEvent({ type: 'cron-openai-status', status: aiRes.status });
+    if (!aiRes.ok) {
+      const msg = await aiRes.text();
+      throw new Error(`OpenAI request failed: ${aiRes.status} ${msg}`);
+    }
 
     const aiData: any = await aiRes.json();
     const markdown: string = aiData.choices[0].message.content.trim();
@@ -52,22 +57,39 @@ export default {
     };
 
     const repoRes = await fetch(repoUrl, { headers });
+    logEvent({ type: 'cron-github-repo-status', status: repoRes.status });
+    if (!repoRes.ok) {
+      const msg = await repoRes.text();
+      throw new Error(`GitHub repo request failed: ${repoRes.status} ${msg}`);
+    }
     const repo: any = await repoRes.json();
     const refRes = await fetch(
       `${repoUrl}/git/ref/heads/${repo.default_branch}`,
       { headers }
     );
+    logEvent({ type: 'cron-github-ref-status', status: refRes.status });
+    if (!refRes.ok) {
+      const msg = await refRes.text();
+      throw new Error(`GitHub ref request failed: ${refRes.status} ${msg}`);
+    }
     const refData: any = await refRes.json();
     const branch = `auto-${date.replace(/-/g, "")}`;
 
     try {
-      await fetch(`${repoUrl}/git/refs`, {
+      logEvent({ type: 'cron-github-create-branch', branch });
+      const createRes = await fetch(`${repoUrl}/git/refs`, {
         method: "POST",
         headers,
         body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
       });
+      logEvent({ type: 'cron-github-create-branch-status', status: createRes.status });
+      if (!createRes.ok) {
+        const msg = await createRes.text();
+        throw new Error(`GitHub branch create failed: ${createRes.status} ${msg}`);
+      }
 
-      await fetch(`${repoUrl}/contents/${encodeURIComponent(path)}`, {
+      logEvent({ type: 'cron-github-upload-post', file: path });
+      const postRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(path)}`, {
         method: "PUT",
         headers,
         body: JSON.stringify({
@@ -76,8 +98,14 @@ export default {
           branch,
         }),
       });
+      logEvent({ type: 'cron-github-upload-post-status', status: postRes.status });
+      if (!postRes.ok) {
+        const msg = await postRes.text();
+        throw new Error(`GitHub post upload failed: ${postRes.status} ${msg}`);
+      }
 
-      await fetch(`${repoUrl}/pulls`, {
+      logEvent({ type: 'cron-github-create-pr', branch });
+      const prRes = await fetch(`${repoUrl}/pulls`, {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -87,6 +115,12 @@ export default {
           body: "This PR was created automatically by a scheduled Cloudflare Worker.",
         }),
       });
+      logEvent({ type: 'cron-github-create-pr-status', status: prRes.status });
+      if (!prRes.ok) {
+        const msg = await prRes.text();
+        throw new Error(`GitHub PR creation failed: ${prRes.status} ${msg}`);
+      }
+
       logEvent({ type: 'cron-complete', branch });
     } catch (err) {
       logError(err, { type: 'cron-error' });

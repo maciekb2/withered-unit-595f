@@ -21,9 +21,23 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   };
   logEvent({ type: 'github-request-repo' });
   const repoRes = await fetch(repoUrl, { headers });
-  const repo: any = await repoRes.json();
   logEvent({ type: 'github-response-repo', status: repoRes.status });
-  const branch = repo.default_branch;
+  if (!repoRes.ok) {
+    const msg = await repoRes.text();
+    throw new Error(`GitHub repo request failed: ${repoRes.status} ${msg}`);
+  }
+  const repo: any = await repoRes.json();
+
+  const refRes = await fetch(`${repoUrl}/git/ref/heads/${repo.default_branch}`, {
+    headers,
+  });
+  logEvent({ type: 'github-get-ref-status', status: refRes.status });
+  if (!refRes.ok) {
+    const msg = await refRes.text();
+    throw new Error(`GitHub ref request failed: ${refRes.status} ${msg}`);
+  }
+  const refData: any = await refRes.json();
+  const branch = `auto-${postDate.replace(/-/g, '')}`;
 
   const imageName = `${postDate}-${slug}.png`;
   const postName = `${postDate}-${slug}.md`;
@@ -39,8 +53,20 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   ].join('\n');
 
   try {
+    logEvent({ type: 'github-create-branch', branch });
+    const createRes = await fetch(`${repoUrl}/git/refs`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
+    });
+    logEvent({ type: 'github-create-branch-status', status: createRes.status });
+    if (!createRes.ok) {
+      const msg = await createRes.text();
+      throw new Error(`GitHub branch create failed: ${createRes.status} ${msg}`);
+    }
+
     logEvent({ type: 'github-upload-post', file: postName });
-    await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
+    const postRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -49,10 +75,15 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         branch,
       }),
     });
+    logEvent({ type: 'github-upload-post-status', status: postRes.status });
+    if (!postRes.ok) {
+      const msg = await postRes.text();
+      throw new Error(`GitHub post upload failed: ${postRes.status} ${msg}`);
+    }
 
-  const heroBase64 = heroImage.toString('base64');
+    const heroBase64 = heroImage.toString('base64');
     logEvent({ type: 'github-upload-image', file: imageName });
-    await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
+    const imgRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -61,12 +92,32 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         branch,
       }),
     });
+    logEvent({ type: 'github-upload-image-status', status: imgRes.status });
+    if (!imgRes.ok) {
+      const msg = await imgRes.text();
+      throw new Error(`GitHub image upload failed: ${imgRes.status} ${msg}`);
+    }
 
-    logEvent({ type: 'github-publish-complete', post: postName, image: imageName });
+    logEvent({ type: 'github-create-pr', branch });
+    const prRes = await fetch(`${repoUrl}/pulls`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        title: `Automated post for ${postDate}`,
+        head: branch,
+        base: repo.default_branch,
+        body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
+      }),
+    });
+    logEvent({ type: 'github-create-pr-status', status: prRes.status });
+    if (!prRes.ok) {
+      const msg = await prRes.text();
+      throw new Error(`GitHub PR creation failed: ${prRes.status} ${msg}`);
+    }
+
+    logEvent({ type: 'github-publish-complete', post: postName, image: imageName, branch });
   } catch (err) {
     logError(err, { type: 'github-publish-error' });
     throw err;
   }
-
-  // Files are committed directly to the default branch
 }
