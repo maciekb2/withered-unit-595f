@@ -19,7 +19,6 @@ const {
     pubDate,
     updatedDate,
     heroImage,
-    views,
     likes,
     prev,
     next,
@@ -94,7 +93,7 @@ const {
                                                                         </div>
                                                                 )
                                                         }
-                                                        <div class="views">Wyświetlenia: <span id="view-count">{views ?? 0}</span></div>
+                                                        <div class="views">Wyświetlenia: <span id="view-count">0</span></div>
                                                         <div class="likes">Polubienia: <span id="like-count">{likes ?? 0}</span> <button id="like-btn">❤️</button></div>
                                                 </div>
 						<h1>{title}</h1>
@@ -108,8 +107,7 @@ const {
                 <Footer />
                 <script type="module">
                         const slug = {JSON.stringify(slug)};
-                        const initialViews = {JSON.stringify(views ?? 0)};
-                        fetch(`/api/views-init/${slug}?value=${initialViews}`, { method: 'POST' })
+                        fetch(`/api/views-init/${slug}?value=0`, { method: 'POST' })
                                 .finally(() => {
                                         fetch(`/api/views/${slug}`, { method: 'POST' })
                                                 .then((r) => r.ok ? r.json() : { views: 0 })
