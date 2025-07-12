@@ -108,11 +108,15 @@ const {
                 <Footer />
                 <script type="module">
                         const slug = {JSON.stringify(slug)};
-                        fetch(`/api/views/${slug}`, { method: 'POST' })
-                                .then((r) => r.ok ? r.json() : { views: 0 })
-                                .then((d) => {
-                                        const el = document.getElementById('view-count');
-                                        if (el) el.textContent = d.views;
+                        const initialViews = {JSON.stringify(views ?? 0)};
+                        fetch(`/api/views-init/${slug}?value=${initialViews}`, { method: 'POST' })
+                                .finally(() => {
+                                        fetch(`/api/views/${slug}`, { method: 'POST' })
+                                                .then((r) => r.ok ? r.json() : { views: 0 })
+                                                .then((d) => {
+                                                        const el = document.getElementById('view-count');
+                                                        if (el) el.textContent = d.views;
+                                                });
                                 });
                         fetch('/api/likes')
                                 .then((r) => r.ok ? r.json() : {})
