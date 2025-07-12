@@ -4,9 +4,14 @@ import { retryFetch } from '../utils/retryFetch';
 export interface GenerateHeroOptions {
   apiKey: string;
   prompt: string;
+  /**
+   * Size of the generated image. OpenAI currently supports
+   * '256x256', '512x512' and '1024x1024'. Defaults to '1024x1024'.
+   */
+  size?: '256x256' | '512x512' | '1024x1024';
 }
 
-export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions): Promise<Buffer> {
+export async function generateHeroImage({ apiKey, prompt, size = '1024x1024' }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
   logEvent({ type: 'openai-image-request', promptSnippet: prompt.slice(0, 100) });
   try {
@@ -19,7 +24,7 @@ export async function generateHeroImage({ apiKey, prompt }: GenerateHeroOptions)
       body: JSON.stringify({
         prompt,
         n: 1,
-        size: '1024x1024',
+        size,
         response_format: 'b64_json',
       }),
       retries: 2,
