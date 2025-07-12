@@ -87,6 +87,31 @@ async function handleGetViews(env: Env) {
   });
 }
 
+async function handleLike(request: Request, env: Env, slug: string) {
+  const key = `like-${slug}`;
+  const current = parseInt((await env.pseudointelekt_likes.get(key)) || '0');
+  const updated = current + 1;
+  await env.pseudointelekt_likes.put(key, updated.toString());
+  return new Response(JSON.stringify({ likes: updated }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+async function handleGetLikes(env: Env) {
+  const list = await env.pseudointelekt_likes.list();
+  const data: Record<string, number> = {};
+  for (const { name } of list.keys) {
+    const value = await env.pseudointelekt_likes.get(name);
+    if (value) {
+      const slug = name.replace(/^like-/, '');
+      data[slug] = parseInt(value);
+    }
+  }
+  return new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     logRequest(request);
@@ -104,6 +129,13 @@ export default {
       }
       if (request.method === 'GET' && url.pathname === '/api/views') {
         return await handleGetViews(env);
+      }
+      if (request.method === 'POST' && url.pathname.startsWith('/api/likes/')) {
+        const slug = url.pathname.substring('/api/likes/'.length);
+        return await handleLike(request, env, slug);
+      }
+      if (request.method === 'GET' && url.pathname === '/api/likes') {
+        return await handleGetLikes(env);
       }
       return await server.fetch(request, env, ctx);
     } catch (err) {
