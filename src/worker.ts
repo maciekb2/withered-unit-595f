@@ -105,9 +105,10 @@ async function handleLike(request: Request, env: Env, slug: string) {
   });
 }
 
-async function handleGetLikes(env: Env) {
+async function handleGetLikes(env: Env, slugs: string[] = []) {
   const list = await env.pseudointelekt_likes.list();
   const data: Record<string, number> = {};
+
   for (const { name } of list.keys) {
     const value = await env.pseudointelekt_likes.get(name);
     if (value) {
@@ -115,6 +116,14 @@ async function handleGetLikes(env: Env) {
       data[slug] = parseInt(value);
     }
   }
+
+  for (const slug of slugs) {
+    if (data[slug] == null) {
+      await env.pseudointelekt_likes.put(`like-${slug}`, '0');
+      data[slug] = 0;
+    }
+  }
+
   return new Response(JSON.stringify(data), {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -148,7 +157,9 @@ export default {
         return await handleLike(request, env, slug);
       }
       if (request.method === 'GET' && url.pathname === '/api/likes') {
-        return await handleGetLikes(env);
+        const slugsParam = url.searchParams.get('slugs');
+        const slugs = slugsParam ? slugsParam.split(',').filter(Boolean) : [];
+        return await handleGetLikes(env, slugs);
       }
       return await server.fetch(request, env, ctx);
     } catch (err) {

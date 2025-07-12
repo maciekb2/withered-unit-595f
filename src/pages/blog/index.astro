@@ -65,11 +65,15 @@ const posts = (await getCollection('blog')).sort(
 				color: rgb(var(--black));
 				line-height: 1;
 			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
+                        .date {
+                                margin: 0;
+                                color: rgb(var(--gray));
+                        }
+                        .count {
+                                margin-left: 0.5em;
+                                color: rgb(var(--gray));
+                        }
+                        ul li a:hover h4,
 			ul li a:hover .date {
 				color: rgb(var(--accent));
 			}
@@ -101,6 +105,7 @@ const posts = (await getCollection('blog')).sort(
                 <main>
                         <div class="layout">
                         <section>
+
                                 <ul>
                                         {
                                                 posts.map((post) => (
@@ -120,6 +125,29 @@ const posts = (await getCollection('blog')).sort(
                         <Sidebar />
                         </div>
                 </main>
-		<Footer />
-	</body>
+               <Footer />
+               <script type="module">
+                       const list = document.getElementById('top-liked-list');
+                       if (list) {
+                               const items = Array.from(list.querySelectorAll('li'));
+                               const slugs = items.map((li) => li.dataset.slug).filter(Boolean).join(',');
+                               fetch(`/api/likes?slugs=${slugs}`)
+                                       .then((r) => (r.ok ? r.json() : {}))
+                                       .then((data) => {
+                                               items.forEach((li) => {
+                                                       const slug = li.dataset.slug;
+                                                       if (slug && data[slug] != null) {
+                                                               li.dataset.likes = data[slug];
+                                                               const span = li.querySelector('.count');
+                                                               if (span) span.textContent = data[slug];
+                                                       }
+                                               });
+                                               items.sort(
+                                                       (a, b) => parseInt(b.dataset.likes || '0') - parseInt(a.dataset.likes || '0')
+                                               );
+                                               items.forEach((li) => list.appendChild(li));
+                                       });
+                       }
+               </script>
+       </body>
 </html>
