@@ -1,5 +1,6 @@
 import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
+import { retryFetch } from '../utils/retryFetch';
 import type { ArticleResult } from './articleGenerator';
 
 export interface PublishOptions {
@@ -36,6 +37,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     const msg = await refRes.text();
     throw new Error(`GitHub ref request failed: ${refRes.status} ${msg}`);
   }
+
   const refData: any = await refRes.json();
   const branch = `auto-${postDate.replace(/-/g, '')}`;
 
@@ -55,6 +57,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   try {
     logEvent({ type: 'github-create-branch', branch });
     const createRes = await fetch(`${repoUrl}/git/refs`, {
+
       method: 'POST',
       headers,
       body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: refData.object.sha }),
@@ -67,6 +70,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
 
     logEvent({ type: 'github-upload-post', file: postName });
     const postRes = await fetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
+
       method: 'PUT',
       headers,
       body: JSON.stringify({
@@ -74,6 +78,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         content: btoa(markdown),
         branch,
       }),
+      retries: 2,
+      retryDelayMs: 1000,
     });
     logEvent({ type: 'github-upload-post-status', status: postRes.status });
     if (!postRes.ok) {
@@ -90,6 +96,19 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
         message: `Add hero image for ${postDate}`,
         content: heroBase64,
         branch,
+      }),
+      retries: 2,
+      retryDelayMs: 1000,
+    });
+
+    await fetch(`${repoUrl}/pulls`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        title: `Automated post for ${postDate}`,
+        head: branch,
+        base: repo.default_branch,
+        body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
       }),
     });
     logEvent({ type: 'github-upload-image-status', status: imgRes.status });
