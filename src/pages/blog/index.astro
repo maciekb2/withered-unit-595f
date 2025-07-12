@@ -8,11 +8,8 @@ import FormattedDate from '../../components/FormattedDate.astro';
 import Sidebar from '../../components/Sidebar.astro';
 
 const posts = (await getCollection('blog')).sort(
-        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const topLiked = [...posts]
-        .sort((a, b) => (b.data.likes ?? 0) - (a.data.likes ?? 0))
-        .slice(0, 3);
 ---
 
 <!doctype html>
@@ -103,22 +100,6 @@ const topLiked = [...posts]
 		<Header />
                 <main>
                         <div class="layout">
-                        <section>
-                                <h2>Najwięcej polubień</h2>
-                                <ul>
-                                        {
-                                                topLiked.map((post) => (
-                                                        <li>
-                                                                <a href={`/blog/${post.id}/`}>
-                                                                        <img width={720} height={360} src={post.data.heroImage} alt="" />
-                                                                        <h4 class="title">{post.data.title}</h4>
-                                                                        <p class="date"><FormattedDate date={post.data.pubDate} /></p>
-                                                                </a>
-                                                        </li>
-                                                ))
-                                        }
-                                </ul>
-                        </section>
                         <section>
                                 <ul>
                                         {
