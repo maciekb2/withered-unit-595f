@@ -9,9 +9,19 @@ export interface GenerateHeroOptions {
    * '256x256', '512x512' and '1024x1024'. Defaults to '1024x1024'.
    */
   size?: '256x256' | '512x512' | '1024x1024';
+  /**
+   * Style variant for DALL·E 3. 'vivid' is more saturated and dynamic,
+   * while 'natural' is more realistic. Defaults to 'vivid'.
+   */
+  style?: 'vivid' | 'natural';
+  /**
+   * Image quality for DALL·E 3. 'standard' is faster, 'hd' yields
+   * crisper images similar to ChatGPT. Defaults to 'hd'.
+   */
+  quality?: 'standard' | 'hd';
 }
 
-export async function generateHeroImage({ apiKey, prompt, size = '1024x1024' }: GenerateHeroOptions): Promise<Buffer> {
+export async function generateHeroImage({ apiKey, prompt, size = '1024x1024', style = 'vivid', quality = 'hd' }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
   logEvent({ type: 'openai-image-request', promptSnippet: prompt.slice(0, 100) });
   try {
@@ -22,9 +32,12 @@ export async function generateHeroImage({ apiKey, prompt, size = '1024x1024' }: 
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
+        model: 'dall-e-3',
         prompt,
         n: 1,
         size,
+        style,
+        quality,
         response_format: 'b64_json',
       }),
       retries: 2,
