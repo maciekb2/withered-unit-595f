@@ -29,9 +29,9 @@ const newest = [...posts]
   </section>
   <section>
     <h3>Najwięcej polubień</h3>
-    <ul>
+    <ul id="most-liked-list">
       {mostLiked.map((post) => (
-        <li>
+        <li data-slug={post.id} data-likes={post.data.likes}>
           <a href={`/blog/${post.id}/`}>{post.data.title}</a>
           <span class="count">{post.data.likes}</span>
         </li>
@@ -69,6 +69,26 @@ const newest = [...posts]
           (a, b) => parseInt(b.dataset.views || '0') - parseInt(a.dataset.views || '0')
         );
         items.forEach((li) => list.appendChild(li));
+      });
+  }
+  const likeList = document.getElementById('most-liked-list');
+  if (likeList) {
+    const items = Array.from(likeList.querySelectorAll('li'));
+    fetch('/api/likes')
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data) => {
+        items.forEach((li) => {
+          const slug = li.dataset.slug;
+          if (slug && data[slug] != null) {
+            li.dataset.likes = data[slug];
+            const span = li.querySelector('.count');
+            if (span) span.textContent = data[slug];
+          }
+        });
+        items.sort(
+          (a, b) => parseInt(b.dataset.likes || '0') - parseInt(a.dataset.likes || '0')
+        );
+        items.forEach((li) => likeList.appendChild(li));
       });
   }
 </script>

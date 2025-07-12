@@ -17,6 +17,11 @@
       "binding": "pseudointelekt_views",
       "id": "0bdd1f5ed5e64d38877fa2dfc796b4ed",
       "preview_id": "0bdd1f5ed5e64d38877fa2dfc796b4ed"
+    },
+    {
+      "binding": "pseudointelekt_likes",
+      "id": "<KV_ID>",
+      "preview_id": "<KV_PREVIEW_ID>"
     }
   ],
   "observability": {

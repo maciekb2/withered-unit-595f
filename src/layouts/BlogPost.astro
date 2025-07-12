@@ -20,6 +20,7 @@ const {
     updatedDate,
     heroImage,
     views,
+    likes,
     prev,
     next,
 } = Astro.props as Props;
@@ -69,6 +70,9 @@ const {
                         .views {
                                 font-size: 0.9em;
                         }
+                        .likes {
+                                font-size: 0.9em;
+                        }
                 </style>
 	</head>
 
@@ -91,6 +95,7 @@ const {
                                                                 )
                                                         }
                                                         <div class="views">Wyświetlenia: <span id="view-count">{views ?? 0}</span></div>
+                                                        <div class="likes">Polubienia: <span id="like-count">{likes ?? 0}</span> <button id="like-btn">❤️</button></div>
                                                 </div>
 						<h1>{title}</h1>
 						<hr />
@@ -109,6 +114,21 @@ const {
                                         const el = document.getElementById('view-count');
                                         if (el) el.textContent = d.views;
                                 });
+                        fetch('/api/likes')
+                                .then((r) => r.ok ? r.json() : {})
+                                .then((d) => {
+                                        const el = document.getElementById('like-count');
+                                        if (el && d[slug] != null) el.textContent = d[slug];
+                                });
+                        const likeBtn = document.getElementById('like-btn');
+                        likeBtn?.addEventListener('click', () => {
+                                fetch(`/api/likes/${slug}`, { method: 'POST' })
+                                        .then((r) => r.ok ? r.json() : { likes: 0 })
+                                        .then((d) => {
+                                                const el = document.getElementById('like-count');
+                                                if (el) el.textContent = d.likes;
+                                        });
+                        });
                 </script>
         </body>
 </html>
