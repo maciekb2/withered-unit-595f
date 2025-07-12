@@ -1,7 +1,7 @@
 {
   "model": "gpt-4o",
   "temperature": 0.9,
-  "max_tokens": 1200,
+  "max_tokens": 3600,
   "messages": [
     {
       "role": "system",
