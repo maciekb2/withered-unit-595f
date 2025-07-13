@@ -51,27 +51,9 @@ const statusEl = document.getElementById('status');
 const articlePromptEl = document.getElementById('article-prompt');
 const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
+let promptShown = false;
 
-async function loadInitialPrompt() {
-  try {
-    const res = await fetch('/api/get-prompt', { credentials: 'include' });
-    if (!res.ok) throw new Error('status ' + res.status);
-    const data = await res.json();
-    appendLog('✏ Domyślny prompt:');
-    articlePromptEl.value = data.prompt;
-    if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
-    articlePromptEl.style.display = 'block';
-  } catch (err) {
-    appendLog('❌ Błąd pobierania prompta');
-  }
-}
-
-async function start() {
-  await loadInitialPrompt();
-  startStream();
-}
-
-start();
+startStream();
 
 function appendLog(text) {
   const div = document.createElement('div');
@@ -87,6 +69,9 @@ function appendLogElement(el) {
 
 function startStream() {
   const es = new EventSource('/api/generate-stream');
+  es.addEventListener('open', () => {
+    appendLog('🔌 Połączono z serwerem');
+  });
   es.onmessage = (e) => {
     const msg = JSON.parse(e.data);
     if (msg.log) {
@@ -105,16 +90,18 @@ function startStream() {
   if (msg.articleTitle) {
     appendLog(`📰 Nowy artykuł: ${msg.articleTitle}`);
   }
-  if (msg.articlePrompt) {
-    appendLog('✏ Prompt (artykuł):');
+  if (msg.articlePrompt && msg.awaitingPrompt) {
     articlePromptEl.value = msg.articlePrompt;
-    if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
-    articlePromptEl.style.display = 'block';
-  }
-  if (msg.awaitingPrompt) {
+    if (!promptShown) {
+      appendLog('✏ Prompt (artykuł):');
+      appendLogElement(articlePromptEl);
+      appendLogElement(continueBtn);
+      promptShown = true;
+    }
     articlePromptEl.removeAttribute('readonly');
+    articlePromptEl.style.display = 'block';
     continueBtn.style.display = 'inline-block';
-    if (!continueBtn.parentNode) appendLogElement(continueBtn);
+
   }
   if (msg.heroPrompt) {
     appendLog('🎨 Prompt (obrazek):');
@@ -127,9 +114,10 @@ function startStream() {
       es.close();
     }
   };
-  es.onerror = () => {
-    statusEl.textContent = 'Błąd połączenia';
-    appendLog('❌ Błąd połączenia');
+  es.onerror = (err) => {
+    statusEl.textContent = 'Błąd połączenia (SSE)';
+    appendLog('❌ Błąd połączenia (SSE)');
+    console.error('EventSource failed', err);
     es.close();
   };
 
@@ -148,7 +136,7 @@ function startStream() {
       articlePromptEl.setAttribute('readonly', '');
       continueBtn.style.display = 'none';
     } catch (err) {
-      appendLog('❌ Błąd podczas wysyłania prompta');
+      appendLog(`❌ Błąd podczas wysyłania prompta: ${err}`);
       continueBtn.disabled = false;
     }
   });
