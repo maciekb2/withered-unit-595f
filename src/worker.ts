@@ -3,7 +3,6 @@ import cron from './cron-worker';
 import { generateAndPublish } from './modules/generateAndPublish';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
-import { escapeHtml } from './utils/escapeHtml';
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -41,6 +40,7 @@ async function handleContact(request: Request, env: Env) {
     throw err;
   }
 }
+
 
 
 async function handleGenerateArticleJson(request: Request, env: Env) {
@@ -277,14 +277,34 @@ export default {
         response = await handleContact(request, env);
       } else if (
         request.method === 'GET' &&
-        url.pathname === '/api/generate-article'
+        url.pathname === '/api/generate-stream'
       ) {
+        const { readable, writable } = new TransformStream();
+        const writer = writable.getWriter();
+        const ctrl = {
+          enqueue: (chunk: string) => writer.write(new TextEncoder().encode(chunk)),
+          close: () => writer.close(),
+        };
+        generateAndPublish(env, ctrl).catch(err => {
+          console.error('Błąd w tle:', err);
+          const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
+          ctrl.enqueue(`data: ${msg}\n\n`);
+          ctrl.close();
+        });
+        response = new Response(readable, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            Connection: 'keep-alive',
+          },
+        });
         const accept = request.headers.get('Accept') || '';
         if (accept.includes('application/json')) {
           response = await handleGenerateArticleJson(request, env);
         } else {
           response = await handleGenerateArticleHtml(request, env, ctx);
         }
+
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')

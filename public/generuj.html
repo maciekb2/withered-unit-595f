@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<title>Generowanie artykułu</title>
+<style>
+body { font-family: sans-serif; padding: 2rem; }
+#log { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 4px; max-height: 60vh; overflow-y: auto; }
+</style>
+</head>
+<body>
+<h1>Generowanie artykułu</h1>
+<div id="status">Oczekiwanie na dane...</div>
+<pre id="log"></pre>
+<script>
+const logEl = document.getElementById('log');
+const statusEl = document.getElementById('status');
+const es = new EventSource('/api/generate-stream');
+es.onmessage = (e) => {
+  const msg = JSON.parse(e.data);
+  if (msg.log) {
+    logEl.textContent += msg.log + '\n';
+  }
+  if (msg.done) {
+    statusEl.innerHTML = `Zakończono! <a href="${msg.url}">Zobacz PR</a>`;
+    es.close();
+  }
+};
+es.onerror = () => {
+  statusEl.textContent = 'Błąd połączenia';
+  es.close();
+};
+</script>
+</body>
+</html>
