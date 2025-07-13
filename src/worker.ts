@@ -7,6 +7,8 @@ import articlePrompt from './prompt/article-content.txt?raw';
 import heroTemplate from './prompt/hero-image.txt?raw';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
+import { slugify } from './utils/slugify';
+import { escapeHtml } from './utils/escapeHtml';
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -45,14 +47,19 @@ async function handleContact(request: Request, env: Env) {
   }
 }
 
-async function handleGenerateArticle(request: Request, env: Env) {
+async function generateAndPublish(env: Env) {
+  const article = await generateArticle({ apiKey: env.OPENAI_API_KEY, prompt: articlePrompt });
+  const heroPrompt = heroTemplate.replace('{title}', article.title);
+  const heroImage = await generateHeroImage({ apiKey: env.OPENAI_API_KEY, prompt: heroPrompt });
+  await publishArticleToGitHub({ env, article, heroImage });
+  return { article, slug: slugify(article.title) };
+}
+
+async function handleGenerateArticleJson(request: Request, env: Env) {
   logEvent({ type: 'generate-article-endpoint-start' });
   logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
   try {
-    const article = await generateArticle({ apiKey: env.OPENAI_API_KEY, prompt: articlePrompt });
-    const heroPrompt = heroTemplate.replace('{title}', article.title);
-    const heroImage = await generateHeroImage({ apiKey: env.OPENAI_API_KEY, prompt: heroPrompt });
-    await publishArticleToGitHub({ env, article, heroImage });
+    const { article } = await generateAndPublish(env);
     logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
     return new Response(JSON.stringify(article), {
       headers: { 'Content-Type': 'application/json' },
@@ -61,6 +68,52 @@ async function handleGenerateArticle(request: Request, env: Env) {
     logError(err, { type: 'generate-article-endpoint-error' });
     throw err;
   }
+}
+
+async function handleGenerateArticleHtml(request: Request, env: Env) {
+  logEvent({ type: 'generate-article-endpoint-start' });
+  logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+  const send = (str: string) => writer.write(encoder.encode(str));
+
+  send(
+    `<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"><title>Generowanie artyku\u0142u</title>` +
+      `<style>body{font-family:sans-serif;text-align:center;padding-top:2rem;}` +
+      `.spinner{border:4px solid #f3f3f3;border-top:4px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 2s linear infinite;margin:0 auto;}` +
+      `@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}` +
+      `pre{max-width:600px;margin:1rem auto;text-align:left;background:#f4f4f4;padding:1rem;overflow:auto;}` +
+      `</style></head><body><div class="spinner"></div><p>Trwa generowanie artyku\u0142u...</p><pre id="log"></pre>` +
+      `<script>function log(m){document.getElementById('log').textContent+=m+'\n';}</script>`
+  );
+
+  const origLog = console.log;
+  const origErr = console.error;
+  console.log = (...args: unknown[]) => {
+    origLog(...args);
+    send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+  };
+  console.error = (...args: unknown[]) => {
+    origErr(...args);
+    send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+  };
+
+  try {
+    const { article, slug } = await generateAndPublish(env);
+    logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
+    send(`<script>log('Zako\u0144czono');window.location.href='/blog/${slug}/';</script></body></html>`);
+  } catch (err) {
+    logError(err, { type: 'generate-article-endpoint-error' });
+    send(`<script>log('B\u0142\u0105d: ${escapeHtml(String(err))}');</script></body></html>`);
+    throw err;
+  } finally {
+    console.log = origLog;
+    console.error = origErr;
+    writer.close();
+  }
+
+  return new Response(readable, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
 }
 
 async function handleView(request: Request, env: Env, slug: string) {
@@ -194,7 +247,12 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/generate-article'
       ) {
-        response = await handleGenerateArticle(request, env);
+        const accept = request.headers.get('Accept') || '';
+        if (accept.includes('application/json')) {
+          response = await handleGenerateArticleJson(request, env);
+        } else {
+          response = await handleGenerateArticleHtml(request, env);
+        }
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')

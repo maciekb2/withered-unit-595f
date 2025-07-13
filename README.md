@@ -85,7 +85,7 @@ Możliwe jest też wygenerowanie wpisu poprzez endpoint Workers:
 GET /api/generate-article
 ```
 
-Wejście na ten adres uruchamia proces tworzenia wpisu i zwraca w odpowiedzi JSON z tytułem oraz treścią artykułu. Wygenerowane pliki są od razu commitowane do `main` na GitHubie.
+Domyślnie w przeglądarce pojawi się strona z komunikatem „Trwa generowanie artykułu” wraz z logami postępu. Po zakończeniu nastąpi przekierowanie na nowo utworzony wpis. Jeśli potrzebny jest surowy JSON z wynikiem, należy wysłać zapytanie z nagłówkiem `Accept: application/json`.
 
 ## Logowanie zdarzeń
 
