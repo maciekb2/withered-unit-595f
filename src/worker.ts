@@ -41,7 +41,6 @@ async function handleContact(request: Request, env: Env) {
   }
 }
 
-
 async function handleView(request: Request, env: Env, slug: string) {
   const key = `view-${slug}`;
   let value = await env.pseudointelekt_views.get(key);
