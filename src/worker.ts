@@ -1,8 +1,11 @@
 import server from './_worker.js';
 import cron from './cron-worker';
 import { generateAndPublish } from './modules/generateAndPublish';
+import { createDeferred } from './utils/deferred';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
+
+const pendingPrompts = new Map<string, (prompt: string) => void>();
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -178,12 +181,16 @@ export default {
           enqueue: (chunk: string) => writer.write(new TextEncoder().encode(chunk)),
           close: () => writer.close(),
         };
-        generateAndPublish(env, ctrl).catch(err => {
-          console.error('Błąd w tle:', err);
-          const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
-          ctrl.enqueue(`data: ${msg}\n\n`);
-          ctrl.close();
-        });
+        const deferred = createDeferred<string>();
+        pendingPrompts.set(session.id, deferred.resolve);
+        generateAndPublish(env, ctrl, deferred.promise)
+          .catch(err => {
+            console.error('Błąd w tle:', err);
+            const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
+            ctrl.enqueue(`data: ${msg}\n\n`);
+            ctrl.close();
+          })
+          .finally(() => pendingPrompts.delete(session.id));
         response = new Response(readable, {
           headers: {
             'Content-Type': 'text/event-stream',
@@ -191,6 +198,19 @@ export default {
             Connection: 'keep-alive',
           },
         });
+      } else if (
+        request.method === 'POST' &&
+        url.pathname === '/api/update-prompt'
+      ) {
+        const resolver = pendingPrompts.get(session.id);
+        if (!resolver) {
+          response = new Response('No pending prompt', { status: 400 });
+        } else {
+          const data = await request.json();
+          const prompt = (data as any).prompt ?? '';
+          resolver(String(prompt));
+          response = new Response('OK');
+        }
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')

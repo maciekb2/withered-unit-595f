@@ -15,7 +15,8 @@ export interface GenerateAndPublishResult {
 
 export async function generateAndPublish(
   env: Env,
-  controller?: { enqueue: (chunk: string) => void; close: () => void }
+  controller?: { enqueue: (chunk: string) => void; close: () => void },
+  promptPromise?: Promise<string>
 ): Promise<GenerateAndPublishResult> {
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
@@ -28,16 +29,25 @@ export async function generateAndPublish(
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
     send('📑 Pobrane tytuły', { recentTitles: recent });
 
-    const finalPrompt = articleTemplate.replace(
+    let finalPrompt = articleTemplate.replace(
       '{recent_titles}',
       recent.map((t, i) => `${i + 1}. ${t}`).join('\n')
     );
 
-    send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
+    if (promptPromise) {
+      send('✏️ Możesz edytować prompt i kliknąć Kontynuuj', {
+        articlePrompt: finalPrompt,
+        awaitingPrompt: true,
+      });
+      finalPrompt = await promptPromise;
+      send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
+    } else {
+      send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
+    }
+
     const article = await generateArticle({
       apiKey: env.OPENAI_API_KEY,
-      prompt: articleTemplate,
-      recentTitles: recent,
+      prompt: finalPrompt,
       maxTokens: 7200,
     });
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
