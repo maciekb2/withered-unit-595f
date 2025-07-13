@@ -1,19 +1,30 @@
-let logsKv: KVNamespace | undefined;
+let logsDb: D1Database | undefined;
 let execCtx: ExecutionContext | undefined;
+let workerId: string | undefined;
 
-export function initLogger(kv?: KVNamespace, ctx?: ExecutionContext): void {
-  logsKv = kv;
+export function initLogger(
+  db?: D1Database,
+  ctx?: ExecutionContext,
+  id?: string
+): void {
+  logsDb = db;
   execCtx = ctx;
+  workerId = id;
 }
 
 function storeLog(entry: Record<string, unknown>): void {
-  if (!logsKv) return;
-  const type = typeof entry.type === 'string' ? entry.type : 'log';
-  const date = new Date().toISOString().split('T')[0];
-  const key = `${date}/${type}/${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 8)}`;
-  const promise = logsKv.put(key, JSON.stringify(entry));
+  if (!logsDb) return;
+  const promise = (async () => {
+    await logsDb.exec(
+      'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)'
+    );
+    return logsDb
+      .prepare(
+        'INSERT INTO logs (time, worker_id, data) VALUES (?1, ?2, ?3)'
+      )
+      .bind(new Date().toISOString(), workerId || 'unknown', JSON.stringify(entry))
+      .run();
+  })();
   if (execCtx) {
     execCtx.waitUntil(promise);
   }

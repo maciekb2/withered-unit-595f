@@ -179,7 +179,7 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-    initLogger(env.pseudointelekt_logs, ctx);
+    initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
     const session = getSessionInfo(request);
     logRequest(request, session.id);
     if (session.isNew) {
