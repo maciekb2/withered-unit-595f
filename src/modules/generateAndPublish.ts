@@ -26,17 +26,24 @@ export async function generateAndPublish(
   try {
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
+    send('📑 Pobrane tytuły', { recentTitles: recent });
 
-    send('🧠 Generuję treść artykułu...');
+    const finalPrompt = articleTemplate.replace(
+      '{recent_titles}',
+      recent.map((t, i) => `${i + 1}. ${t}`).join('\n')
+    );
+
+    send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
     const article = await generateArticle({
       apiKey: env.OPENAI_API_KEY,
       prompt: articleTemplate,
       recentTitles: recent,
       maxTokens: 7200,
     });
+    send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
-    send('🎨 Tworzę obrazek do artykułu...');
     const heroPrompt = heroTemplate.replace('{title}', article.title);
+    send('🎨 Tworzę obrazek do artykułu...', { heroPrompt });
     const heroImage = await generateHeroImage({ apiKey: env.OPENAI_API_KEY, prompt: heroPrompt });
 
     send('📦 Publikuję na GitHubie...');

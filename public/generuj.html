@@ -6,20 +6,51 @@
 <style>
 body { font-family: sans-serif; padding: 2rem; }
 #log { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 4px; max-height: 60vh; overflow-y: auto; }
+#info { margin: 1em 0; }
+#info h2 { margin-top: 1em; }
+.home-button { display: inline-block; margin-top: 2em; padding: 0.75em 1.5em; background: var(--diplomatic-blue, #1c3d5a); color: var(--ivory, #f8f6f1); border-radius: 4px; text-decoration: none; border: 2px solid var(--diplomatic-blue, #1c3d5a); }
+.home-button:hover { background: var(--gold-accent, #cba135); color: var(--charcoal, #2d2d2d); }
 </style>
 </head>
 <body>
 <h1>Generowanie artykułu</h1>
 <div id="status">Oczekiwanie na dane...</div>
+<div id="info">
+  <h2>Ostatnie tytuły</h2>
+  <ul id="titles"></ul>
+  <h2>Nowy artykuł</h2>
+  <p id="article-title"></p>
+  <h2>Prompt (artykuł)</h2>
+  <pre id="article-prompt"></pre>
+  <h2>Prompt (obrazek)</h2>
+  <pre id="hero-prompt"></pre>
+</div>
 <pre id="log"></pre>
+<a href="/" class="home-button">Strona główna</a>
 <script>
 const logEl = document.getElementById('log');
 const statusEl = document.getElementById('status');
+const titlesEl = document.getElementById('titles');
+const articleTitleEl = document.getElementById('article-title');
+const articlePromptEl = document.getElementById('article-prompt');
+const heroPromptEl = document.getElementById('hero-prompt');
 const es = new EventSource('/api/generate-stream');
 es.onmessage = (e) => {
   const msg = JSON.parse(e.data);
   if (msg.log) {
     logEl.textContent += msg.log + '\n';
+  }
+  if (msg.recentTitles) {
+    titlesEl.innerHTML = msg.recentTitles.map(t => `<li>${t}</li>`).join('');
+  }
+  if (msg.articleTitle) {
+    articleTitleEl.textContent = msg.articleTitle;
+  }
+  if (msg.articlePrompt) {
+    articlePromptEl.textContent = msg.articlePrompt;
+  }
+  if (msg.heroPrompt) {
+    heroPromptEl.textContent = msg.heroPrompt;
   }
   if (msg.done) {
     statusEl.innerHTML = `Zakończono! <a href="${msg.url}">Zobacz PR</a>`;
