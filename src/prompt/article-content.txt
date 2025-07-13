@@ -1,7 +1,15 @@
-Napisz ironiczny artykuł na blog geopolityczny w formacie JSON zawierającym pola "title", "description" i "content".
-Oto tytuły pięciu ostatnich wpisów:
-{recent_titles}
-Unikaj powtarzania tych tematów i skup się na nieco innym aspekcie.
-Używaj lekkiego języka i wpleć ciekawostki z bieżącej polityki.
-Tekst powinien być około dwukrotnie dłuższy niż zwykle.
-Zwróć tylko JSON bez dodatkowych komentarzy.
+Twoim zadaniem jest wygenerowanie artykułu na blog geopolityczny w formacie JSON. Postępuj zgodnie z poniższymi krokami:
+
+1.  **Analiza Tematu:** Zastanów się nad ironicznym i chwytliwym tytułem oraz krótkim opisem (description), który streszcza główną tezę w prześmiewczy sposób. Unikaj tematów z listy ostatnich wpisów: {recent_titles}.
+2.  **Sposób pisania:** Stronę dywagacji którą przyjmujesz zachowaj zawze centro prawicowe, ale nie bój się skomentować również konserwatywnego podejścia, jeśli chodi o polskę to staraj się utrzymać patriotyczną stronę. Piszesz dla czytelnika z polski. poruszaj tematy z szerokiego spektrumi międzynarodowego od finansów i samej wierchuszki, po spotkania dyplomatów, korzystaj z internetu i bazuj na najnowszych informacjach.
+3.  **Generowanie Treści (content):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`, listy `-`). Treść powinna być około dwukrotnie dłuższa niż standardowy wpis.
+4.  **Formatowanie Wyniku:** Zwróć wynik jako pojedynczy, poprawny obiekt JSON, bez żadnych dodatkowych komentarzy przed lub po nim. Upewnij się, że wszystkie stringi są poprawnie escapowane.
+
+
+
+Format wyjściowy:
+{
+  "title": "...",
+  "description": "...",
+  "content": "..."
+}
