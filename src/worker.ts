@@ -42,6 +42,112 @@ async function handleContact(request: Request, env: Env) {
 }
 
 
+
+async function handleGenerateArticleJson(request: Request, env: Env) {
+  logEvent({ type: 'generate-article-endpoint-start' });
+  logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
+  try {
+    const { article } = await generateAndPublish(env);
+    logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
+    return new Response(JSON.stringify(article), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    logError(err, { type: 'generate-article-endpoint-error' });
+    throw err;
+  }
+}
+
+async function handleGenerateArticleHtml(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+) {
+  logEvent({ type: 'generate-article-endpoint-start' });
+  logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+  const send = (str: string) => writer.write(encoder.encode(str));
+
+  send(
+    `<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"><title>Generowanie artyku\u0142u</title>` +
+      `<style>` +
+      `body{font-family:sans-serif;text-align:center;padding-top:2rem;}` +
+      `.spinner{border:4px solid #f3f3f3;border-top:4px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 2s linear infinite;margin:0 auto;}` +
+      `@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}` +
+      `pre{max-width:600px;margin:1rem auto;text-align:left;background:#f4f4f4;padding:1rem;overflow:auto;}` +
+      `#status{margin-top:1rem;font-size:1.2rem;}` +
+      `</style></head><body><div class="spinner"></div><p id="status">Trwa generowanie artyku\u0142u...</p><pre id="log"></pre>` +
+      `<script>
+        const logEl = document.getElementById('log');
+        const statusEl = document.getElementById('status');
+        function log(m){
+          logEl.textContent += m + '\n';
+          try{
+            const obj = JSON.parse(m);
+            switch(obj.type){
+              case 'generate-article-start':
+                statusEl.textContent = 'Generowanie tre\u015bci artyku\u0142u...';
+                break;
+              case 'generate-hero-start':
+                statusEl.textContent = 'Generowanie obrazu...';
+                break;
+              case 'generate-hero-complete':
+                statusEl.textContent = 'Publikowanie artyku\u0142u...';
+                break;
+            }
+          }catch(e){}
+        }
+      </script>`
+  );
+
+  ctx.waitUntil(
+    (async () => {
+      const origLog = console.log;
+      const origErr = console.error;
+      console.log = (...args: unknown[]) => {
+        origLog(...args);
+        send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+      };
+      console.error = (...args: unknown[]) => {
+        origErr(...args);
+        send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+      };
+
+      try {
+        const { article, slug } = await generateAndPublish(env);
+        logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
+        send(
+          `<script>
+            log('Zako\u0144czono');
+            const spinner = document.querySelector('.spinner');
+            if (spinner) spinner.style.display = 'none';
+            statusEl.textContent = 'Wygenerowano artyku\u0142!';
+            const container = document.createElement('div');
+            container.style.marginTop = '1rem';
+            container.innerHTML = '<p><a href="/blog/${slug}/">Zobacz artyku\u0142</a></p>' +
+              '<a href="/" style="margin-right:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Strona g\u0142\u00f3wna</a>' +
+              '<a href="/api/generate-article" style="margin-left:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Nowy artyku\u0142</a>';
+            document.body.appendChild(container);
+          </script></body></html>`
+        );
+      } catch (err) {
+        logError(err, { type: 'generate-article-endpoint-error' });
+        send(`<script>log('B\u0142\u0105d: ${escapeHtml(String(err))}');</script></body></html>`);
+      } finally {
+        console.log = origLog;
+        console.error = origErr;
+        writer.close();
+      }
+    })(),
+  );
+
+  return new Response(readable, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
+}
+
 async function handleView(request: Request, env: Env, slug: string) {
   const key = `view-${slug}`;
   let value = await env.pseudointelekt_views.get(key);
@@ -192,6 +298,13 @@ export default {
             Connection: 'keep-alive',
           },
         });
+        const accept = request.headers.get('Accept') || '';
+        if (accept.includes('application/json')) {
+          response = await handleGenerateArticleJson(request, env);
+        } else {
+          response = await handleGenerateArticleHtml(request, env, ctx);
+        }
+
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')
