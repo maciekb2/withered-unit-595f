@@ -1,5 +1,4 @@
-import { generateArticle } from '../src/modules/articleGenerator';
-import { generateHeroImage } from '../src/modules/heroImageGenerator';
+import { generateArticleAssets } from '../src/modules/generateArticleAssets';
 import { assembleArticle } from '../src/modules/articleAssembler';
 import { logEvent, logError } from '../src/utils/logger';
 import { getRecentTitlesFS } from '../src/utils/recentTitlesFs';
@@ -12,21 +11,19 @@ async function main() {
   const heroPromptTemplate = await fs.readFile('src/prompt/hero-image.txt', 'utf8');
 
   const recent = await getRecentTitlesFS();
-  const recentList = recent.map((t, i) => `${i + 1}. ${t}`).join('\n');
-  const articlePrompt = articleTemplate.replace('{recent_titles}', recentList);
 
   const apiKey = process.env.OPENAI_API_KEY || '';
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY is required');
   }
 
-  const article = await generateArticle({
+  const { article, heroImage } = await generateArticleAssets({
     apiKey,
-    prompt: articlePrompt,
+    articleTemplate,
+    heroTemplate: heroPromptTemplate,
+    recentTitles: recent,
     maxTokens: 7200,
   });
-  const heroPrompt = heroPromptTemplate.replace('{title}', article.title);
-  const heroImage = await generateHeroImage({ apiKey, prompt: heroPrompt });
 
   try {
     const { postPath, imagePath } = await assembleArticle({ article, heroImage });

@@ -11,14 +11,25 @@ export interface GenerateArticleOptions {
   apiKey: string;
   prompt: string;
   maxTokens?: number;
+  /**
+   * Optional list of recent titles to be substituted into the prompt as
+   * `"{recent_titles}"`. This helps avoid generating duplicate topics.
+   */
+  recentTitles?: string[];
 }
 
-export async function generateArticle({ apiKey, prompt, maxTokens }: GenerateArticleOptions): Promise<ArticleResult> {
+export async function generateArticle({ apiKey, prompt, maxTokens, recentTitles }: GenerateArticleOptions): Promise<ArticleResult> {
+  const finalPrompt = recentTitles
+    ? prompt.replace(
+        '{recent_titles}',
+        recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
+      )
+    : prompt;
   logEvent({ type: 'generate-article-start' });
   logEvent({
     type: 'openai-request',
     model: 'gpt-4o',
-    promptSnippet: prompt.slice(0, 100),
+    promptSnippet: finalPrompt.slice(0, 100),
   });
   try {
     const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
@@ -30,7 +41,7 @@ export async function generateArticle({ apiKey, prompt, maxTokens }: GenerateArt
       body: JSON.stringify({
         model: 'gpt-4o',
         max_tokens: maxTokens,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: finalPrompt }],
       }),
       retries: 2,
       retryDelayMs: 1000,
