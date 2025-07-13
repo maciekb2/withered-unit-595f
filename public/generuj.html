@@ -52,6 +52,22 @@ const articlePromptEl = document.getElementById('article-prompt');
 const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
 
+async function loadInitialPrompt() {
+  try {
+    const res = await fetch('/api/get-prompt');
+    if (!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    appendLog('✏ Domyślny prompt:');
+    articlePromptEl.value = data.prompt;
+    if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
+    articlePromptEl.style.display = 'block';
+  } catch (err) {
+    appendLog('❌ Błąd pobierania prompta');
+  }
+}
+
+loadInitialPrompt();
+
 function appendLog(text) {
   const div = document.createElement('div');
   div.textContent = text;
