@@ -19,7 +19,7 @@ function storeLog(entry: Record<string, unknown>): void {
   }
 }
 
-export function logRequest(request: Request): void {
+export function logRequest(request: Request, sessionId?: string): void {
   const url = new URL(request.url);
   const headers = request.headers;
   const ip =
@@ -41,6 +41,7 @@ export function logRequest(request: Request): void {
     country,
     userAgent: ua,
     referer,
+    sessionId,
   };
   console.log(JSON.stringify(entry));
   storeLog(entry);
