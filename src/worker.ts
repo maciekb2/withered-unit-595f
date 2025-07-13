@@ -5,7 +5,7 @@ import { generateHeroImage } from './modules/heroImageGenerator';
 import { publishArticleToGitHub } from './modules/githubPublisher';
 import articlePrompt from './prompt/article-content.txt?raw';
 import heroTemplate from './prompt/hero-image.txt?raw';
-import { logRequest, logEvent, logError } from './utils/logger';
+import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -148,6 +148,7 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    initLogger(env.pseudointelekt_logs, ctx);
     logRequest(request);
     const url = new URL(request.url);
     try {

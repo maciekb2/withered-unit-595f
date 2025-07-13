@@ -4,10 +4,11 @@ export interface Env {
   GITHUB_REPO: string; // owner/repo
   SLACK_WEBHOOK_URL: string;
   pseudointelekt_contact_form: KVNamespace;
+  pseudointelekt_logs: KVNamespace;
 }
 
 import blogPostPrompt from "./prompt/blog-post.txt?raw";
-import { logEvent, logError } from './utils/logger';
+import { initLogger, logEvent, logError } from './utils/logger';
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -15,6 +16,7 @@ function slugify(text: string) {
 
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+    initLogger(env.pseudointelekt_logs, ctx);
     logEvent({ type: 'cron-start', time: event.scheduledTime });
     const date = new Date(event.scheduledTime).toISOString().split("T")[0];
 

@@ -23,6 +23,11 @@
       "id": "e22b4da9fe0e45d8ae2515792d5929df",
       "preview_id": "e22b4da9fe0e45d8ae2515792d5929df"
     }
+    ,{
+      "binding": "pseudointelekt_logs",
+      "id": "d3a2f2838cff46bdaa9a9ef0e7bf1da9",
+      "preview_id": "d3a2f2838cff46bdaa9a9ef0e7bf1da9"
+    }
   ],
   "observability": {
     "enabled": true

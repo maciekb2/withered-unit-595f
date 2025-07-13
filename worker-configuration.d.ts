@@ -9,4 +9,5 @@ interface Env {
         pseudointelekt_contact_form: KVNamespace;
         pseudointelekt_views: KVNamespace;
         pseudointelekt_likes: KVNamespace;
+        pseudointelekt_logs: KVNamespace;
 }
