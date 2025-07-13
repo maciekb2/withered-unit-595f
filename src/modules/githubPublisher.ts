@@ -87,7 +87,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       headers,
       body: JSON.stringify({
         message: `Add post for ${postDate}`,
-        content: btoa(markdown),
+        content: Buffer.from(markdown, 'utf-8').toString('base64'),
         branch,
       }),
       retries: 2,
