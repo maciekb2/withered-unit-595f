@@ -110,13 +110,10 @@ Przykładowe zapytanie HTTP zostanie zapisane w kolumnie `data` jako JSON podobn
 ```json
 {
   "time": "2024-05-06T12:34:56.000Z",
-  "type": "request",
   "method": "GET",
   "path": "/about",
-  "host": "example.com",
   "ip": "203.0.113.42",
   "country": "PL",
-  "userAgent": "Mozilla/5.0",
   "referer": "https://google.com"
 }
 ```
