@@ -59,13 +59,14 @@ export default {
       "Content-Type": "application/json",
     };
 
+    logEvent({ type: 'cron-github-repo-url', url: repoUrl });
     const repoRes = await fetch(repoUrl, { headers });
-    logEvent({ type: 'cron-github-repo-status', status: repoRes.status });
+    const repoText = await repoRes.text();
+    logEvent({ type: 'cron-github-repo-status', status: repoRes.status, body: repoText });
     if (!repoRes.ok) {
-      const msg = await repoRes.text();
-      throw new Error(`GitHub repo request failed: ${repoRes.status} ${msg}`);
+      throw new Error(`GitHub repo request failed: ${repoRes.status} ${repoText}`);
     }
-    const repo: any = await repoRes.json();
+    const repo: any = JSON.parse(repoText);
     const refRes = await fetch(
       `${repoUrl}/git/ref/heads/${repo.default_branch}`,
       { headers }
