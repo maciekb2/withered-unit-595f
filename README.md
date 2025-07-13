@@ -89,9 +89,10 @@ GET /api/generate-stream
 ```
 
 Najprościej skorzystać z podstrony `generuj.html`, która łączy się z tym
-strumieniem i wyświetla postęp. Po zakończeniu zostanie zwrócony link do utworzonego
-pull requesta na GitHubie. Wszelkie informacje pojawiają się na bieżąco bez
-odświeżania strony.
+strumieniem i wyświetla postęp. Po pobraniu tytułów wczytany zostaje domyślny
+prompt, który można edytować przed kontynuacją. Po zakończeniu zostanie
+zwrócony link do utworzonego pull requesta na GitHubie. Wszelkie informacje
+pojawiają się na bieżąco bez odświeżania strony.
 
 Szczegółowy opis znajduje się w pliku [docs/generate-stream.md](docs/generate-stream.md).
 
