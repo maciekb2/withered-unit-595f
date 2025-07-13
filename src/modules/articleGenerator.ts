@@ -10,9 +10,10 @@ export interface ArticleResult {
 export interface GenerateArticleOptions {
   apiKey: string;
   prompt: string;
+  maxTokens?: number;
 }
 
-export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions): Promise<ArticleResult> {
+export async function generateArticle({ apiKey, prompt, maxTokens }: GenerateArticleOptions): Promise<ArticleResult> {
   logEvent({ type: 'generate-article-start' });
   logEvent({
     type: 'openai-request',
@@ -28,6 +29,7 @@ export async function generateArticle({ apiKey, prompt }: GenerateArticleOptions
       },
       body: JSON.stringify({
         model: 'gpt-4o',
+        max_tokens: maxTokens,
         messages: [{ role: 'user', content: prompt }],
       }),
       retries: 2,
