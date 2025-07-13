@@ -161,6 +161,7 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
 }
 
 async function handleGetPrompt(env: Env) {
+  logEvent({ type: 'get-prompt' });
   const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
   const prompt = articleTemplate.replace(
     '{recent_titles}',
@@ -188,6 +189,7 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
       ) {
+        logEvent({ type: 'generate-stream-start', sessionId: session.id });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
         const ctrl = {
@@ -217,10 +219,12 @@ export default {
       ) {
         const resolver = pendingPrompts.get(session.id);
         if (!resolver) {
+          logEvent({ type: 'update-prompt-missing', sessionId: session.id });
           response = new Response('No pending prompt', { status: 400 });
         } else {
           const data = await request.json();
           const prompt = (data as any).prompt ?? '';
+          logEvent({ type: 'update-prompt', sessionId: session.id });
           resolver(String(prompt));
           response = new Response('OK');
         }

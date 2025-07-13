@@ -54,7 +54,7 @@ const continueBtn = document.getElementById('continue-btn');
 
 async function loadInitialPrompt() {
   try {
-    const res = await fetch('/api/get-prompt');
+    const res = await fetch('/api/get-prompt', { credentials: 'include' });
     if (!res.ok) throw new Error('status ' + res.status);
     const data = await res.json();
     appendLog('✏ Domyślny prompt:');
@@ -66,7 +66,12 @@ async function loadInitialPrompt() {
   }
 }
 
-loadInitialPrompt();
+async function start() {
+  await loadInitialPrompt();
+  startStream();
+}
+
+start();
 
 function appendLog(text) {
   const div = document.createElement('div');
@@ -80,12 +85,13 @@ function appendLogElement(el) {
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-const es = new EventSource('/api/generate-stream');
-es.onmessage = (e) => {
-  const msg = JSON.parse(e.data);
-  if (msg.log) {
-    appendLog(msg.log);
-  }
+function startStream() {
+  const es = new EventSource('/api/generate-stream');
+  es.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.log) {
+      appendLog(msg.log);
+    }
   if (msg.recentTitles) {
     appendLog('📚 Ostatnie tytuły:');
     const list = document.createElement('ul');
@@ -104,7 +110,6 @@ es.onmessage = (e) => {
     articlePromptEl.value = msg.articlePrompt;
     if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
     articlePromptEl.style.display = 'block';
-
   }
   if (msg.awaitingPrompt) {
     articlePromptEl.removeAttribute('readonly');
@@ -115,35 +120,39 @@ es.onmessage = (e) => {
     appendLog('🎨 Prompt (obrazek):');
     appendLog(msg.heroPrompt);
   }
-  if (msg.done) {
-    statusEl.textContent = 'Zakończono!';
-    prLinkEl.href = msg.url;
-    prLinkEl.style.display = 'inline-block';
+    if (msg.done) {
+      statusEl.textContent = 'Zakończono!';
+      prLinkEl.href = msg.url;
+      prLinkEl.style.display = 'inline-block';
+      es.close();
+    }
+  };
+  es.onerror = () => {
+    statusEl.textContent = 'Błąd połączenia';
+    appendLog('❌ Błąd połączenia');
     es.close();
-  }
-};
-es.onerror = () => {
-  statusEl.textContent = 'Błąd połączenia';
-  appendLog('❌ Błąd połączenia');
-  es.close();
-};
+  };
 
-continueBtn.addEventListener('click', async () => {
-  continueBtn.disabled = true;
-  try {
-    await fetch('/api/update-prompt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: articlePromptEl.value }),
-    });
-    appendLog('⏭ Kontynuuję tworzenie...');
-    articlePromptEl.setAttribute('readonly', '');
-    continueBtn.style.display = 'none';
-  } catch (err) {
-    appendLog('❌ Błąd połączenia podczas wysyłania prompta');
-    continueBtn.disabled = false;
-  }
-});
+  continueBtn.addEventListener('click', async () => {
+    continueBtn.disabled = true;
+    try {
+      appendLog('📨 Wysyłam zaktualizowany prompt...');
+      const res = await fetch('/api/update-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: articlePromptEl.value }),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('status ' + res.status);
+      appendLog('⏭ Kontynuuję tworzenie...');
+      articlePromptEl.setAttribute('readonly', '');
+      continueBtn.style.display = 'none';
+    } catch (err) {
+      appendLog('❌ Błąd podczas wysyłania prompta');
+      continueBtn.disabled = false;
+    }
+  });
+}
 </script>
 </body>
 </html>
