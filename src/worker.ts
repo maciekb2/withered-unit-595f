@@ -209,14 +209,16 @@ export default {
         };
         const deferred = createDeferred<string>();
         pendingPrompts.set(session.id, deferred.resolve);
-        generateAndPublish(env, ctrl, deferred.promise)
-          .catch(err => {
-            console.error('Błąd w tle:', err);
-            const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
-            ctrl.enqueue(`data: ${msg}\n\n`);
-            ctrl.close();
-          })
-          .finally(() => pendingPrompts.delete(session.id));
+        ctx.waitUntil(
+          generateAndPublish(env, ctrl, deferred.promise)
+            .catch(err => {
+              console.error('Błąd w tle:', err);
+              const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
+              ctrl.enqueue(`data: ${msg}\n\n`);
+              ctrl.close();
+            })
+            .finally(() => pendingPrompts.delete(session.id))
+        );
         response = new Response(readable, {
           headers: {
             'Content-Type': 'text/event-stream',
