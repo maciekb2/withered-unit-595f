@@ -10,14 +10,14 @@ const truncate = (title: string, len = 50) =>
 <nav class="post-nav">
     {prev && (
         <a href={`/blog/${prev.id}/`} class="prev">
-            <span class="arrow" aria-hidden="true">\u2190</span>
+            <span class="arrow" aria-hidden="true">←</span>
             <span class="title">{truncate(prev.data.title)}</span>
         </a>
     )}
     {next && (
         <a href={`/blog/${next.id}/`} class="next">
             <span class="title">{truncate(next.data.title)}</span>
-            <span class="arrow" aria-hidden="true">\u2192</span>
+            <span class="arrow" aria-hidden="true">→</span>
         </a>
     )}
 </nav>
@@ -28,7 +28,7 @@ const truncate = (title: string, len = 50) =>
     gap: 1em;
     margin: 2em 0;
     padding: 0 1em;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 .post-nav a {
     color: var(--accent);
