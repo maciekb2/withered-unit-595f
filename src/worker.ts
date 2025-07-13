@@ -207,7 +207,7 @@ async function handleLike(
 }
 
 async function handleGetLikes(env: Env, slugs: string[] = []) {
-  const list = await env.pseudointelekt_likes.list();
+  const list = await env.pseudointelekt_likes.list({ prefix: 'like-' });
   const data: Record<string, number> = {};
 
   for (const { name } of list.keys) {
