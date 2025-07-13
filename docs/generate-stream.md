@@ -48,3 +48,6 @@ es.onmessage = (e) => {
 1. Uruchom lokalnie `npm run dev`.
 2. Otwórz `http://localhost:8787/generuj.html` (port zależy od konfiguracji wranglera).
 3. Obserwuj logi i poczekaj na link do pull requesta.
+
+Podstrona `generuj.html` przesyła teraz własne zdarzenia pod endpoint `POST /api/client-log`,
+dzięki czemu wszystkie akcje z przeglądarki trafiają do bazy D1.

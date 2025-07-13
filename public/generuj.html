@@ -53,6 +53,16 @@ const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
 let promptShown = false;
 
+function sendLog(event, details = {}) {
+  fetch('/api/client-log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, ...details }),
+    credentials: 'include',
+    keepalive: true,
+  }).catch(() => {});
+}
+
 startStream();
 
 function appendLog(text) {
@@ -68,12 +78,16 @@ function appendLogElement(el) {
 }
 
 function startStream() {
+  appendLog('🔗 Łączenie z /api/generate-stream...');
+  sendLog('connect', { endpoint: '/api/generate-stream' });
   const es = new EventSource('/api/generate-stream');
   es.addEventListener('open', () => {
     appendLog('🔌 Połączono z serwerem');
+    sendLog('sse-open');
   });
   es.onmessage = (e) => {
     const msg = JSON.parse(e.data);
+    sendLog('sse-message', msg);
     if (msg.log) {
       appendLog(msg.log);
     }
@@ -111,6 +125,7 @@ function startStream() {
       statusEl.textContent = 'Zakończono!';
       prLinkEl.href = msg.url;
       prLinkEl.style.display = 'inline-block';
+      sendLog('sse-complete', { url: msg.url });
       es.close();
     }
   };
@@ -118,13 +133,15 @@ function startStream() {
     statusEl.textContent = 'Błąd połączenia (SSE)';
     appendLog('❌ Błąd połączenia (SSE)');
     console.error('EventSource failed', err);
+    sendLog('sse-error', { message: err.message });
     es.close();
   };
 
   continueBtn.addEventListener('click', async () => {
     continueBtn.disabled = true;
     try {
-      appendLog('📨 Wysyłam zaktualizowany prompt...');
+      appendLog('📨 Wysyłam zaktualizowany prompt do /api/update-prompt...');
+      sendLog('update-prompt-send', { endpoint: '/api/update-prompt' });
       const res = await fetch('/api/update-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -132,11 +149,13 @@ function startStream() {
         credentials: 'include',
       });
       if (!res.ok) throw new Error('status ' + res.status);
+      sendLog('update-prompt-response', { status: res.status });
       appendLog('⏭ Kontynuuję tworzenie...');
       articlePromptEl.setAttribute('readonly', '');
       continueBtn.style.display = 'none';
     } catch (err) {
       appendLog(`❌ Błąd podczas wysyłania prompta: ${err}`);
+      sendLog('update-prompt-error', { message: String(err) });
       continueBtn.disabled = false;
     }
   });

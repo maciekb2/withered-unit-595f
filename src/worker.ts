@@ -172,6 +172,17 @@ async function handleGetPrompt(env: Env) {
   });
 }
 
+async function handleClientLog(request: Request, sessionId: string) {
+  try {
+    const data = (await request.json()) as Record<string, unknown>;
+    logEvent({ type: 'client-log', sessionId, ...data });
+    return new Response('OK');
+  } catch (err) {
+    logError(err, { type: 'client-log-error' });
+    return new Response('Bad Request', { status: 400 });
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
@@ -213,6 +224,11 @@ export default {
             Connection: 'keep-alive',
           },
         });
+      } else if (
+        request.method === 'POST' &&
+        url.pathname === '/api/client-log'
+      ) {
+        response = await handleClientLog(request, session.id);
       } else if (
         request.method === 'POST' &&
         url.pathname === '/api/update-prompt'
