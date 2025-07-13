@@ -39,18 +39,13 @@ export function logRequest(request: Request, sessionId?: string): void {
     'unknown';
   const cf = (request as any).cf || {};
   const country = cf.country || headers.get('CF-IPCountry') || 'unknown';
-  const ua = headers.get('User-Agent') || 'unknown';
   const referer = headers.get('Referer') || '';
-  const host = headers.get('Host') || url.hostname;
   const entry = {
     time: new Date().toISOString(),
-    type: 'request',
     method: request.method,
     path: url.pathname + url.search,
-    host,
     ip,
     country,
-    userAgent: ua,
     referer,
     sessionId,
   };
