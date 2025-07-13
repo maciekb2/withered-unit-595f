@@ -68,12 +68,34 @@ async function handleGenerateArticleHtml(request: Request, env: Env) {
 
   send(
     `<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"><title>Generowanie artyku\u0142u</title>` +
-      `<style>body{font-family:sans-serif;text-align:center;padding-top:2rem;}` +
+      `<style>` +
+      `body{font-family:sans-serif;text-align:center;padding-top:2rem;}` +
       `.spinner{border:4px solid #f3f3f3;border-top:4px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 2s linear infinite;margin:0 auto;}` +
       `@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}` +
       `pre{max-width:600px;margin:1rem auto;text-align:left;background:#f4f4f4;padding:1rem;overflow:auto;}` +
-      `</style></head><body><div class="spinner"></div><p>Trwa generowanie artyku\u0142u...</p><pre id="log"></pre>` +
-      `<script>function log(m){document.getElementById('log').textContent+=m+'\n';}</script>`
+      `#status{margin-top:1rem;font-size:1.2rem;}` +
+      `</style></head><body><div class="spinner"></div><p id="status">Trwa generowanie artyku\u0142u...</p><pre id="log"></pre>` +
+      `<script>
+        const logEl = document.getElementById('log');
+        const statusEl = document.getElementById('status');
+        function log(m){
+          logEl.textContent += m + '\n';
+          try{
+            const obj = JSON.parse(m);
+            switch(obj.type){
+              case 'generate-article-start':
+                statusEl.textContent = 'Generowanie tre\u015bci artyku\u0142u...';
+                break;
+              case 'generate-hero-start':
+                statusEl.textContent = 'Generowanie obrazu...';
+                break;
+              case 'generate-hero-complete':
+                statusEl.textContent = 'Publikowanie artyku\u0142u...';
+                break;
+            }
+          }catch(e){}
+        }
+      </script>`
   );
 
   const origLog = console.log;
