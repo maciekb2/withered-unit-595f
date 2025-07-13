@@ -81,18 +81,19 @@ npx tsx scripts/publish-article.ts
 Skrypt pobiera klucz `OPENAI_API_KEY` z zmiennych środowiskowych, zapisuje pliki w odpowiednich katalogach, a następnie wykonuje commit do repozytorium.
 Wygenerowane wpisy są automatycznie publikowane na gałęzi `main` w repozytorium określonym przez `GITHUB_REPO`.
 
-Możliwe jest też wygenerowanie wpisu poprzez endpoint Workers:
-
+Generowanie wpisu można uruchomić również z poziomu przeglądarki. Nowy endpoint
+SSE zwraca kolejne logi w czasie rzeczywistym:
 
 ```
-GET /api/generate-article
+GET /api/generate-stream
 ```
 
-Po każdej publikacji Worker wysyła powiadomienie na Slacka zawierające
-początek artykułu oraz link do utworzonego pull requesta na GitHubie.
-Pozwala to szybko zaakceptować zmiany.
+Najprościej skorzystać z podstrony `generuj.html`, która łączy się z tym
+strumieniem i wyświetla postęp. Po zakończeniu zostanie zwrócony link do utworzonego
+pull requesta na GitHubie. Wszelkie informacje pojawiają się na bieżąco bez
+odświeżania strony.
 
-Domyślnie w przeglądarce pojawi się strona z komunikatem „Trwa generowanie artykułu” wraz z logami postępu. Po zakończeniu nastąpi przekierowanie na nowo utworzony wpis. Jeśli potrzebny jest surowy JSON z wynikiem, należy wysłać zapytanie z nagłówkiem `Accept: application/json`.
+Szczegółowy opis znajduje się w pliku [docs/generate-stream.md](docs/generate-stream.md).
 
 ## Logowanie zdarzeń
 
