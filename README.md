@@ -63,17 +63,19 @@ Dodatkowo w sekcji `vars` umieść adres swojego webhooka Slack:
 ```
 
 ### Personalizacja promptu
-Plik `src/prompt/blog-post.txt` definiuje prompt dla OpenAI. Edytuj go, aby dostosować generowane wpisy.
+Plik `src/prompt/article-content.txt` definiuje prompt dla OpenAI. Edytuj go, aby dostosować generowane wpisy.
+Szablon wykorzystuje placeholder `{recent_titles}`, który zostaje zastąpiony listą
+pięciu ostatnich tytułów w celu uniknięcia powtarzania tematów.
 
 ### Automatyczne generowanie nowych wpisów
 Moduły w katalogu `src/modules` pozwalają na wygenerowanie treści artykułu oraz hero obrazka z wykorzystaniem API OpenAI. Przykładowe prompty znajdują się w `src/prompt/article-content.txt` oraz `src/prompt/hero-image.txt`.
 
 Hero obrazy są generowane przez model DALL·E 3. Funkcja `generateHeroImage()` przyjmuje opcjonalne parametry `style` i `quality`, które domyślnie ustawiono na `vivid` i `hd`, aby uzyskać wyraźny efekt zbliżony do tego w ChatGPT.
 
-Do złożenia i zacommitowania wpisu służy skrypt `scripts/publish-article.ts`:
+Do złożenia i zacommitowania wpisu służy skrypt `scripts/publish-article.ts` uruchamiany przez `tsx`:
 
 ```bash
-node scripts/publish-article.ts
+npx tsx scripts/publish-article.ts
 ```
 
 Skrypt pobiera klucz `OPENAI_API_KEY` z zmiennych środowiskowych, zapisuje pliki w odpowiednich katalogach, a następnie wykonuje commit do repozytorium.
