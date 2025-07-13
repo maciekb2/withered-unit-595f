@@ -83,9 +83,14 @@ Wygenerowane wpisy są automatycznie publikowane na gałęzi `main` w repozytori
 
 Możliwe jest też wygenerowanie wpisu poprzez endpoint Workers:
 
+
 ```
 GET /api/generate-article
 ```
+
+Po każdej publikacji Worker wysyła powiadomienie na Slacka zawierające
+początek artykułu oraz link do utworzonego pull requesta na GitHubie.
+Pozwala to szybko zaakceptować zmiany.
 
 Domyślnie w przeglądarce pojawi się strona z komunikatem „Trwa generowanie artykułu” wraz z logami postępu. Po zakończeniu nastąpi przekierowanie na nowo utworzony wpis. Jeśli potrzebny jest surowy JSON z wynikiem, należy wysłać zapytanie z nagłówkiem `Accept: application/json`.
 
