@@ -6,6 +6,7 @@ import { publishArticleToGitHub } from './modules/githubPublisher';
 import articlePrompt from './prompt/article-content.txt?raw';
 import heroTemplate from './prompt/hero-image.txt?raw';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
+import { getSessionInfo, appendSessionCookie } from './utils/session';
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -149,41 +150,55 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs, ctx);
-    logRequest(request);
+    const session = getSessionInfo(request);
+    logRequest(request, session.id);
+    if (session.isNew) {
+      logEvent({ type: 'session-start', sessionId: session.id });
+    }
     const url = new URL(request.url);
     try {
+      let response: Response;
       if (request.method === 'POST' && url.pathname === '/api/contact') {
-        return await handleContact(request, env);
-      }
-      if (request.method === 'GET' && url.pathname === '/api/generate-article') {
-        return await handleGenerateArticle(request, env);
-      }
-      if (request.method === 'POST' && url.pathname.startsWith('/api/views-init/')) {
+        response = await handleContact(request, env);
+      } else if (
+        request.method === 'GET' &&
+        url.pathname === '/api/generate-article'
+      ) {
+        response = await handleGenerateArticle(request, env);
+      } else if (
+        request.method === 'POST' &&
+        url.pathname.startsWith('/api/views-init/')
+      ) {
         const slug = url.pathname.substring('/api/views-init/'.length);
-        return await handleInitView(request, env, slug);
-      }
-      if (url.pathname.startsWith('/api/views/')) {
+        response = await handleInitView(request, env, slug);
+      } else if (url.pathname.startsWith('/api/views/')) {
         const slug = url.pathname.substring('/api/views/'.length);
         if (request.method === 'POST') {
-          return await handleView(request, env, slug);
+          response = await handleView(request, env, slug);
+        } else if (request.method === 'GET') {
+          response = await handleGetView(env, slug);
+        } else {
+          response = new Response('Method Not Allowed', { status: 405 });
         }
-        if (request.method === 'GET') {
-          return await handleGetView(env, slug);
-        }
-      }
-      if (request.method === 'GET' && url.pathname === '/api/views') {
-        return await handleGetViews(env);
-      }
-      if (request.method === 'POST' && url.pathname.startsWith('/api/likes/')) {
+      } else if (request.method === 'GET' && url.pathname === '/api/views') {
+        response = await handleGetViews(env);
+      } else if (
+        request.method === 'POST' &&
+        url.pathname.startsWith('/api/likes/')
+      ) {
         const slug = url.pathname.substring('/api/likes/'.length);
-        return await handleLike(request, env, slug);
-      }
-      if (request.method === 'GET' && url.pathname === '/api/likes') {
+        response = await handleLike(request, env, slug);
+      } else if (request.method === 'GET' && url.pathname === '/api/likes') {
         const slugsParam = url.searchParams.get('slugs');
         const slugs = slugsParam ? slugsParam.split(',').filter(Boolean) : [];
-        return await handleGetLikes(env, slugs);
+        response = await handleGetLikes(env, slugs);
+      } else {
+        response = await server.fetch(request, env, ctx);
       }
-      return await server.fetch(request, env, ctx);
+      if (session.isNew) {
+        appendSessionCookie(response, session.id);
+      }
+      return response;
     } catch (err) {
       logError(err, { type: 'fetch-error', path: url.pathname });
       throw err;
