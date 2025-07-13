@@ -107,14 +107,11 @@ const {
                 <Footer />
                 <script type="module" define:vars={{ slug }}>
                         const currentSlug = slug;
-                        fetch(`/api/views-init/${currentSlug}?value=0`, { method: 'POST' })
-                                .finally(() => {
-                                        fetch(`/api/views/${currentSlug}`, { method: 'POST' })
-                                                .then((r) => r.ok ? r.json() : { views: 0 })
-                                                .then((d) => {
-                                                        const el = document.getElementById('view-count');
-                                                        if (el) el.textContent = d.views;
-                                                });
+                        fetch(`/api/views/${currentSlug}`, { method: 'POST' })
+                                .then((r) => r.ok ? r.json() : { views: 0 })
+                                .then((d) => {
+                                        const el = document.getElementById('view-count');
+                                        if (el) el.textContent = d.views;
                                 });
                         fetch(`/api/likes?slugs=${currentSlug}`)
                                 .then((r) => r.ok ? r.json() : {})
