@@ -4,6 +4,8 @@ import { generateAndPublish } from './modules/generateAndPublish';
 import { createDeferred } from './utils/deferred';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
+import articleTemplate from './prompt/article-content.txt?raw';
+import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
 
 const pendingPrompts = new Map<string, (prompt: string) => void>();
 
@@ -158,6 +160,18 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
   });
 }
 
+async function handleGetPrompt(env: Env) {
+  logEvent({ type: 'get-prompt' });
+  const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
+  const prompt = articleTemplate.replace(
+    '{recent_titles}',
+    recent.map((t, i) => `${i + 1}. ${t}`).join('\n')
+  );
+  return new Response(JSON.stringify({ prompt }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
@@ -175,6 +189,7 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
       ) {
+        logEvent({ type: 'generate-stream-start', sessionId: session.id });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
         const ctrl = {
@@ -204,13 +219,20 @@ export default {
       ) {
         const resolver = pendingPrompts.get(session.id);
         if (!resolver) {
+          logEvent({ type: 'update-prompt-missing', sessionId: session.id });
           response = new Response('No pending prompt', { status: 400 });
         } else {
           const data = await request.json();
           const prompt = (data as any).prompt ?? '';
+          logEvent({ type: 'update-prompt', sessionId: session.id });
           resolver(String(prompt));
           response = new Response('OK');
         }
+      } else if (
+        request.method === 'GET' &&
+        url.pathname === '/api/get-prompt'
+      ) {
+        response = await handleGetPrompt(env);
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')
