@@ -24,6 +24,10 @@ export async function generateAndPublish(
     controller.enqueue(`data: ${message}\n\n`);
   };
 
+  const keepAlive = setInterval(() => {
+    controller?.enqueue(':keepalive\n\n');
+  }, 20000);
+
   try {
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
@@ -75,6 +79,7 @@ export async function generateAndPublish(
     send(`❌ Błąd: ${(err as Error).message}`);
     throw err;
   } finally {
+    clearInterval(keepAlive);
     controller?.close();
   }
 }
