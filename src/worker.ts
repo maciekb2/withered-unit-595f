@@ -297,7 +297,14 @@ export default {
       return response;
     } catch (err) {
       logError(err, { type: 'fetch-error', path: url.pathname });
-      throw err;
+      const errorResponse = {
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      };
+      return new Response(JSON.stringify(errorResponse, null, 2), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   },
   scheduled: cron.scheduled,
