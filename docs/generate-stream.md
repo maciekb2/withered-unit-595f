@@ -13,6 +13,9 @@ Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JS
 - `recentTitles` – listę pobranych tytułów;
 - `articlePrompt` – domyślny prompt wysłany do przeglądarki;
 - `awaitingPrompt` – jeśli `true`, skrypt czeka na edycję prompta;
+
+- `articlePrompt` – finalny prompt wysłany do ChatGPT;
+
 - `articleTitle` – tytuł wygenerowanego artykułu;
 - `heroPrompt` – prompt użyty do stworzenia obrazka.
 
