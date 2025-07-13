@@ -11,6 +11,8 @@ export interface Env {
 import blogPostPrompt from "./prompt/blog-post.txt?raw";
 import { initLogger, logEvent, logError } from './utils/logger';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
+import { normalizeRepo } from './utils/github';
+
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -56,7 +58,14 @@ export default {
     const slug = slugify(title);
     const path = `src/content/blog/${date}-${slug}.md`;
 
-    const repoUrl = `https://api.github.com/repos/${env.GITHUB_REPO}`;
+    if (!env.GITHUB_TOKEN) {
+      throw new Error('GITHUB_TOKEN is not set');
+    }
+    if (!env.GITHUB_REPO) {
+      throw new Error('GITHUB_REPO is not set');
+    }
+    const repoPath = normalizeRepo(env.GITHUB_REPO);
+    const repoUrl = `https://api.github.com/repos/${repoPath}`;
     const headers = {
       Authorization: `Bearer ${env.GITHUB_TOKEN}`,
       "User-Agent": "cron-worker",

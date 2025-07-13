@@ -1,6 +1,7 @@
 import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
+import { normalizeRepo } from '../utils/github';
 import type { ArticleResult } from './articleGenerator';
 
 export interface PublishOptions {
@@ -14,7 +15,14 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   logEvent({ type: 'github-publish-start', title: article.title });
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
-  const repoUrl = `https://api.github.com/repos/${env.GITHUB_REPO}`;
+  if (!env.GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN is not set');
+  }
+  if (!env.GITHUB_REPO) {
+    throw new Error('GITHUB_REPO is not set');
+  }
+  const repoPath = normalizeRepo(env.GITHUB_REPO);
+  const repoUrl = `https://api.github.com/repos/${repoPath}`;
   const headers = {
     Authorization: `Bearer ${env.GITHUB_TOKEN}`,
     'User-Agent': 'article-publisher',
