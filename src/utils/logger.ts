@@ -8,7 +8,11 @@ export function initLogger(kv?: KVNamespace, ctx?: ExecutionContext): void {
 
 function storeLog(entry: Record<string, unknown>): void {
   if (!logsKv) return;
-  const key = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const type = typeof entry.type === 'string' ? entry.type : 'log';
+  const date = new Date().toISOString().split('T')[0];
+  const key = `${date}/${type}/${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
   const promise = logsKv.put(key, JSON.stringify(entry));
   if (execCtx) {
     execCtx.waitUntil(promise);
@@ -22,6 +26,8 @@ export function logRequest(request: Request): void {
     headers.get('CF-Connecting-IP') ||
     headers.get('X-Forwarded-For') ||
     'unknown';
+  const cf = (request as any).cf || {};
+  const country = cf.country || headers.get('CF-IPCountry') || 'unknown';
   const ua = headers.get('User-Agent') || 'unknown';
   const referer = headers.get('Referer') || '';
   const host = headers.get('Host') || url.hostname;
@@ -32,6 +38,7 @@ export function logRequest(request: Request): void {
     path: url.pathname + url.search,
     host,
     ip,
+    country,
     userAgent: ua,
     referer,
   };
@@ -42,6 +49,7 @@ export function logRequest(request: Request): void {
 export function logEvent(event: Record<string, unknown>): void {
   const entry = {
     time: new Date().toISOString(),
+    type: 'event',
     ...event,
   };
   console.log(JSON.stringify(entry));
