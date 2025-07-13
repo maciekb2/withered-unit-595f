@@ -4,24 +4,51 @@ interface NavProps {
     next?: { id: string; data: { title: string } };
 }
 const { prev, next } = Astro.props as NavProps;
+const truncate = (title: string, len = 50) =>
+    title.length > len ? title.slice(0, len) + '…' : title;
 ---
 <nav class="post-nav">
     {prev && (
-        <a href={`/blog/${prev.id}/`} class="prev">\u00ab {prev.data.title}</a>
+        <a href={`/blog/${prev.id}/`} class="prev">
+            <span class="arrow" aria-hidden="true">\u2190</span>
+            <span class="title">{truncate(prev.data.title)}</span>
+        </a>
     )}
     {next && (
-        <a href={`/blog/${next.id}/`} class="next">{next.data.title} \u00bb</a>
+        <a href={`/blog/${next.id}/`} class="next">
+            <span class="title">{truncate(next.data.title)}</span>
+            <span class="arrow" aria-hidden="true">\u2192</span>
+        </a>
     )}
 </nav>
 <style>
 .post-nav {
     display: flex;
     justify-content: space-between;
+    gap: 1em;
     margin: 2em 0;
     padding: 0 1em;
+    flex-wrap: wrap;
 }
 .post-nav a {
     color: var(--accent);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.25em 0;
+    flex: 1 1 45%;
+}
+.post-nav a.next {
+    justify-content: flex-end;
+    text-align: right;
+}
+.post-nav .arrow {
+    font-size: 1.2em;
+}
+.post-nav .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
