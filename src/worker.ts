@@ -58,7 +58,11 @@ async function handleGenerateArticleJson(request: Request, env: Env) {
   }
 }
 
-async function handleGenerateArticleHtml(request: Request, env: Env) {
+async function handleGenerateArticleHtml(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+) {
   logEvent({ type: 'generate-article-endpoint-start' });
   logEvent({ type: 'endpoint-request-id', id: crypto.randomUUID() });
   const { readable, writable } = new TransformStream();
@@ -98,45 +102,50 @@ async function handleGenerateArticleHtml(request: Request, env: Env) {
       </script>`
   );
 
-  const origLog = console.log;
-  const origErr = console.error;
-  console.log = (...args: unknown[]) => {
-    origLog(...args);
-    send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
-  };
-  console.error = (...args: unknown[]) => {
-    origErr(...args);
-    send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
-  };
+  ctx.waitUntil(
+    (async () => {
+      const origLog = console.log;
+      const origErr = console.error;
+      console.log = (...args: unknown[]) => {
+        origLog(...args);
+        send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+      };
+      console.error = (...args: unknown[]) => {
+        origErr(...args);
+        send(`<script>log(${JSON.stringify(args.join(' '))});</script>`);
+      };
 
-  try {
-    const { article, slug } = await generateAndPublish(env);
-    logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
-    send(
-      `<script>
-        log('Zako\u0144czono');
-        const spinner = document.querySelector('.spinner');
-        if (spinner) spinner.style.display = 'none';
-        statusEl.textContent = 'Wygenerowano artyku\u0142!';
-        const container = document.createElement('div');
-        container.style.marginTop = '1rem';
-        container.innerHTML = '<p><a href="/blog/${slug}/">Zobacz artyku\u0142</a></p>' +
-          '<a href="/" style="margin-right:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Strona g\u0142\u00f3wna</a>' +
-          '<a href="/api/generate-article" style="margin-left:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Nowy artyku\u0142</a>';
-        document.body.appendChild(container);
-      </script></body></html>`
-    );
-  } catch (err) {
-    logError(err, { type: 'generate-article-endpoint-error' });
-    send(`<script>log('B\u0142\u0105d: ${escapeHtml(String(err))}');</script></body></html>`);
-    throw err;
-  } finally {
-    console.log = origLog;
-    console.error = origErr;
-    writer.close();
-  }
+      try {
+        const { article, slug } = await generateAndPublish(env);
+        logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
+        send(
+          `<script>
+            log('Zako\u0144czono');
+            const spinner = document.querySelector('.spinner');
+            if (spinner) spinner.style.display = 'none';
+            statusEl.textContent = 'Wygenerowano artyku\u0142!';
+            const container = document.createElement('div');
+            container.style.marginTop = '1rem';
+            container.innerHTML = '<p><a href="/blog/${slug}/">Zobacz artyku\u0142</a></p>' +
+              '<a href="/" style="margin-right:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Strona g\u0142\u00f3wna</a>' +
+              '<a href="/api/generate-article" style="margin-left:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Nowy artyku\u0142</a>';
+            document.body.appendChild(container);
+          </script></body></html>`
+        );
+      } catch (err) {
+        logError(err, { type: 'generate-article-endpoint-error' });
+        send(`<script>log('B\u0142\u0105d: ${escapeHtml(String(err))}');</script></body></html>`);
+      } finally {
+        console.log = origLog;
+        console.error = origErr;
+        writer.close();
+      }
+    })(),
+  );
 
-  return new Response(readable, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  return new Response(readable, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
 }
 
 async function handleView(request: Request, env: Env, slug: string) {
@@ -274,7 +283,7 @@ export default {
         if (accept.includes('application/json')) {
           response = await handleGenerateArticleJson(request, env);
         } else {
-          response = await handleGenerateArticleHtml(request, env);
+          response = await handleGenerateArticleHtml(request, env, ctx);
         }
       } else if (
         request.method === 'POST' &&
