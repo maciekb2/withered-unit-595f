@@ -112,7 +112,20 @@ async function handleGenerateArticleHtml(request: Request, env: Env) {
   try {
     const { article, slug } = await generateAndPublish(env);
     logEvent({ type: 'generate-article-endpoint-complete', title: article.title });
-    send(`<script>log('Zako\u0144czono');window.location.href='/blog/${slug}/';</script></body></html>`);
+    send(
+      `<script>
+        log('Zako\u0144czono');
+        const spinner = document.querySelector('.spinner');
+        if (spinner) spinner.style.display = 'none';
+        statusEl.textContent = 'Wygenerowano artyku\u0142!';
+        const container = document.createElement('div');
+        container.style.marginTop = '1rem';
+        container.innerHTML = '<p><a href="/blog/${slug}/">Zobacz artyku\u0142</a></p>' +
+          '<a href="/" style="margin-right:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Strona g\u0142\u00f3wna</a>' +
+          '<a href="/api/generate-article" style="margin-left:0.5rem;padding:0.5em 1em;border:1px solid #3498db;border-radius:4px;text-decoration:none;">Nowy artyku\u0142</a>';
+        document.body.appendChild(container);
+      </script></body></html>`
+    );
   } catch (err) {
     logError(err, { type: 'generate-article-endpoint-error' });
     send(`<script>log('B\u0142\u0105d: ${escapeHtml(String(err))}');</script></body></html>`);
