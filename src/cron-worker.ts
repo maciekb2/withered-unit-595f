@@ -10,6 +10,7 @@ export interface Env {
 
 import blogPostPrompt from "./prompt/blog-post.txt?raw";
 import { initLogger, logEvent, logError } from './utils/logger';
+import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -21,7 +22,9 @@ export default {
     logEvent({ type: 'cron-start', time: event.scheduledTime });
     const date = new Date(event.scheduledTime).toISOString().split("T")[0];
 
-    const prompt = blogPostPrompt.replace("${date}", date);
+    const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
+    const recentList = recent.map((t, i) => `${i + 1}. ${t}`).join('\n');
+    const prompt = blogPostPrompt.replace("${date}", date).replace('{recent_titles}', recentList);
 
     const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -31,6 +34,7 @@ export default {
       },
       body: JSON.stringify({
         model: "gpt-4-turbo",
+        max_tokens: 7200,
         messages: [
           {
             role: "user",
