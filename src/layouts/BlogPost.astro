@@ -94,7 +94,7 @@ const {
                                                                 )
                                                         }
                                                         <div class="views">Wyświetlenia: <span id="view-count">0</span></div>
-                                                        <div class="likes">Polubienia: <span id="like-count">{likes ?? 0}</span> <button id="like-btn">❤️</button></div>
+                                                        <div class="likes">Polubienia: <span id="like-count">{likes ?? 0}</span> <button id="like-btn" aria-label="Polub wpis">♡</button></div>
                                                 </div>
 						<h1>{title}</h1>
 						<hr />
@@ -113,19 +113,34 @@ const {
                                         const el = document.getElementById('view-count');
                                         if (el) el.textContent = d.views;
                                 });
+                        const likeBtn = document.getElementById('like-btn');
+                        const likeStorageKey = `liked-${currentSlug}`;
                         fetch(`/api/likes?slugs=${currentSlug}`)
                                 .then((r) => r.ok ? r.json() : {})
                                 .then((d) => {
                                         const el = document.getElementById('like-count');
                                         if (el && d[currentSlug] != null) el.textContent = d[currentSlug];
+                                        if (likeBtn && sessionStorage.getItem(likeStorageKey)) {
+                                                likeBtn.disabled = true;
+                                                likeBtn.textContent = '❤️';
+                                                likeBtn.classList.add('liked');
+                                        }
                                 });
-                        const likeBtn = document.getElementById('like-btn');
                         likeBtn?.addEventListener('click', () => {
                                 fetch(`/api/likes/${currentSlug}`, { method: 'POST' })
                                         .then((r) => r.ok ? r.json() : { likes: 0 })
                                         .then((d) => {
                                                 const el = document.getElementById('like-count');
                                                 if (el) el.textContent = d.likes;
+                                                if (likeBtn) {
+                                                        likeBtn.disabled = true;
+                                                        likeBtn.textContent = '❤️';
+                                                        likeBtn.classList.add('liked', 'heartbeat');
+                                                        likeBtn.addEventListener('animationend', () => {
+                                                                likeBtn.classList.remove('heartbeat');
+                                                        }, { once: true });
+                                                }
+                                                sessionStorage.setItem(likeStorageKey, '1');
                                         });
                         });
                 </script>

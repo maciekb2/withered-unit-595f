@@ -123,11 +123,31 @@ async function handleGetViews(env: Env) {
   });
 }
 
-async function handleLike(request: Request, env: Env, slug: string) {
+async function handleLike(
+  request: Request,
+  env: Env,
+  slug: string,
+  sessionId: string,
+) {
   const key = `like-${slug}`;
-  const current = parseInt((await env.pseudointelekt_likes.get(key)) || '0');
+  let value = await env.pseudointelekt_likes.get(key);
+  if (value == null) {
+    await env.pseudointelekt_likes.put(key, '0');
+    value = '0';
+  }
+
+  const sessionKey = `liked-${sessionId}-${slug}`;
+  const alreadyLiked = await env.pseudointelekt_likes.get(sessionKey);
+  const current = parseInt(value);
+  if (alreadyLiked) {
+    return new Response(JSON.stringify({ likes: current }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const updated = current + 1;
   await env.pseudointelekt_likes.put(key, updated.toString());
+  await env.pseudointelekt_likes.put(sessionKey, '1');
   return new Response(JSON.stringify({ likes: updated }), {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -197,7 +217,7 @@ export default {
         url.pathname.startsWith('/api/likes/')
       ) {
         const slug = url.pathname.substring('/api/likes/'.length);
-        response = await handleLike(request, env, slug);
+        response = await handleLike(request, env, slug, session.id);
       } else if (request.method === 'GET' && url.pathname === '/api/likes') {
         const slugsParam = url.searchParams.get('slugs');
         const slugs = slugsParam ? slugsParam.split(',').filter(Boolean) : [];
