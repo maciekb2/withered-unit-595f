@@ -47,7 +47,10 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   }
 
   const refData: any = await refRes.json();
-  const branch = `auto-${postDate.replace(/-/g, '')}`;
+  // Include a slugified title in the branch name to avoid collisions when
+  // publishing multiple posts on the same day.
+  const shortSlug = slug.slice(0, 20);
+  const branch = `auto-${postDate.replace(/-/g, '')}-${shortSlug}`;
 
   const imageName = `${postDate}-${slug}.png`;
   const postName = `${postDate}-${slug}.md`;
@@ -124,7 +127,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       method: 'POST',
       headers,
       body: JSON.stringify({
-        title: `Automated post for ${postDate}`,
+        // Include the article title to make each PR distinct
+        title: `Automated post for ${postDate}: ${article.title}`,
         head: branch,
         base: repo.default_branch,
         body: 'This PR was created automatically by a scheduled Cloudflare Worker.',
