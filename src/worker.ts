@@ -178,7 +178,8 @@ export default {
           enqueue: (chunk: string) => writer.write(new TextEncoder().encode(chunk)),
           close: () => writer.close(),
         };
-        generateAndPublish(env, ctrl).catch(err => {
+        const prompt = url.searchParams.get('prompt') || undefined;
+        generateAndPublish(env, ctrl, prompt).catch(err => {
           console.error('Błąd w tle:', err);
           const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
           ctrl.enqueue(`data: ${msg}\n\n`);

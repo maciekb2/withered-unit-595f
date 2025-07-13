@@ -15,7 +15,8 @@ export interface GenerateAndPublishResult {
 
 export async function generateAndPublish(
   env: Env,
-  controller?: { enqueue: (chunk: string) => void; close: () => void }
+  controller?: { enqueue: (chunk: string) => void; close: () => void },
+  articlePrompt: string = articleTemplate
 ): Promise<GenerateAndPublishResult> {
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
@@ -30,7 +31,7 @@ export async function generateAndPublish(
     send('🧠 Generuję treść artykułu...');
     const article = await generateArticle({
       apiKey: env.OPENAI_API_KEY,
-      prompt: articleTemplate,
+      prompt: articlePrompt,
       recentTitles: recent,
       maxTokens: 7200,
     });

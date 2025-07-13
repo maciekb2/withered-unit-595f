@@ -9,27 +9,45 @@ body { font-family: sans-serif; padding: 2rem; }
 </style>
 </head>
 <body>
-<h1>Generowanie artykułu</h1>
-<div id="status">Oczekiwanie na dane...</div>
-<pre id="log"></pre>
-<script>
-const logEl = document.getElementById('log');
-const statusEl = document.getElementById('status');
-const es = new EventSource('/api/generate-stream');
-es.onmessage = (e) => {
-  const msg = JSON.parse(e.data);
-  if (msg.log) {
-    logEl.textContent += msg.log + '\n';
+  <h1>Generowanie artykułu</h1>
+  <label for="prompt">Prompt:</label><br />
+  <textarea id="prompt" rows="10" cols="80">Napisz ironiczny artykuł na blog geopolityczny w formacie JSON zawierającym pola "title", "description" i "content".
+Oto tytuły pięciu ostatnich wpisów:
+{recent_titles}
+Unikaj powtarzania tych tematów i skup się na nieco innym aspekcie.
+Używaj lekkiego języka i wpleć ciekawostki z bieżącej polityki.
+Tekst powinien być około dwukrotnie dłuższy niż zwykle.
+Zwróć tylko JSON bez dodatkowych komentarzy.</textarea>
+  <br />
+  <button id="start">Start</button>
+  <div id="status"></div>
+  <pre id="log"></pre>
+  <script>
+  const logEl = document.getElementById('log');
+  const statusEl = document.getElementById('status');
+  const startBtn = document.getElementById('start');
+  let es;
+  function start() {
+    startBtn.disabled = true;
+    const prompt = document.getElementById('prompt').value;
+    statusEl.textContent = 'Łączę...';
+    es = new EventSource('/api/generate-stream?prompt=' + encodeURIComponent(prompt));
+    es.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.log) {
+        logEl.textContent += msg.log + '\n';
+      }
+      if (msg.done) {
+        statusEl.innerHTML = `Zakończono! <a href="${msg.url}">Zobacz PR</a>`;
+        es.close();
+      }
+    };
+    es.onerror = () => {
+      statusEl.textContent = 'Błąd połączenia';
+      es.close();
+    };
   }
-  if (msg.done) {
-    statusEl.innerHTML = `Zakończono! <a href="${msg.url}">Zobacz PR</a>`;
-    es.close();
-  }
-};
-es.onerror = () => {
-  statusEl.textContent = 'Błąd połączenia';
-  es.close();
-};
-</script>
+  startBtn.addEventListener('click', start);
+  </script>
 </body>
 </html>
