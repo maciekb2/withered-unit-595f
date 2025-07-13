@@ -1,4 +1,5 @@
-import { generateArticleAssets } from './generateArticleAssets';
+import { generateArticle } from './articleGenerator';
+import { generateHeroImage } from './heroImageGenerator';
 import { publishArticleToGitHub } from './githubPublisher';
 import { sendSlackMessage } from '../utils/slack';
 import articleTemplate from '../prompt/article-content.txt?raw';
@@ -12,20 +13,51 @@ export interface GenerateAndPublishResult {
   slug: string;
 }
 
-export async function generateAndPublish(env: Env): Promise<GenerateAndPublishResult> {
-  const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
-  const { article, heroImage } = await generateArticleAssets({
-    apiKey: env.OPENAI_API_KEY,
-    articleTemplate,
-    heroTemplate,
-    recentTitles: recent,
-    maxTokens: 7200,
-  });
-  const prUrl = await publishArticleToGitHub({ env, article, heroImage });
-  const snippet = article.content.slice(0, 300);
-  await sendSlackMessage(
-    env.SLACK_WEBHOOK_URL,
-    `Nowy artykuł: ${article.title}\n${snippet}...\n${prUrl}`
-  );
-  return { article, slug: slugify(article.title) };
+export async function generateAndPublish(
+  env: Env,
+  controller?: { enqueue: (chunk: string) => void; close: () => void }
+): Promise<GenerateAndPublishResult> {
+  const send = (log: string, data: Record<string, unknown> = {}) => {
+    if (!controller) return;
+    const message = JSON.stringify({ log, ...data });
+    controller.enqueue(`data: ${message}\n\n`);
+  };
+
+  try {
+    send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
+    const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
+
+    send('🧠 Generuję treść artykułu...');
+    const article = await generateArticle({
+      apiKey: env.OPENAI_API_KEY,
+      prompt: articleTemplate,
+      recentTitles: recent,
+      maxTokens: 7200,
+    });
+
+    send('🎨 Tworzę obrazek do artykułu...');
+    const heroPrompt = heroTemplate.replace('{title}', article.title);
+    const heroImage = await generateHeroImage({ apiKey: env.OPENAI_API_KEY, prompt: heroPrompt });
+
+    send('📦 Publikuję na GitHubie...');
+    const prUrl = await publishArticleToGitHub({ env, article, heroImage });
+
+    const snippet = article.content.slice(0, 300);
+    await sendSlackMessage(
+      env.SLACK_WEBHOOK_URL,
+      `Nowy artykuł: ${article.title}\n${snippet}...\n${prUrl}`
+    );
+
+    send('🎉 Publikacja zakończona sukcesem!', {
+      done: true,
+      url: prUrl,
+    });
+
+    return { article, slug: slugify(article.title) };
+  } catch (err) {
+    send(`❌ Błąd: ${(err as Error).message}`);
+    throw err;
+  } finally {
+    controller?.close();
+  }
 }
