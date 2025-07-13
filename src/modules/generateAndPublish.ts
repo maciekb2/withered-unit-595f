@@ -53,12 +53,18 @@ export async function generateAndPublish(
       apiKey: env.OPENAI_API_KEY,
       prompt: finalPrompt,
       maxTokens: 7200,
+      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
     });
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
     const heroPrompt = heroTemplate.replace('{title}', article.title);
     send('🎨 Tworzę obrazek do artykułu...', { heroPrompt });
-    const heroImage = await generateHeroImage({ apiKey: env.OPENAI_API_KEY, prompt: heroPrompt });
+    const heroImage = await generateHeroImage({
+      apiKey: env.OPENAI_API_KEY,
+      prompt: heroPrompt,
+      style: (env.OPENAI_IMAGE_STYLE as any) || 'vivid',
+      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'hd',
+    });
 
     send('📦 Publikuję na GitHubie...');
     const prUrl = await publishArticleToGitHub({ env, article, heroImage });

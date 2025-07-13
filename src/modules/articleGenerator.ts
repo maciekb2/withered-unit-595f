@@ -10,6 +10,10 @@ export interface ArticleResult {
 export interface GenerateArticleOptions {
   apiKey: string;
   prompt: string;
+  /**
+   * OpenAI model used for text generation. Defaults to 'gpt-4o'.
+   */
+  model?: string;
   maxTokens?: number;
   /**
    * Optional list of recent titles to be substituted into the prompt as
@@ -18,7 +22,7 @@ export interface GenerateArticleOptions {
   recentTitles?: string[];
 }
 
-export async function generateArticle({ apiKey, prompt, maxTokens, recentTitles }: GenerateArticleOptions): Promise<ArticleResult> {
+export async function generateArticle({ apiKey, prompt, model = 'gpt-4o', maxTokens, recentTitles }: GenerateArticleOptions): Promise<ArticleResult> {
   const finalPrompt = recentTitles
     ? prompt.replace(
         '{recent_titles}',
@@ -28,7 +32,7 @@ export async function generateArticle({ apiKey, prompt, maxTokens, recentTitles 
   logEvent({ type: 'generate-article-start' });
   logEvent({
     type: 'openai-request',
-    model: 'gpt-4o',
+    model,
     promptSnippet: finalPrompt.slice(0, 100),
   });
   try {
@@ -39,7 +43,7 @@ export async function generateArticle({ apiKey, prompt, maxTokens, recentTitles 
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model,
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: finalPrompt }],
       }),

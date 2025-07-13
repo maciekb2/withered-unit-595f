@@ -54,11 +54,15 @@ wrangler kv:namespace create pseudointelekt_contact_form
 ```
 Następnie w pliku `wrangler.json` dodaj uzyskany `id` i `preview_id` w sekcji `kv_namespaces` pod nazwą `pseudointelekt_contact_form`.
 
-Dodatkowo w sekcji `vars` umieść adres swojego webhooka Slack:
+Dodatkowo w sekcji `vars` umieść adres swojego webhooka Slack i opcjonalne
+ustawienia modeli OpenAI:
 
 ```json
   "vars": {
-    "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>"
+    "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>",
+    "OPENAI_TEXT_MODEL": "gpt-4o",
+    "OPENAI_IMAGE_STYLE": "vivid",
+    "OPENAI_IMAGE_QUALITY": "hd"
   }
 ```
 
