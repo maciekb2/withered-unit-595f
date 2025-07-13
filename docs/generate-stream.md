@@ -8,7 +8,14 @@ Nowy mechanizm pozwala śledzić postęp tworzenia wpisu w czasie rzeczywistym z
 GET /api/generate-stream
 ```
 
-Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JSON zawierający przynajmniej pole `log`. Po zakończeniu wysyłany jest obiekt `{ done: true, url: '<link do PR>' }`.
+Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JSON zawierający przynajmniej pole `log`. Dodatkowe pola mogą przekazywać:
+
+- `recentTitles` – listę pobranych tytułów;
+- `articlePrompt` – finalny prompt wysłany do ChatGPT;
+- `articleTitle` – tytuł wygenerowanego artykułu;
+- `heroPrompt` – prompt użyty do stworzenia obrazka.
+
+Po zakończeniu wysyłany jest obiekt `{ done: true, url: '<link do PR>' }`.
 
 ## Podstrona `generuj.html`
 
