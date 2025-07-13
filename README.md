@@ -86,3 +86,29 @@ GET /api/generate-article
 ```
 
 Wejście na ten adres uruchamia proces tworzenia wpisu i zwraca w odpowiedzi JSON z tytułem oraz treścią artykułu. Wygenerowane pliki są od razu commitowane do `main` na GitHubie.
+
+## Logowanie zdarzeń
+
+Worker zapisuje logi w przestrzeni **pseudointelekt_logs**. Każdy wpis to pojedynczy obiekt JSON, którego klucz ma postać:
+
+```
+YYYY-MM-DD/<typ>/<timestamp>-<losowe>
+```
+
+Przykładowy rekord dla zapytania HTTP wygląda następująco:
+
+```json
+{
+  "time": "2024-05-06T12:34:56.000Z",
+  "type": "request",
+  "method": "GET",
+  "path": "/about",
+  "host": "example.com",
+  "ip": "203.0.113.42",
+  "country": "PL",
+  "userAgent": "Mozilla/5.0",
+  "referer": "https://google.com"
+}
+```
+
+Dzięki temu można łatwo filtrować logi po dacie i rodzaju zdarzenia.
