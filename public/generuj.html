@@ -5,10 +5,25 @@
 <title>Generowanie artykułu</title>
 <style>
 body { font-family: sans-serif; padding: 2rem; }
-#log { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 4px; max-height: 60vh; overflow-y: auto; }
-#panel { margin-bottom: 1em; }
-#panel h2 { margin-top: 1em; }
-#footer { margin-top: 2em; }
+#log {
+  white-space: pre-wrap;
+  background: #f4f4f4;
+  padding: 1rem;
+  border-radius: 4px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-top: 1em;
+}
+#panel {
+  margin-bottom: 1em;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 4px;
+  background: #fafafa;
+}
+#footer {
+  margin-top: 2em;
+}
 .home-button { display: inline-block; padding: 0.75em 1.5em; background: var(--diplomatic-blue, #1c3d5a); color: var(--ivory, #f8f6f1); border-radius: 4px; text-decoration: none; border: 2px solid var(--diplomatic-blue, #1c3d5a); margin-right: 1em; }
 .home-button:hover { background: var(--gold-accent, #cba135); color: var(--charcoal, #2d2d2d); }
 textarea { width: 100%; height: 8em; }
@@ -20,18 +35,11 @@ textarea { width: 100%; height: 8em; }
 <div id="panel">
   <div id="status">Oczekiwanie na dane...</div>
 
-  <h2>Ostatnie tytuły</h2>
-  <ul id="titles"></ul>
-  <h2>Nowy artykuł</h2>
-  <p id="article-title"></p>
-  <h2>Prompt (artykuł)</h2>
-  <textarea id="article-prompt" readonly></textarea>
-  <button id="continue-btn" style="display:none">Kontynuuj</button>
+  <div id="log"></div>
 
-  <h2>Prompt (obrazek)</h2>
-  <pre id="hero-prompt"></pre>
+  <textarea id="article-prompt" style="display:none" readonly></textarea>
+  <button id="continue-btn" style="display:none">Kontynuuj</button>
 </div>
-<pre id="log"></pre>
 <div id="footer">
   <a id="pr-link" class="home-button" style="display:none">Zobacz PR</a>
   <a href="/" class="home-button">Strona główna</a>
@@ -40,35 +48,55 @@ textarea { width: 100%; height: 8em; }
 <script>
 const logEl = document.getElementById('log');
 const statusEl = document.getElementById('status');
-const titlesEl = document.getElementById('titles');
-const articleTitleEl = document.getElementById('article-title');
 const articlePromptEl = document.getElementById('article-prompt');
-const heroPromptEl = document.getElementById('hero-prompt');
 const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
+
+function appendLog(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  logEl.appendChild(div);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function appendLogElement(el) {
+  logEl.appendChild(el);
+  logEl.scrollTop = logEl.scrollHeight;
+}
 
 const es = new EventSource('/api/generate-stream');
 es.onmessage = (e) => {
   const msg = JSON.parse(e.data);
   if (msg.log) {
-    logEl.textContent += msg.log + '\n';
+    appendLog(msg.log);
   }
   if (msg.recentTitles) {
-    titlesEl.innerHTML = msg.recentTitles.map(t => `<li>${t}</li>`).join('');
+    appendLog('📚 Ostatnie tytuły:');
+    const list = document.createElement('ul');
+    msg.recentTitles.forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      list.appendChild(li);
+    });
+    appendLogElement(list);
   }
   if (msg.articleTitle) {
-    articleTitleEl.textContent = msg.articleTitle;
+    appendLog(`📰 Nowy artykuł: ${msg.articleTitle}`);
   }
   if (msg.articlePrompt) {
+    appendLog('✏ Prompt (artykuł):');
     articlePromptEl.value = msg.articlePrompt;
+    if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
+    articlePromptEl.style.display = 'block';
   }
   if (msg.awaitingPrompt) {
     articlePromptEl.removeAttribute('readonly');
     continueBtn.style.display = 'inline-block';
-
+    if (!continueBtn.parentNode) appendLogElement(continueBtn);
   }
   if (msg.heroPrompt) {
-    heroPromptEl.textContent = msg.heroPrompt;
+    appendLog('🎨 Prompt (obrazek):');
+    appendLog(msg.heroPrompt);
   }
   if (msg.done) {
     statusEl.textContent = 'Zakończono!';
@@ -79,18 +107,25 @@ es.onmessage = (e) => {
 };
 es.onerror = () => {
   statusEl.textContent = 'Błąd połączenia';
+  appendLog('❌ Błąd połączenia');
   es.close();
 };
 
 continueBtn.addEventListener('click', async () => {
   continueBtn.disabled = true;
-  await fetch('/api/update-prompt', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: articlePromptEl.value }),
-  });
-  articlePromptEl.setAttribute('readonly', '');
-  continueBtn.style.display = 'none';
+  try {
+    await fetch('/api/update-prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: articlePromptEl.value }),
+    });
+    appendLog('⏭ Kontynuuję tworzenie...');
+    articlePromptEl.setAttribute('readonly', '');
+    continueBtn.style.display = 'none';
+  } catch (err) {
+    appendLog('❌ Błąd połączenia podczas wysyłania prompta');
+    continueBtn.disabled = false;
+  }
 });
 </script>
 </body>
