@@ -4,7 +4,8 @@ export interface Env {
   GITHUB_REPO: string; // owner/repo
   SLACK_WEBHOOK_URL: string;
   pseudointelekt_contact_form: KVNamespace;
-  pseudointelekt_logs: KVNamespace;
+  pseudointelekt_logs_db: D1Database;
+  WORKER_ID: string;
 }
 
 import blogPostPrompt from "./prompt/blog-post.txt?raw";
@@ -16,7 +17,7 @@ function slugify(text: string) {
 
 export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    initLogger(env.pseudointelekt_logs, ctx);
+    initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
     logEvent({ type: 'cron-start', time: event.scheduledTime });
     const date = new Date(event.scheduledTime).toISOString().split("T")[0];
 

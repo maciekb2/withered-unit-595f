@@ -23,12 +23,17 @@
       "id": "e22b4da9fe0e45d8ae2515792d5929df",
       "preview_id": "e22b4da9fe0e45d8ae2515792d5929df"
     }
-    ,{
-      "binding": "pseudointelekt_logs",
-      "id": "d3a2f2838cff46bdaa9a9ef0e7bf1da9",
-      "preview_id": "d3a2f2838cff46bdaa9a9ef0e7bf1da9"
+  ],
+  "d1_databases": [
+    {
+      "binding": "pseudointelekt_logs_db",
+      "database_name": "pseudointelekt_logs",
+      "database_id": "c290edf1-394f-4c8b-940c-da62db2774b1"
     }
   ],
+  "vars": {
+    "WORKER_ID": "pseudointelekt2137-blog"
+  },
   "observability": {
     "enabled": true
   },

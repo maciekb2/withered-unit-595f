@@ -9,5 +9,6 @@ interface Env {
         pseudointelekt_contact_form: KVNamespace;
         pseudointelekt_views: KVNamespace;
         pseudointelekt_likes: KVNamespace;
-        pseudointelekt_logs: KVNamespace;
+        WORKER_ID: string;
+        pseudointelekt_logs_db: D1Database;
 }

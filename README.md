@@ -89,13 +89,23 @@ Wejście na ten adres uruchamia proces tworzenia wpisu i zwraca w odpowiedzi JSO
 
 ## Logowanie zdarzeń
 
-Worker zapisuje logi w przestrzeni **pseudointelekt_logs**. Każdy wpis to pojedynczy obiekt JSON, którego klucz ma postać:
+Logi są teraz zapisywane w bazie **D1** o nazwie `pseudointelekt_logs`. Tabela `logs` posiada kolumny:
 
-```
-YYYY-MM-DD/<typ>/<timestamp>-<losowe>
+- `id` – automatyczny identyfikator,
+- `time` – czas zdarzenia,
+- `worker_id` – identyfikator workera,
+- `data` – pełny zapis zdarzenia w formacie JSON.
+
+Aby utworzyć bazę wykonaj:
+
+```bash
+wrangler d1 create pseudointelekt_logs
 ```
 
-Przykładowy rekord dla zapytania HTTP wygląda następująco:
+Otrzymany `database_id` wpisz w pliku `wrangler.json` w sekcji `d1_databases` (w tym repo to `c290edf1-394f-4c8b-940c-da62db2774b1`).
+W sekcji `vars` ustaw `WORKER_ID` na `pseudointelekt2137-blog`, który będzie wstawiany do kolumny `worker_id`.
+
+Przykładowe zapytanie HTTP zostanie zapisane w kolumnie `data` jako JSON podobny do poniższego:
 
 ```json
 {
@@ -110,5 +120,3 @@ Przykładowy rekord dla zapytania HTTP wygląda następująco:
   "referer": "https://google.com"
 }
 ```
-
-Dzięki temu można łatwo filtrować logi po dacie i rodzaju zdarzenia.
