@@ -88,6 +88,7 @@ es.onmessage = (e) => {
     articlePromptEl.value = msg.articlePrompt;
     if (!articlePromptEl.parentNode) appendLogElement(articlePromptEl);
     articlePromptEl.style.display = 'block';
+
   }
   if (msg.awaitingPrompt) {
     articlePromptEl.removeAttribute('readonly');
