@@ -11,7 +11,7 @@ export interface PublishOptions {
   date?: string;
 }
 
-export async function publishArticleToGitHub({ env, article, heroImage, date }: PublishOptions): Promise<void> {
+export async function publishArticleToGitHub({ env, article, heroImage, date }: PublishOptions): Promise<string> {
   logEvent({ type: 'github-publish-start', title: article.title });
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
@@ -143,24 +143,14 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     }
     const prData: any = await prRes.json();
 
-    logEvent({ type: 'github-merge-pr', number: prData.number });
-    const mergeRes = await retryFetch(`${repoUrl}/pulls/${prData.number}/merge`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({
-        commit_title: `Auto merge for ${postDate}`,
-        merge_method: 'squash',
-      }),
-      retries: 2,
-      retryDelayMs: 1000,
+    logEvent({
+      type: 'github-publish-complete',
+      post: postName,
+      image: imageName,
+      branch,
+      pr: prData.html_url,
     });
-    logEvent({ type: 'github-merge-pr-status', status: mergeRes.status });
-    if (!mergeRes.ok) {
-      const msg = await mergeRes.text();
-      throw new Error(`GitHub PR merge failed: ${mergeRes.status} ${msg}`);
-    }
-
-    logEvent({ type: 'github-publish-complete', post: postName, image: imageName, branch });
+    return prData.html_url as string;
   } catch (err) {
     logError(err, { type: 'github-publish-error' });
     throw err;
