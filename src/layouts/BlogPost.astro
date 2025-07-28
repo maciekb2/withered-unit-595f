@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import PostNavigation from '../components/PostNavigation.astro';
+import { SITE_TITLE } from '../consts';
 
 type Props = CollectionEntry<'blog'>['data'] & {
     slug: string;
@@ -23,15 +24,30 @@ const {
     prev,
     next,
 } = Astro.props as Props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  image: heroImage ? new URL(heroImage, Astro.site).toString() : undefined,
+  url: new URL(`/blog/${slug}/`, Astro.site).toString(),
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  author: { "@type": "Organization", name: SITE_TITLE },
+};
 ---
 
 <html lang="en">
-	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
+        <head>
+                <BaseHead title={title} description={description} />
+                <script type="application/ld+json">
+                        {JSON.stringify(jsonLd)}
+                </script>
+                <style>
+                        main {
+                                width: calc(100% - 2em);
+                                max-width: 100%;
 				margin: 0;
 			}
 			.hero-image {
