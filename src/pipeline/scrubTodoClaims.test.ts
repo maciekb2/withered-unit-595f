@@ -8,3 +8,9 @@ test('scrubTodoClaims removes tagged sentences', () => {
   assert.equal(removedCount, 1);
   assert(!cleaned.includes('[[TODO-CLAIM]]'));
 });
+
+test('preserves headings on separate lines', () => {
+  const md = '## Sekcja\nFakt.[[TODO-CLAIM]] Kolejny.';
+  const { cleaned } = scrubTodoClaims(md);
+  assert(cleaned.startsWith('## Sekcja\n'));
+});
