@@ -1,17 +1,22 @@
-import { generateArticle } from './articleGenerator';
+import { generateOutline } from '../pipeline/outline';
+import { generateDraft } from '../pipeline/draft';
+import { editDraft } from '../pipeline/edit';
+import { formatFinal } from '../pipeline/format';
+import type { FinalJson } from '../pipeline/types';
 import { generateHeroImage } from './heroImageGenerator';
-import type { ArticleResult } from './articleGenerator';
 
 export interface GenerateArticleAssetsOptions {
   apiKey: string;
   articleTemplate: string;
   heroTemplate: string;
   recentTitles: string[];
+  baseTopic?: string;
+  model?: string;
   maxTokens?: number;
 }
 
 export interface GenerateArticleAssetsResult {
-  article: ArticleResult;
+  article: FinalJson;
   heroImage: Buffer;
 }
 
@@ -20,14 +25,26 @@ export async function generateArticleAssets({
   articleTemplate,
   heroTemplate,
   recentTitles,
+  baseTopic = 'Aktualny temat',
+  model,
   maxTokens,
 }: GenerateArticleAssetsOptions): Promise<GenerateArticleAssetsResult> {
-  const article = await generateArticle({
+  const prompt = articleTemplate.replace(
+    '{recent_titles}',
+    recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
+  );
+
+  const outline = await generateOutline({ apiKey, baseTopic, model });
+  const draft = await generateDraft({
     apiKey,
-    prompt: articleTemplate,
-    recentTitles,
+    outline,
+    articlePrompt: prompt,
+    model,
     maxTokens,
   });
+  const edited = await editDraft({ apiKey, draft, outline, model, maxTokens });
+  const article = formatFinal(edited);
+
   const heroPrompt = heroTemplate.replace('{title}', article.title);
   const heroImage = await generateHeroImage({ apiKey, prompt: heroPrompt });
   return { article, heroImage };
