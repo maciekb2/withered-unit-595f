@@ -2,10 +2,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
-import type { ArticleResult } from './articleGenerator';
+import type { FinalJson } from '../pipeline/types';
+import { validateFinalJson, yamlEscape } from '../utils/validators';
 
 export interface AssembleOptions {
-  article: ArticleResult;
+  article: FinalJson;
   heroImage: Buffer;
   blogDir?: string;
   publicDir?: string;
@@ -21,6 +22,14 @@ export async function assembleArticle({
 }: AssembleOptions): Promise<{ postPath: string; imagePath: string }> {
   logEvent({ type: 'assemble-start', title: article.title });
   logEvent({ type: 'assemble-paths', blogDir, publicDir });
+  const validation = validateFinalJson(article);
+  if (!validation.ok) {
+    logError(new Error('Final JSON validation failed'), {
+      type: 'assemble-validate-error',
+      errors: validation.errs,
+    });
+    throw new Error('Final JSON validation failed: ' + validation.errs.join('; '));
+  }
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
 
@@ -34,8 +43,8 @@ export async function assembleArticle({
 
   const fm = [
     '---',
-    `title: "${article.title}"`,
-    `description: "${article.description}"`,
+    `title: "${yamlEscape(article.title)}"`,
+    `description: "${yamlEscape(article.description)}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
     'views: 0',
