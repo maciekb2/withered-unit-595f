@@ -31,6 +31,7 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-4o', max
 
     const json = extractJson<any>(text);
 
+
     const outline: Outline = {
       finalTitle: json.finalTitle,
       description: json.description,

@@ -6,6 +6,7 @@ import { chat } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 
+
 export interface EditDraftOptions {
   apiKey: string;
   draft: Draft;
@@ -27,6 +28,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxT
       model,
     });
     const json: Edited = extractJson<Edited>(text);
+
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }
