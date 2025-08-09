@@ -102,12 +102,20 @@ export async function generateAndPublish(
     const validation = validateAntiHallucination(edited.markdown, outline);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));
     if (warns.length) {
-      send('⚠️ Ostrzeżenia walidatora', { warnings: warns });
+      send('⚠️ Ostrzeżenia walidatora', {
+        warnings: warns,
+        stats: validation.stats,
+      });
     }
     if (!validation.ok) {
       const errs = validation.errors.filter(e => e.startsWith('ERROR'));
-      send('❌ Błąd walidacji treści', { errors: errs });
-      throw new Error('Content validation failed');
+      send('❌ Błąd walidacji treści', {
+        errors: errs,
+        stats: validation.stats,
+      });
+      throw new Error(`Content validation failed: ${errs.join('; ')}`);
+    } else {
+      send('✅ Walidacja treści OK', { stats: validation.stats });
     }
 
     const article = formatFinal(edited);

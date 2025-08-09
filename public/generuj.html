@@ -92,6 +92,29 @@ function startStream() {
     if (msg.log) {
       appendLog(msg.log);
     }
+  if (msg.warnings) {
+    appendLog('⚠️ Ostrzeżenia:');
+    const list = document.createElement('ul');
+    msg.warnings.forEach(w => {
+      const li = document.createElement('li');
+      li.textContent = w;
+      list.appendChild(li);
+    });
+    appendLogElement(list);
+  }
+  if (msg.errors) {
+    appendLog('❌ Błędy:');
+    const list = document.createElement('ul');
+    msg.errors.forEach(er => {
+      const li = document.createElement('li');
+      li.textContent = er;
+      list.appendChild(li);
+    });
+    appendLogElement(list);
+  }
+  if (msg.stats) {
+    appendLog(`📊 Statystyki: roszczenia=${msg.stats.claims}, ze źródłem=${msg.stats.withSource}, todo=${msg.stats.todo}`);
+  }
   if (msg.recentTitles) {
     appendLog('📚 Ostatnie tytuły:');
     const list = document.createElement('ul');
