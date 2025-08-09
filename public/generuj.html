@@ -52,6 +52,7 @@ const articlePromptEl = document.getElementById('article-prompt');
 const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
 let promptShown = false;
+let topicForm;
 
 function sendLog(event, details = {}) {
   fetch('/api/client-log', {
@@ -101,6 +102,37 @@ function startStream() {
     });
     appendLogElement(list);
   }
+  if (msg.hotTopics) {
+    appendLog('🔥 Gorące tematy:');
+    const list = document.createElement('ul');
+    msg.hotTopics.forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      list.appendChild(li);
+    });
+    appendLogElement(list);
+  }
+  if (msg.topicSuggestions && !topicForm) {
+    appendLog('💡 Propozycje tematów:');
+    topicForm = document.createElement('div');
+    msg.topicSuggestions.forEach((s, i) => {
+      const label = document.createElement('label');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'topic';
+      radio.value = s.title;
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(`${s.title} – ${s.rationale}`));
+      topicForm.appendChild(label);
+      topicForm.appendChild(document.createElement('br'));
+    });
+    const custom = document.createElement('input');
+    custom.type = 'text';
+    custom.id = 'custom-topic';
+    custom.placeholder = 'Własny temat';
+    topicForm.appendChild(custom);
+    appendLogElement(topicForm);
+  }
   if (msg.articleTitle) {
     appendLog(`📰 Nowy artykuł: ${msg.articleTitle}`);
   }
@@ -145,7 +177,18 @@ function startStream() {
       const res = await fetch('/api/update-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: articlePromptEl.value }),
+        body: JSON.stringify({
+          prompt: articlePromptEl.value,
+          topic: (() => {
+            if (topicForm) {
+              const checked = topicForm.querySelector('input[name="topic"]:checked');
+              if (checked) return checked.value;
+              const custom = document.getElementById('custom-topic');
+              if (custom) return custom.value;
+            }
+            return '';
+          })(),
+        }),
         credentials: 'include',
       });
       if (!res.ok) throw new Error('status ' + res.status);
