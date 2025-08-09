@@ -1,6 +1,7 @@
 import type { HotTopic } from '../utils/hotTopics';
 import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
+import { extractJson } from '../utils/json';
 
 export interface SuggestedTopic {
   title: string;
@@ -61,13 +62,7 @@ export async function suggestArticleTopic(
     }
     logEvent({ type: 'openai-response-text', text: text.slice(0, 200) });
 
-    let jsonText = text;
-    const match = /^```(?:json)?\n([\s\S]*?)\n```$/.exec(text);
-    if (match) {
-      jsonText = match[1];
-    }
-
-    const parsed: SuggestedTopic[] = JSON.parse(jsonText);
+    const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(text);
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());
     const result: SuggestedTopic[] = [];

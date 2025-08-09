@@ -2,6 +2,7 @@ import { logEvent, logError } from '../utils/logger';
 import type { Outline } from './types';
 import { chat } from './openai';
 import { guardrails } from './guardrails';
+import { extractJson } from '../utils/json';
 
 export interface GenerateOutlineOptions {
   apiKey: string;
@@ -28,10 +29,8 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-4o', max
       model,
     });
 
-    let jsonText = text;
-    const match = /^```(?:json)?\n([\s\S]*?)\n```$/.exec(text);
-    if (match) jsonText = match[1];
-    const json = JSON.parse(jsonText);
+    const json = extractJson<any>(text);
+
 
     const outline: Outline = {
       finalTitle: json.finalTitle,

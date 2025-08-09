@@ -4,6 +4,8 @@ import { scrubTodoClaims } from './scrubTodoClaims';
 import type { Outline, Draft, Edited } from './types';
 import { chat } from './openai';
 import { guardrails } from './guardrails';
+import { extractJson } from '../utils/json';
+
 
 export interface EditDraftOptions {
   apiKey: string;
@@ -25,10 +27,8 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxT
       max_tokens: maxTokens ?? 1000,
       model,
     });
-    let jsonText = text;
-    const match = /^```(?:json)?\n([\s\S]*?)\n```$/.exec(text);
-    if (match) jsonText = match[1];
-    const json: Edited = JSON.parse(jsonText);
+    const json: Edited = extractJson<Edited>(text);
+
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }
