@@ -55,7 +55,11 @@ export async function generateAndPublish(
     let baseTopic = hotTopics[0]?.title || 'Aktualny temat';
 
     if (promptPromise) {
-      const suggestions = await suggestArticleTopic(hotTopics, recent);
+      const suggestions = await suggestArticleTopic(
+        hotTopics,
+        recent,
+        env.OPENAI_API_KEY,
+      );
       send('💡 Propozycje tematów', { topicSuggestions: suggestions });
       send('✏️ Możesz edytować prompt i wybrać temat', {
         articlePrompt,

@@ -12,7 +12,6 @@ const recent = ['Stary tytuł 1', 'Stary tytuł 2'];
 
 test('suggestArticleTopic avoids recent titles and covers multiple themes', async () => {
   const originalFetch = globalThis.fetch;
-  process.env.OPENAI_API_KEY = 'test-key';
   globalThis.fetch = async () =>
     new Response(
       JSON.stringify({
@@ -31,7 +30,11 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
       { status: 200 },
     ) as any;
 
-  const suggestions = await suggestArticleTopic(mockHotTopics, recent);
+  const suggestions = await suggestArticleTopic(
+    mockHotTopics,
+    recent,
+    'test-key',
+  );
 
   assert.equal(suggestions.length, 3);
   for (const s of suggestions) {

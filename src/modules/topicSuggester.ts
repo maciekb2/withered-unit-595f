@@ -10,6 +10,7 @@ export interface SuggestedTopic {
 export async function suggestArticleTopic(
   hotTopics: HotTopic[],
   recentTitles: string[],
+  apiKey: string,
 ): Promise<SuggestedTopic[]> {
   const prompt = [
     'Mam listę gorących tematów:',
@@ -23,7 +24,6 @@ export async function suggestArticleTopic(
     'Wynik parsuj jako JSON array { title, rationale }.',
   ].join('\n');
 
-  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY not set');
   }
