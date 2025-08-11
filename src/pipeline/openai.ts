@@ -4,8 +4,6 @@ import { retryFetch } from '../utils/retryFetch';
 export interface ChatOptions {
   system?: string;
   user: string;
-  temperature: number;
-  top_p: number;
   max_completion_tokens: number;
   model?: string;
 }
@@ -13,8 +11,6 @@ export interface ChatOptions {
 export async function chat(apiKey: string, {
   system,
   user,
-  temperature,
-  top_p,
   max_completion_tokens,
   model = 'gpt-5',
 }: ChatOptions): Promise<string> {
@@ -30,7 +26,7 @@ export async function chat(apiKey: string, {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, temperature, top_p, max_completion_tokens, messages }),
+      body: JSON.stringify({ model, max_completion_tokens, messages }),
       retries: 2,
       retryDelayMs: 1000,
     });

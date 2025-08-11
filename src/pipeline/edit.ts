@@ -27,8 +27,6 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTo
     const text = await chat(apiKey, {
       system: guardrails(),
       user: prompt,
-      temperature: 0.2,
-      top_p: 0.9,
       max_completion_tokens: maxTokens ?? 1000,
       model,
     });

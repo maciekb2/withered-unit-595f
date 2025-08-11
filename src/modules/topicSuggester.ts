@@ -35,8 +35,6 @@ export async function suggestArticleTopic(
     const text = await chat(apiKey, {
       system: guardrails(),
       user: prompt,
-      temperature: 0.7,
-      top_p: 0.9,
       max_completion_tokens: 600,
     });
 
