@@ -10,6 +10,7 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 ## 2. Outline
 `generateOutline(baseTopic)` przygotowuje strukturę artykułu:
 - używa `chat()` (model gpt-5) z guardrails (temperature 0.3, top_p 0.9, max_completion_tokens 800),
+
 - zwraca `finalTitle`, `description` i 4–5 sekcji po 2–5 bulletów,
 - każdy bullet zawiera konkretną statystykę, datę lub nazwę raportu z wiarygodnym źródłem; w razie braku danych oznaczony jest `[[TODO-CLAIM]]`,
 - opis ≤200 znaków, bez znaków markdown; tytuł ≤100 znaków,
