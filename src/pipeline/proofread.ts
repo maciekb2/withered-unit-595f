@@ -26,8 +26,7 @@ export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens }: 
       user: prompt,
       temperature: 0.2,
       top_p: 0.9,
-      max_tokens: maxTokens ?? 1000,
-      model,
+      max_completion_tokens: maxTokens ?? 1000,      model,
     });
     const json: Edited = extractJson<Edited>(text);
     if (json.title.length > 100 || json.description.length > 200) {

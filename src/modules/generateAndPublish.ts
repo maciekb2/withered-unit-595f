@@ -74,7 +74,7 @@ export async function generateAndPublish(
     const outlineRes = await generateOutline({
       apiKey: env.OPENAI_API_KEY,
       baseTopic,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
     });
     send('outline-prompt', { prompt: outlineRes.prompt });
     send('outline-response', { response: outlineRes.raw });
@@ -86,7 +86,7 @@ export async function generateAndPublish(
       apiKey: env.OPENAI_API_KEY,
       outline,
       articlePrompt,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
       maxTokens: 7200,
     });
     send('draft-prompt', { prompt: draftRes.prompt });
@@ -99,7 +99,7 @@ export async function generateAndPublish(
       apiKey: env.OPENAI_API_KEY,
       draft,
       outline,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
       maxTokens: 7200,
     });
     send('edit-prompt', { prompt: editRes.prompt });
@@ -111,7 +111,7 @@ export async function generateAndPublish(
     const proofRes = await proofread({
       apiKey: env.OPENAI_API_KEY,
       edited,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
       maxTokens: 7200,
     });
     send('proofread-prompt', { prompt: proofRes.prompt });

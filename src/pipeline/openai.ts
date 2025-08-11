@@ -6,7 +6,7 @@ export interface ChatOptions {
   user: string;
   temperature: number;
   top_p: number;
-  max_tokens: number;
+  max_completion_tokens: number;
   model?: string;
 }
 
@@ -15,7 +15,7 @@ export async function chat(apiKey: string, {
   user,
   temperature,
   top_p,
-  max_tokens,
+  max_completion_tokens,
   model = 'gpt-5',
 }: ChatOptions): Promise<string> {
   const messages: any[] = [];
@@ -30,7 +30,7 @@ export async function chat(apiKey: string, {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, temperature, top_p, max_tokens, messages }),
+      body: JSON.stringify({ model, temperature, top_p, max_completion_tokens, messages }),
       retries: 2,
       retryDelayMs: 1000,
     });

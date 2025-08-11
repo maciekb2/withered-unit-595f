@@ -37,7 +37,7 @@ export async function suggestArticleTopic(
       user: prompt,
       temperature: 0.7,
       top_p: 0.9,
-      max_tokens: 600,
+      max_completion_tokens: 600,
     });
 
     const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(text);

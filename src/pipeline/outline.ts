@@ -31,7 +31,7 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxT
       user: prompt,
       temperature: 0.3,
       top_p: 0.9,
-      max_tokens: maxTokens ?? 800,
+      max_completion_tokens: maxTokens ?? 800,
       model,
     });
 

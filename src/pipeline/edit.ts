@@ -29,7 +29,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTo
       user: prompt,
       temperature: 0.2,
       top_p: 0.9,
-      max_tokens: maxTokens ?? 1000,
+      max_completion_tokens: maxTokens ?? 1000,
       model,
     });
     const json: Edited = extractJson<Edited>(text);

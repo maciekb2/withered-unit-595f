@@ -28,7 +28,7 @@ export async function generateDraft({ apiKey, outline, articlePrompt, model = 'g
       user: finalPrompt,
       temperature: 0.6,
       top_p: 0.9,
-      max_tokens: maxTokens ?? 1200,
+      max_completion_tokens: maxTokens ?? 1200,
       model,
     });
     logEvent({ type: 'draft-complete' });
