@@ -7,7 +7,7 @@ export function formatFinal(edited: Edited): FinalJson {
   if (edited.description.length > 200) {
     throw new Error('description too long');
   }
-  if (edited.markdown.length < 500) {
+  if (edited.markdown.length < 900) {
     throw new Error('content too short');
   }
   return { title: edited.title, description: edited.description, content: edited.markdown };

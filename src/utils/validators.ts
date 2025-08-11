@@ -11,8 +11,8 @@ export function validateFinalJson(a: FinalJson): { ok: boolean; errs: string[] }
   if (/[#*_`]/.test(a.description)) {
     errs.push('description contains markdown characters');
   }
-  if (!a.content || a.content.length < 500) {
-    errs.push('content must be at least 500 chars');
+  if (!a.content || a.content.length < 800) {
+    errs.push('content must be at least 800 chars');
   }
   return { ok: errs.length === 0, errs };
 }

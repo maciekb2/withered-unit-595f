@@ -5,7 +5,7 @@ import { validateFinalJson, yamlEscape } from './validators.js';
 const baseArticle = {
   title: 'Tytul',
   description: 'Opis bez markdownu',
-  content: 'a'.repeat(500)
+  content: 'a'.repeat(800)
 };
 
 test('validateFinalJson passes for valid article', () => {
@@ -23,7 +23,8 @@ test('validateFinalJson fails for markdown in description', () => {
 test('validateFinalJson fails for short content', () => {
   const res = validateFinalJson({ ...baseArticle, content: 'short' });
   assert.equal(res.ok, false);
-  assert.ok(res.errs.some(e => e.includes('500')));
+  assert.ok(res.errs.some(e => e.includes('800')));
+
 });
 
 test('yamlEscape escapes quotes', () => {

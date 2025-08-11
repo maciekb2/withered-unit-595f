@@ -6,7 +6,6 @@ import { chat } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 
-
 export interface EditDraftOptions {
   apiKey: string;
   draft: Draft;
