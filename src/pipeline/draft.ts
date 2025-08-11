@@ -19,6 +19,7 @@ export interface GenerateDraftResult {
 }
 
 export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-4o', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
+
   const finalPrompt = buildDraftPrompt(outline, articlePrompt);
 
   logEvent({ type: 'draft-start' });
@@ -33,6 +34,7 @@ export async function generateDraft({ apiKey, outline, articlePrompt, model = 'g
     });
     logEvent({ type: 'draft-complete' });
     return { draft: { markdown: text }, prompt: finalPrompt, raw: text };
+
   } catch (err) {
     logError(err, { type: 'draft-error' });
     throw err;

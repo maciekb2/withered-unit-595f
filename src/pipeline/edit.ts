@@ -21,6 +21,7 @@ export interface EditDraftResult {
 }
 
 export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
+
   const prompt = buildEditPrompt(draft, outline);
   logEvent({ type: 'edit-start' });
   try {
@@ -33,6 +34,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxT
       model,
     });
     const json: Edited = extractJson<Edited>(text);
+
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }
@@ -46,6 +48,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxT
     const result: Edited = { ...json, markdown: cleaned };
     logEvent({ type: 'edit-complete', title: result.title });
     return { edited: result, prompt, raw: text };
+
   } catch (err) {
     logError(err, { type: 'edit-error' });
     throw err;

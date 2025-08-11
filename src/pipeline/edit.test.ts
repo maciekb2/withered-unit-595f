@@ -84,6 +84,7 @@ test('editDraft scrubs TODO claims and logs warning', async () => {
 
   const res = await editDraft({ apiKey: 'k', draft: { markdown: 'm' }, outline: { finalTitle: 't', description: 'd', sections: [], guardrails: [] } });
   assert(!res.edited.markdown.includes('[[TODO-CLAIM]]'));
+
   const logged = logs.some(l => l.includes('todo-claim-warning') && l.includes('"removedCount":1'));
   assert(logged);
 

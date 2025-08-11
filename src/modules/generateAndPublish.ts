@@ -73,6 +73,7 @@ export async function generateAndPublish(
 
     send('outline-start', { baseTopic });
     const outlineRes = await generateOutline({
+
       apiKey: env.OPENAI_API_KEY,
       baseTopic,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
@@ -84,6 +85,7 @@ export async function generateAndPublish(
 
     send('draft-start');
     const draftRes = await generateDraft({
+
       apiKey: env.OPENAI_API_KEY,
       outline,
       articlePrompt,
@@ -106,6 +108,7 @@ export async function generateAndPublish(
     send('edit-prompt', { prompt: editRes.prompt });
     send('edit-response', { response: editRes.raw });
     const edited = editRes.edited;
+
     send('edit-end', { title: edited.title });
 
     const validation = validateAntiHallucination(edited.markdown, outline);

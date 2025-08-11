@@ -37,6 +37,7 @@ export async function generateArticleAssets({
   const outlineRes = await generateOutline({ apiKey, baseTopic, model });
   const outline = outlineRes.outline;
   const draftRes = await generateDraft({
+
     apiKey,
     outline,
     articlePrompt: prompt,
