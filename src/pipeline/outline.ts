@@ -11,12 +11,20 @@ export interface GenerateOutlineOptions {
   maxTokens?: number;
 }
 
+export interface GenerateOutlineResult {
+  outline: Outline;
+  prompt: string;
+  raw: string;
+}
+
+
 const REQUIRED_GUARDRAILS = [
   'Nie cytuj ‘najnowszego raportu X’ bez źródła.',
   'Dane liczbowe tylko jako trend/zakres albo z warunkami (jeśli brak źródła).',
 ];
 
-export async function generateOutline({ apiKey, baseTopic, model = 'gpt-4o', maxTokens }: GenerateOutlineOptions): Promise<Outline> {
+export async function generateOutline({ apiKey, baseTopic, model = 'gpt-4o', maxTokens }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+
   const prompt = `Temat bazowy: ${baseTopic}\nNa jego podstawie przygotuj konspekt artykułu satyrycznego w tonie centro-prawicowym, PL-patriotycznym.\nUwzględnij 4–6 sekcji (każda 2–5 bulletów) i jedną lub dwie analogie do sytuacji z ostatnich 2 lat.\nDodaj listę guardrails (avoid).\nWynik parsuj jako { finalTitle, description, sections: [{h2, bullets}], guardrails }.`;
   logEvent({ type: 'outline-start' });
   try {
@@ -58,7 +66,8 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-4o', max
     }
 
     logEvent({ type: 'outline-complete', title: outline.finalTitle });
-    return outline;
+    return { outline, prompt, raw: text };
+
   } catch (err) {
     logError(err, { type: 'outline-error' });
     throw err;

@@ -25,8 +25,9 @@ const sampleResponse = {
 test('generateOutline returns 4-6 sections', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify(sampleResponse), { status: 200 }) as any;
-  const outline = await generateOutline({ apiKey: 'k', baseTopic: 'T' });
-  assert.equal(outline.sections.length, 4);
+  const res = await generateOutline({ apiKey: 'k', baseTopic: 'T' });
+  assert.equal(res.outline.sections.length, 4);
+
   globalThis.fetch = original;
 });
 

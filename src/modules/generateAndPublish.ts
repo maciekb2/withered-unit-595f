@@ -72,31 +72,43 @@ export async function generateAndPublish(
     }
 
     send('outline-start', { baseTopic });
-    const outline = await generateOutline({
+    const outlineRes = await generateOutline({
+
       apiKey: env.OPENAI_API_KEY,
       baseTopic,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
     });
+    send('outline-prompt', { prompt: outlineRes.prompt });
+    send('outline-response', { response: outlineRes.raw });
+    const outline = outlineRes.outline;
     send('outline-end', { outline });
 
     send('draft-start');
-    const draft = await generateDraft({
+    const draftRes = await generateDraft({
+
       apiKey: env.OPENAI_API_KEY,
       outline,
       articlePrompt,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
       maxTokens: 7200,
     });
+    send('draft-prompt', { prompt: draftRes.prompt });
+    send('draft-response', { response: draftRes.raw });
+    const draft = draftRes.draft;
     send('draft-end');
 
     send('edit-start');
-    const edited = await editDraft({
+    const editRes = await editDraft({
       apiKey: env.OPENAI_API_KEY,
       draft,
       outline,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
       maxTokens: 7200,
     });
+    send('edit-prompt', { prompt: editRes.prompt });
+    send('edit-response', { response: editRes.raw });
+    const edited = editRes.edited;
+
     send('edit-end', { title: edited.title });
 
     const validation = validateAntiHallucination(edited.markdown, outline);

@@ -12,7 +12,14 @@ export interface GenerateDraftOptions {
   maxTokens?: number;
 }
 
-export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-4o', maxTokens }: GenerateDraftOptions): Promise<Draft> {
+export interface GenerateDraftResult {
+  draft: Draft;
+  prompt: string;
+  raw: string;
+}
+
+export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-4o', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
+
   const finalPrompt = buildDraftPrompt(outline, articlePrompt);
 
   logEvent({ type: 'draft-start' });
@@ -26,7 +33,8 @@ export async function generateDraft({ apiKey, outline, articlePrompt, model = 'g
       model,
     });
     logEvent({ type: 'draft-complete' });
-    return { markdown: text };
+    return { draft: { markdown: text }, prompt: finalPrompt, raw: text };
+
   } catch (err) {
     logError(err, { type: 'draft-error' });
     throw err;

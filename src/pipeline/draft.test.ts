@@ -26,6 +26,7 @@ test('generateDraft keeps TODO-CLAIM tokens', async () => {
   ) as any;
 
   const res = await generateDraft({ apiKey: 'k', outline, articlePrompt: 'p' });
-  assert(res.markdown.includes('[[TODO-CLAIM]]'));
+  assert(res.draft.markdown.includes('[[TODO-CLAIM]]'));
+
   globalThis.fetch = original;
 });

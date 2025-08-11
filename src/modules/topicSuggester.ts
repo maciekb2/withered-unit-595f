@@ -40,7 +40,6 @@ export async function suggestArticleTopic(
       max_tokens: 600,
     });
 
-
     const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(text);
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());

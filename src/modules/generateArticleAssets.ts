@@ -34,15 +34,19 @@ export async function generateArticleAssets({
     recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
   );
 
-  const outline = await generateOutline({ apiKey, baseTopic, model });
-  const draft = await generateDraft({
+  const outlineRes = await generateOutline({ apiKey, baseTopic, model });
+  const outline = outlineRes.outline;
+  const draftRes = await generateDraft({
+
     apiKey,
     outline,
     articlePrompt: prompt,
     model,
     maxTokens,
   });
-  const edited = await editDraft({ apiKey, draft, outline, model, maxTokens });
+  const draft = draftRes.draft;
+  const editRes = await editDraft({ apiKey, draft, outline, model, maxTokens });
+  const edited = editRes.edited;
   const article = formatFinal(edited);
 
   const heroPrompt = heroTemplate.replace('{title}', article.title);
