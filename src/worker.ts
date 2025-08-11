@@ -211,6 +211,7 @@ export default {
           close: () => writer.close(),
         };
         const deferred = createDeferred<{ topic: string }>();
+
         pendingPrompts.set(session.id, deferred.resolve);
         ctx.waitUntil(
           generateAndPublish(env, ctrl, deferred.promise)

@@ -40,6 +40,7 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 - brak którejś sekcji z outline → błąd.
 
 ## 7. Format i publikacja
+
 `formatFinal()` buduje `FinalJson` i sprawdza schema (`title` ≤100, `description` ≤200 i bez `#*_\``, `content` ≥500 znaków). `validateFinalJson()` dodatkowo escapu‑je pola dla YAML.
 
 Po pozytywnej walidacji:
