@@ -1,8 +1,10 @@
 export function extractJson<T>(text: string): T {
-  let jsonText = text.trim();
+  const original = text.trim();
+  let jsonText = original;
+
   const fenceMatch = /^```(?:json)?\n([\s\S]*?)\n```$/m.exec(jsonText);
   if (fenceMatch) {
-    jsonText = fenceMatch[1];
+    jsonText = fenceMatch[1].trim();
   } else {
     const objStart = jsonText.indexOf('{');
     const arrStart = jsonText.indexOf('[');
@@ -17,6 +19,11 @@ export function extractJson<T>(text: string): T {
         jsonText = jsonText.slice(objStart, objEnd + 1);
       }
     }
+    jsonText = jsonText.trim();
+  }
+
+  if (!jsonText || !/^[\[{]/.test(jsonText)) {
+    throw new Error(`No JSON found in input: ${original}`);
   }
 
   // quote unquoted keys

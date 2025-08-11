@@ -15,4 +15,7 @@ const obj2 = extractJson<any>(messy);
 assert.equal(obj2.finalTitle, 'X');
 assert.equal(obj2.description, 'Y');
 
+// Should throw when no JSON present
+assert.throws(() => extractJson('```json\n```'), /No JSON/);
+
 console.log('extractJson ok');
