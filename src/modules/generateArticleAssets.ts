@@ -1,6 +1,7 @@
 import { generateOutline } from '../pipeline/outline';
 import { generateDraft } from '../pipeline/draft';
 import { editDraft } from '../pipeline/edit';
+import { proofread } from '../pipeline/proofread';
 import { formatFinal } from '../pipeline/format';
 import type { FinalJson } from '../pipeline/types';
 import { generateHeroImage } from './heroImageGenerator';
@@ -37,7 +38,6 @@ export async function generateArticleAssets({
   const outlineRes = await generateOutline({ apiKey, baseTopic, model });
   const outline = outlineRes.outline;
   const draftRes = await generateDraft({
-
     apiKey,
     outline,
     articlePrompt: prompt,
@@ -46,9 +46,8 @@ export async function generateArticleAssets({
   });
   const draft = draftRes.draft;
   const editRes = await editDraft({ apiKey, draft, outline, model, maxTokens });
-  const edited = editRes.edited;
-  const article = formatFinal(edited);
-
+  const proofRes = await proofread({ apiKey, edited: editRes.edited, model, maxTokens });
+  const article = formatFinal(proofRes.edited);
   const heroPrompt = heroTemplate.replace('{title}', article.title);
   const heroImage = await generateHeroImage({ apiKey, prompt: heroPrompt });
   return { article, heroImage };

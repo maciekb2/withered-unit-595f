@@ -10,6 +10,8 @@ import { suggestArticleTopic } from './topicSuggester';
 import { generateOutline } from '../pipeline/outline';
 import { generateDraft } from '../pipeline/draft';
 import { editDraft } from '../pipeline/edit';
+import { proofread } from '../pipeline/proofread';
+
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import type { FinalJson } from '../pipeline/types';
@@ -22,7 +24,7 @@ export interface GenerateAndPublishResult {
 export async function generateAndPublish(
   env: Env,
   controller?: { enqueue: (chunk: string) => void; close: () => void },
-  promptPromise?: Promise<{ prompt: string; topic: string }>
+  promptPromise?: Promise<{ topic: string }>
 ): Promise<GenerateAndPublishResult> {
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
@@ -61,19 +63,16 @@ export async function generateAndPublish(
         env.OPENAI_API_KEY,
       );
       send('💡 Propozycje tematów', { topicSuggestions: suggestions });
-      send('✏️ Możesz edytować prompt i wybrać temat', {
-        articlePrompt,
-        awaitingPrompt: true,
+      send('✏️ Wybierz temat lub wpisz własny', {
+        awaitingTopic: true,
         topicSuggestions: suggestions,
       });
       const res = await promptPromise;
-      articlePrompt = res.prompt;
-      baseTopic = res.topic;
+      baseTopic = res.topic || baseTopic;
     }
 
     send('outline-start', { baseTopic });
     const outlineRes = await generateOutline({
-
       apiKey: env.OPENAI_API_KEY,
       baseTopic,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
@@ -85,7 +84,6 @@ export async function generateAndPublish(
 
     send('draft-start');
     const draftRes = await generateDraft({
-
       apiKey: env.OPENAI_API_KEY,
       outline,
       articlePrompt,
@@ -107,9 +105,20 @@ export async function generateAndPublish(
     });
     send('edit-prompt', { prompt: editRes.prompt });
     send('edit-response', { response: editRes.raw });
-    const edited = editRes.edited;
-
+    let edited = editRes.edited;
     send('edit-end', { title: edited.title });
+
+    send('proofread-start');
+    const proofRes = await proofread({
+      apiKey: env.OPENAI_API_KEY,
+      edited,
+      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      maxTokens: 7200,
+    });
+    send('proofread-prompt', { prompt: proofRes.prompt });
+    send('proofread-response', { response: proofRes.raw });
+    edited = proofRes.edited;
+    send('proofread-end');
 
     const validation = validateAntiHallucination(edited.markdown, outline);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));

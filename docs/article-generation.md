@@ -5,7 +5,7 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 ## 1. Gorące tematy i wybór wątku
 1. Pobierz tytuły ostatnich artykułów z GitHuba.
 2. `getHotTopics()` zbiera wiadomości z RSS (BBC, Politico, PAP, Reuters). Lista jest wysyłana w logu SSE `🔥 Gorące tematy z ostatnich dni`.
-3. `suggestArticleTopic()` (temperature 0.7, top_p 0.9, max_tokens 600) proponuje satyryczne tematy na podstawie gorących newsów i ostatnich wpisów. Użytkownik może wybrać jedną z propozycji lub wprowadzić własny temat bazowy.
+3. `suggestArticleTopic()` (temperature 0.7, top_p 0.9, max_tokens 600) proponuje satyryczne tematy na podstawie gorących newsów i ostatnich wpisów. Użytkownik wybiera jedną z propozycji lub podaje własny temat bazowy.
 
 ## 2. Outline
 `generateOutline(baseTopic)` przygotowuje strukturę artykułu:
@@ -16,24 +16,31 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 
 ## 3. Draft
 `generateDraft(outline, articlePrompt)` tworzy szkic:
-- korzysta z `chat()` (temperature 0.6, top_p 0.9, max_tokens 1200) z wklejonym outline oraz regułami,
-- każdy bullet rozwijany jest w dłuższy, wielozdaniowy akapit,
-- niepewne dane oznaczane są tokenem `[[TODO-CLAIM]]`.
+ - korzysta z `chat()` (temperature 0.6, top_p 0.9, max_tokens 1200) z wklejonym outline oraz regułami,
+ - każdy bullet rozwijany jest w spójny akapit liczący około 10–20 linijek (≥8 zdań),
+ - niepewne dane oznaczane są tokenem `[[TODO-CLAIM]]`.
 
 ## 4. Edit
 `editDraft(draft, outline)` wygładza tekst:
-- `chat()` z niską temperaturą 0.2 (top_p 0.9, max_tokens 1000),
-- nie zmienia tytułu ani opisu, usuwa listy,
-- `scrubTodoClaims()` zastępuje zdania z `[[TODO-CLAIM]]` neutralnym uogólnieniem.
+ - `chat()` z niską temperaturą 0.2 (top_p 0.9, max_tokens 1000),
+ - nie zmienia tytułu ani opisu, dba o spójne akapity 10–20 linijek,
+ - `scrubTodoClaims()` zastępuje zdania z `[[TODO-CLAIM]]` neutralnym uogólnieniem.
 
-## 5. Walidacja treści
+## 5. Proofread
+`proofread(edited)` sprawdza gramatykę i styl:
+- `chat()` z temperaturą 0.2 (top_p 0.9, max_tokens 1000),
+- weryfikuje tytuł, opis i treść, nie zmieniając sensu,
+- zwraca poprawiony tekst, który trafia do walidacji.
+
+## 6. Walidacja treści
 `validateAntiHallucination()` analizuje finalny markdown:
 - raport bez źródła → błąd,
 - twarde liczby bez kontekstu → ostrzeżenie,
 - pozostawiony `[[TODO-CLAIM]]` → błąd,
 - brak którejś sekcji z outline → błąd.
 
-## 6. Format i publikacja
+## 7. Format i publikacja
+
 `formatFinal()` buduje `FinalJson` i sprawdza schema (`title` ≤100, `description` ≤200 i bez `#*_\``, `content` ≥500 znaków). `validateFinalJson()` dodatkowo escapu‑je pola dla YAML.
 
 Po pozytywnej walidacji:
