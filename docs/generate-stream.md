@@ -11,23 +11,20 @@ GET /api/generate-stream
 Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JSON zawierający przynajmniej pole `log`. Dodatkowe pola mogą przekazywać:
 
 - `recentTitles` – listę pobranych tytułów;
-- `articlePrompt` – domyślny prompt wysłany do przeglądarki;
-- `awaitingPrompt` – jeśli `true`, skrypt czeka na edycję prompta;
-
-- `articlePrompt` – finalny prompt wysłany do ChatGPT;
-
-- `articleTitle` – tytuł wygenerowanego artykułu;
-- `heroPrompt` – prompt użyty do stworzenia obrazka.
+- `prompt` / `response` – pełny prompt i odpowiedź z każdego etapu;
+- w razie problemów: `outline-error`, `draft-error`, `edit-error` lub `proofread-error` z polami `error`, `prompt`, `response`;
+- `awaitingTopic` – jeśli `true`, skrypt czeka na wybór tematu;
+ - `articleTitle` – tytuł wygenerowanego artykułu;
+ - `heroPrompt` – prompt użyty do stworzenia obrazka.
 
 Po zakończeniu wysyłany jest obiekt `{ done: true, url: '<link do PR>' }`.
 
-Jeśli pojawi się pole `awaitingPrompt`, skrypt zatrzymuje się i oczekuje na
-wysłanie zmodyfikowanego prompta pod endpoint `POST /api/update-prompt` w
-formacie `{ "prompt": "nowa treść" }`.
+Jeśli pojawi się pole `awaitingTopic`, proces czeka na wysłanie wybranego tematu pod
+endpoint `POST /api/update-prompt` w formacie `{ "topic": "wybrany temat" }`.
 
 ## Podstrona `generuj.html`
 
-W katalogu `public/` dodano prostą stronę, która łączy się z powyższym strumieniem i wypisuje wszystkie logi. Strona wyświetla domyślny prompt w polu tekstowym i pozwala go edytować przed kontynuacją. Otwórz w przeglądarce `/generuj.html`, aby uruchomić proces i obserwować postęp.
+W katalogu `public/` dodano prostą stronę, która łączy się z powyższym strumieniem i wypisuje wszystkie logi. Użytkownik wybiera temat spośród propozycji lub wpisuje własny i potwierdza przyciskiem.
 
 ```
 const es = new EventSource('/api/generate-stream');
