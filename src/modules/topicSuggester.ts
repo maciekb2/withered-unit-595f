@@ -1,7 +1,8 @@
 import type { HotTopic } from '../utils/hotTopics';
 import { logEvent, logError } from '../utils/logger';
-import { retryFetch } from '../utils/retryFetch';
 import { extractJson } from '../utils/json';
+import { chat } from '../pipeline/openai';
+import { guardrails } from '../pipeline/guardrails';
 
 export interface SuggestedTopic {
   title: string;
@@ -30,37 +31,15 @@ export async function suggestArticleTopic(
   }
 
   logEvent({ type: 'suggest-topic-start' });
-  logEvent({ type: 'openai-request', promptSnippet: prompt.slice(0, 100) });
-
   try {
-    const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      retries: 2,
-      retryDelayMs: 1000,
+    const text = await chat(apiKey, {
+      system: guardrails(),
+      user: prompt,
+      temperature: 0.7,
+      top_p: 0.9,
+      max_tokens: 600,
     });
 
-    logEvent({ type: 'openai-response-status', status: res.status });
-
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
-    }
-
-    const data: any = await res.json();
-    logEvent({ type: 'openai-response-received' });
-    const text: string = data?.choices?.[0]?.message?.content?.trim();
-    if (!text) {
-      throw new Error('OpenAI response missing content');
-    }
-    logEvent({ type: 'openai-response-text', text: text.slice(0, 200) });
 
     const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(text);
 

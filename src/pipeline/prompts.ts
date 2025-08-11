@@ -1,4 +1,4 @@
-export const TODO_CLAIM_RULE = 'Jeśli nie masz 100% pewności co do konkretnej liczby, daty lub nazwy raportu – oznacz zdanie tokenem [[TODO-CLAIM]] i sformułuj je warunkowo (np. „jeśli założymy, że…”). Nie wymyślaj źródeł ani dokładnych wartości.';
+export const TODO_CLAIM_RULE = `Jeśli nie masz 100% pewności co do konkretnej liczby, daty lub nazwy raportu – oznacz zdanie tokenem [[TODO-CLAIM]] i sformułuj je warunkowo (np. „jeśli założymy, że…”). Nie wymyślaj źródeł ani dokładnych wartości.`;
 
 import type { Outline, Draft } from './types';
 
@@ -21,3 +21,5 @@ export function buildDraftPrompt(outline: Outline, articlePrompt: string): strin
 
 export function buildEditPrompt(draft: Draft, outline: Outline): string {
   return `Edytuj szkic artykułu, zachowując satyryczny ton i wskazówki. Nie zmieniaj tytułu ani opisu. Utrzymaj płynne, wielozdaniowe akapity.\nZasady:\n${rulesText(outline)}\n\nTytuł: ${outline.finalTitle}\nOpis: ${outline.description}\n\nSzkic:\n${draft.markdown}\n\nZwróć JSON { markdown, title, description }.`;
+}
+
