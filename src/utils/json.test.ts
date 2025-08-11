@@ -9,4 +9,10 @@ assert.equal(obj.finalTitle, 'A');
 assert.equal(obj.description, 'B');
 assert.deepEqual(obj.sections, []);
 
+// Should parse when JSON is embedded in extra text
+const messy = "Oto wynik:\n{ finalTitle: \"X\", description: \"Y\", sections: [] } Inny tekst";
+const obj2 = extractJson<any>(messy);
+assert.equal(obj2.finalTitle, 'X');
+assert.equal(obj2.description, 'Y');
+
 console.log('extractJson ok');
