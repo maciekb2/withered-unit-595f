@@ -24,6 +24,7 @@ test('validateFinalJson fails for short content', () => {
   const res = validateFinalJson({ ...baseArticle, content: 'short' });
   assert.equal(res.ok, false);
   assert.ok(res.errs.some(e => e.includes('800')));
+
 });
 
 test('yamlEscape escapes quotes', () => {

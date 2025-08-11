@@ -9,7 +9,8 @@ export const finalJsonSchema = {
       maxLength: 200,
       pattern: '^[^#*_`]*$'
     },
-    content: { type: 'string', minLength: 800 }
+    content: { type: 'string', minLength: 900 }
+
   }
 } as const;
 

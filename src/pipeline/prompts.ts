@@ -21,4 +21,3 @@ export function buildDraftPrompt(outline: Outline, articlePrompt: string): strin
 
 export function buildEditPrompt(draft: Draft, outline: Outline): string {
   return `Edytuj szkic artykułu, zachowując satyryczny ton i wskazówki. Nie zmieniaj tytułu ani opisu. Utrzymaj płynne, wielozdaniowe akapity.\nZasady:\n${rulesText(outline)}\n\nTytuł: ${outline.finalTitle}\nOpis: ${outline.description}\n\nSzkic:\n${draft.markdown}\n\nZwróć JSON { markdown, title, description }.`;
-}
