@@ -27,6 +27,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxT
       model,
     });
     const json: Edited = extractJson<Edited>(text);
+
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }
