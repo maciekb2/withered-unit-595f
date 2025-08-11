@@ -48,7 +48,6 @@ export async function generateArticleAssets({
   const editRes = await editDraft({ apiKey, draft, outline, model, maxTokens });
   const proofRes = await proofread({ apiKey, edited: editRes.edited, model, maxTokens });
   const article = formatFinal(proofRes.edited);
-
   const heroPrompt = heroTemplate.replace('{title}', article.title);
   const heroImage = await generateHeroImage({ apiKey, prompt: heroPrompt });
   return { article, heroImage };
