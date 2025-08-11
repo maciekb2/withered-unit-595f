@@ -2,17 +2,26 @@ import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
 import { normalizeRepo } from '../utils/github';
-import type { ArticleResult } from './articleGenerator';
+import type { FinalJson } from '../pipeline/types';
+import { validateFinalJson, yamlEscape } from '../utils/validators';
 
 export interface PublishOptions {
   env: Env;
-  article: ArticleResult;
+  article: FinalJson;
   heroImage: Buffer;
   date?: string;
 }
 
 export async function publishArticleToGitHub({ env, article, heroImage, date }: PublishOptions): Promise<string> {
   logEvent({ type: 'github-publish-start', title: article.title });
+  const validation = validateFinalJson(article);
+  if (!validation.ok) {
+    logError(new Error('Final JSON validation failed'), {
+      type: 'github-validate-error',
+      errors: validation.errs,
+    });
+    throw new Error('Final JSON validation failed: ' + validation.errs.join('; '));
+  }
   const postDate = date || new Date().toISOString().split('T')[0];
   const slug = slugify(article.title);
   if (!env.GITHUB_TOKEN) {
@@ -56,8 +65,8 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   const postName = `${postDate}-${slug}.md`;
   const markdown = [
     '---',
-    `title: "${article.title}"`,
-    `description: "${article.description}"`,
+    `title: "${yamlEscape(article.title)}"`,
+    `description: "${yamlEscape(article.description)}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
     'views: 0',

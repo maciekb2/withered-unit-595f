@@ -33,7 +33,7 @@
   ],
   "vars": {
     "WORKER_ID": "pseudointelekt2137-blog",
-    "OPENAI_TEXT_MODEL": "gpt-4o",
+    "OPENAI_TEXT_MODEL": "gpt-5",
     "OPENAI_IMAGE_STYLE": "vivid",
     "OPENAI_IMAGE_QUALITY": "hd"
   },
