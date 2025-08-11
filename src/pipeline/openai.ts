@@ -16,7 +16,7 @@ export async function chat(apiKey: string, {
   temperature,
   top_p,
   max_tokens,
-  model = 'gpt-4o',
+  model = 'gpt-5',
 }: ChatOptions): Promise<string> {
   const messages: any[] = [];
   if (system) messages.push({ role: 'system', content: system });

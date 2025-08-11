@@ -17,8 +17,8 @@ export interface ProofreadResult {
   raw: string;
 }
 
-export async function proofread({ apiKey, edited, model = 'gpt-4o', maxTokens }: ProofreadOptions): Promise<ProofreadResult> {
-  const prompt = `Sprawdź gramatykę i stylistykę poniższego artykułu po polsku. Popraw błędy, nie zmieniaj znaczenia ani faktów. Zwróć JSON { markdown, title, description }.\n\nTytuł: ${edited.title}\nOpis: ${edited.description}\n\nArtykuł:\n${edited.markdown}`;
+export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens }: ProofreadOptions): Promise<ProofreadResult> {
+  const prompt = `Sprawdź gramatykę, stylistykę i naturalność poniższego artykułu po polsku. Usuń powtórzenia, przeredaguj zdania tak, aby brzmiały płynnie w całym tekście, nie zmieniając znaczenia ani faktów. Zwróć JSON { markdown, title, description }.\n\nTytuł: ${edited.title}\nOpis: ${edited.description}\n\nArtykuł:\n${edited.markdown}`;
   logEvent({ type: 'proofread-start' });
   try {
     const text = await chat(apiKey, {

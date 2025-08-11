@@ -18,8 +18,7 @@ export interface GenerateDraftResult {
   raw: string;
 }
 
-export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-4o', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
-
+export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-5', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
   const finalPrompt = buildDraftPrompt(outline, articlePrompt);
 
   logEvent({ type: 'draft-start' });

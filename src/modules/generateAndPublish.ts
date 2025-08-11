@@ -11,7 +11,6 @@ import { generateOutline } from '../pipeline/outline';
 import { generateDraft } from '../pipeline/draft';
 import { editDraft } from '../pipeline/edit';
 import { proofread } from '../pipeline/proofread';
-
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import type { FinalJson } from '../pipeline/types';

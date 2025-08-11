@@ -20,7 +20,7 @@ export interface EditDraftResult {
   raw: string;
 }
 
-export async function editDraft({ apiKey, draft, outline, model = 'gpt-4o', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
+export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
   const prompt = buildEditPrompt(draft, outline);
   logEvent({ type: 'edit-start' });
   try {
