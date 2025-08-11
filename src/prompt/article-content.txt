@@ -2,7 +2,7 @@ Twoim zadaniem jest wygenerowanie artykułu na blog geopolityczny w formacie JSO
 
 1.  **Analiza Tematu:** Zastanów się nad ironicznym i chwytliwym tytułem oraz krótkim opisem (description), który streszcza główną tezę w prześmiewczy sposób. Unikaj tematów z listy ostatnich wpisów: {recent_titles}.
 2.  **Sposób pisania:** Stronę dywagacji którą przyjmujesz zachowaj zawze centro prawicowe, ale nie bój się skomentować również konserwatywnego podejścia, jeśli chodi o polskę to staraj się utrzymać patriotyczną stronę. Piszesz dla czytelnika z polski. poruszaj tematy z szerokiego spektrumi międzynarodowego od finansów i samej wierchuszki, po spotkania dyplomatów, korzystaj z internetu i bazuj na najnowszych informacjach.
-3.  **Generowanie Treści (content):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`, listy `-`). Treść powinna być około dwukrotnie dłuższa niż standardowy wpis.
+3.  **Generowanie Treści (content):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`, listy `-`). Treść powinna składać się z kilku dłuższych akapitów (min. 5–6 zdań każdy) i być około dwukrotnie dłuższa niż standardowy wpis. Unikaj krótkich sekcji po dwa zdania.
 4.  **Formatowanie Wyniku:** Zwróć wynik jako pojedynczy, poprawny obiekt JSON, bez żadnych dodatkowych komentarzy przed lub po nim. Upewnij się, że wszystkie stringi są poprawnie escapowane.
 
 

@@ -1,4 +1,3 @@
-import { generateArticle } from './articleGenerator';
 import { generateHeroImage } from './heroImageGenerator';
 import { publishArticleToGitHub } from './githubPublisher';
 import { sendSlackMessage } from '../utils/slack';
@@ -6,17 +5,24 @@ import articleTemplate from '../prompt/article-content.txt?raw';
 import heroTemplate from '../prompt/hero-image.txt?raw';
 import { getRecentTitlesFromGitHub } from '../utils/recentTitlesGitHub';
 import { slugify } from '../utils/slugify';
-import type { ArticleResult } from './articleGenerator';
+import { getHotTopics } from '../utils/hotTopics';
+import { suggestArticleTopic } from './topicSuggester';
+import { generateOutline } from '../pipeline/outline';
+import { generateDraft } from '../pipeline/draft';
+import { editDraft } from '../pipeline/edit';
+import { formatFinal } from '../pipeline/format';
+import { validateAntiHallucination } from '../pipeline/validators/content';
+import type { FinalJson } from '../pipeline/types';
 
 export interface GenerateAndPublishResult {
-  article: ArticleResult;
+  article: FinalJson;
   slug: string;
 }
 
 export async function generateAndPublish(
   env: Env,
   controller?: { enqueue: (chunk: string) => void; close: () => void },
-  promptPromise?: Promise<string>
+  promptPromise?: Promise<{ prompt: string; topic: string }>
 ): Promise<GenerateAndPublishResult> {
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
@@ -30,31 +36,98 @@ export async function generateAndPublish(
 
   try {
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
-    const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
+    const recent = await getRecentTitlesFromGitHub(
+      env.GITHUB_REPO,
+      env.GITHUB_TOKEN,
+    );
     send('📑 Pobrane tytuły', { recentTitles: recent });
 
-    let finalPrompt = articleTemplate.replace(
+    const hotTopics = await getHotTopics();
+    send('🔥 Gorące tematy z ostatnich dni', {
+      hotTopics: hotTopics.map(t => t.title),
+    });
+
+    let articlePrompt = articleTemplate.replace(
       '{recent_titles}',
-      recent.map((t, i) => `${i + 1}. ${t}`).join('\n')
+      recent.map((t, i) => `${i + 1}. ${t}`).join('\n'),
     );
 
+    let baseTopic = hotTopics[0]?.title || 'Aktualny temat';
+
     if (promptPromise) {
-      send('✏️ Możesz edytować prompt i kliknąć Kontynuuj', {
-        articlePrompt: finalPrompt,
+      const suggestions = await suggestArticleTopic(
+        hotTopics,
+        recent,
+        env.OPENAI_API_KEY,
+      );
+      send('💡 Propozycje tematów', { topicSuggestions: suggestions });
+      send('✏️ Możesz edytować prompt i wybrać temat', {
+        articlePrompt,
         awaitingPrompt: true,
+        topicSuggestions: suggestions,
       });
-      finalPrompt = await promptPromise;
-      send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
-    } else {
-      send('🧠 Generuję treść artykułu...', { articlePrompt: finalPrompt });
+      const res = await promptPromise;
+      articlePrompt = res.prompt;
+      baseTopic = res.topic;
     }
 
-    const article = await generateArticle({
+    send('outline-start', { baseTopic });
+    const outlineRes = await generateOutline({
       apiKey: env.OPENAI_API_KEY,
-      prompt: finalPrompt,
-      maxTokens: 7200,
+      baseTopic,
       model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
     });
+    send('outline-prompt', { prompt: outlineRes.prompt });
+    send('outline-response', { response: outlineRes.raw });
+    const outline = outlineRes.outline;
+    send('outline-end', { outline });
+
+    send('draft-start');
+    const draftRes = await generateDraft({
+      apiKey: env.OPENAI_API_KEY,
+      outline,
+      articlePrompt,
+      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      maxTokens: 7200,
+    });
+    send('draft-prompt', { prompt: draftRes.prompt });
+    send('draft-response', { response: draftRes.raw });
+    const draft = draftRes.draft;
+    send('draft-end');
+
+    send('edit-start');
+    const editRes = await editDraft({
+      apiKey: env.OPENAI_API_KEY,
+      draft,
+      outline,
+      model: env.OPENAI_TEXT_MODEL || 'gpt-4o',
+      maxTokens: 7200,
+    });
+    send('edit-prompt', { prompt: editRes.prompt });
+    send('edit-response', { response: editRes.raw });
+    const edited = editRes.edited;
+    send('edit-end', { title: edited.title });
+
+    const validation = validateAntiHallucination(edited.markdown, outline);
+    const warns = validation.errors.filter(e => e.startsWith('WARN'));
+    if (warns.length) {
+      send('⚠️ Ostrzeżenia walidatora', {
+        warnings: warns,
+        stats: validation.stats,
+      });
+    }
+    if (!validation.ok) {
+      const errs = validation.errors.filter(e => e.startsWith('ERROR'));
+      send('❌ Błąd walidacji treści', {
+        errors: errs,
+        stats: validation.stats,
+      });
+      throw new Error(`Content validation failed: ${errs.join('; ')}`);
+    } else {
+      send('✅ Walidacja treści OK', { stats: validation.stats });
+    }
+
+    const article = formatFinal(edited);
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
     const heroPrompt = heroTemplate.replace('{title}', article.title);
