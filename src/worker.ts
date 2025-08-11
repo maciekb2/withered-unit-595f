@@ -7,7 +7,10 @@ import { getSessionInfo, appendSessionCookie } from './utils/session';
 import articleTemplate from './prompt/article-content.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
 
-const pendingPrompts = new Map<string, (prompt: string) => void>();
+const pendingPrompts = new Map<
+  string,
+  (data: { topic: string }) => void
+>();
 
 async function handleContact(request: Request, env: Env) {
   logEvent({ type: 'contact-start' });
@@ -207,7 +210,7 @@ export default {
           enqueue: (chunk: string) => writer.write(new TextEncoder().encode(chunk)),
           close: () => writer.close(),
         };
-        const deferred = createDeferred<string>();
+        const deferred = createDeferred<{ topic: string }>();
         pendingPrompts.set(session.id, deferred.resolve);
         ctx.waitUntil(
           generateAndPublish(env, ctrl, deferred.promise)
@@ -241,9 +244,9 @@ export default {
           response = new Response('No pending prompt', { status: 400 });
         } else {
           const data = await request.json();
-          const prompt = (data as any).prompt ?? '';
+          const topic = (data as any).topic ?? '';
           logEvent({ type: 'update-prompt', sessionId: session.id });
-          resolver(String(prompt));
+          resolver({ topic: String(topic) });
           response = new Response('OK');
         }
       } else if (
