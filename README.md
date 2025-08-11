@@ -60,7 +60,7 @@ ustawienia modeli OpenAI:
 ```json
   "vars": {
     "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>",
-    "OPENAI_TEXT_MODEL": "gpt-4o",
+    "OPENAI_TEXT_MODEL": "gpt-5",
     "OPENAI_IMAGE_STYLE": "vivid",
     "OPENAI_IMAGE_QUALITY": "hd"
   }
