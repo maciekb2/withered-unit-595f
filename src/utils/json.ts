@@ -1,6 +1,5 @@
 export function extractJson<T>(text: string): T {
   let jsonText = text.trim();
-
   const fenceMatch = /^```(?:json)?\n([\s\S]*?)\n```$/m.exec(jsonText);
   if (fenceMatch) {
     jsonText = fenceMatch[1];
