@@ -23,8 +23,9 @@ export interface EditDraftResult {
 export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
   const prompt = buildEditPrompt(draft, outline);
   logEvent({ type: 'edit-start' });
+  let text = '';
   try {
-    const text = await chat(apiKey, {
+    text = await chat(apiKey, {
       system: guardrails(),
       user: prompt,
       max_completion_tokens: maxTokens ?? 1000,
@@ -45,7 +46,9 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTo
     logEvent({ type: 'edit-complete', title: result.title });
     return { edited: result, prompt, raw: text };
   } catch (err) {
-    logError(err, { type: 'edit-error' });
+    logError(err, { type: 'edit-error', raw: text });
+    (err as any).prompt = prompt;
+    (err as any).raw = text;
     throw err;
   }
 }

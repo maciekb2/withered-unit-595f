@@ -61,3 +61,23 @@ test('generateOutline rejects markdown in description', async () => {
   );
   globalThis.fetch = original;
 });
+
+test('generateOutline exposes prompt and raw on error', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => new Response(
+    JSON.stringify({ choices: [{ message: { content: '' } }] }),
+    { status: 200 }
+  ) as any;
+
+  await assert.rejects(
+    async () => {
+      await generateOutline({ apiKey: 'k', baseTopic: 'T' });
+    },
+    (err: any) => {
+      assert.ok(err.prompt.includes('Temat bazowy: T'));
+      assert.equal(err.raw, '');
+      return /No JSON/.test(err.message);
+    }
+  );
+  globalThis.fetch = original;
+});

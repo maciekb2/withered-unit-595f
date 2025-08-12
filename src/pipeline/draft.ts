@@ -22,8 +22,9 @@ export async function generateDraft({ apiKey, outline, articlePrompt, model = 'g
   const finalPrompt = buildDraftPrompt(outline, articlePrompt);
 
   logEvent({ type: 'draft-start' });
+  let text = '';
   try {
-    const text = await chat(apiKey, {
+    text = await chat(apiKey, {
       system: guardrails(),
       user: finalPrompt,
       max_completion_tokens: maxTokens ?? 1200,
@@ -32,7 +33,9 @@ export async function generateDraft({ apiKey, outline, articlePrompt, model = 'g
     logEvent({ type: 'draft-complete' });
     return { draft: { markdown: text }, prompt: finalPrompt, raw: text };
   } catch (err) {
-    logError(err, { type: 'draft-error' });
+    logError(err, { type: 'draft-error', raw: text });
+    (err as any).prompt = finalPrompt;
+    (err as any).raw = text;
     throw err;
   }
 }

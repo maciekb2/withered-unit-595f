@@ -25,8 +25,9 @@ const REQUIRED_GUARDRAILS = [
 export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxTokens }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
   const prompt = `Temat bazowy: ${baseTopic}\nNa jego podstawie przygotuj konspekt artykułu satyrycznego w tonie centro-prawicowym, PL-patriotycznym.\nUwzględnij 4–5 sekcji (każda 2–5 bulletów) i jedną lub dwie analogie do sytuacji z ostatnich 2 lat.\nKażdy bullet zawiera co najmniej jedną konkretną statystykę, datę lub nazwę raportu wraz z wiarygodnym źródłem (np. GUS, Eurostat, NATO). Jeśli brak pewnych danych, oznacz bullet tokenem [[TODO-CLAIM]].\nDodaj listę guardrails (avoid).\nWynik parsuj jako { finalTitle, description, sections: [{h2, bullets}], guardrails }.`;
   logEvent({ type: 'outline-start' });
+  let text = '';
   try {
-    const text = await chat(apiKey, {
+    text = await chat(apiKey, {
       system: guardrails(),
       user: prompt,
       max_completion_tokens: maxTokens ?? 800,
@@ -64,7 +65,9 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxT
     logEvent({ type: 'outline-complete', title: outline.finalTitle });
     return { outline, prompt, raw: text };
   } catch (err) {
-    logError(err, { type: 'outline-error' });
+    logError(err, { type: 'outline-error', raw: text });
+    (err as any).prompt = prompt;
+    (err as any).raw = text;
     throw err;
   }
 }

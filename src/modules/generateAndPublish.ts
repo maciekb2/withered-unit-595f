@@ -71,51 +71,91 @@ export async function generateAndPublish(
     }
 
     send('outline-start', { baseTopic });
-    const outlineRes = await generateOutline({
-      apiKey: env.OPENAI_API_KEY,
-      baseTopic,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
-    });
-    send('outline-prompt', { prompt: outlineRes.prompt });
-    send('outline-response', { response: outlineRes.raw });
+    let outlineRes;
+    try {
+      outlineRes = await generateOutline({
+        apiKey: env.OPENAI_API_KEY,
+        baseTopic,
+        model: env.OPENAI_TEXT_MODEL || 'gpt-5',
+      });
+      send('outline-prompt', { prompt: outlineRes.prompt });
+      send('outline-response', { response: outlineRes.raw });
+    } catch (err) {
+      send('outline-error', {
+        error: (err as Error).message,
+        prompt: (err as any).prompt,
+        response: (err as any).raw,
+      });
+      throw err;
+    }
     const outline = outlineRes.outline;
     send('outline-end', { outline });
 
     send('draft-start');
-    const draftRes = await generateDraft({
-      apiKey: env.OPENAI_API_KEY,
-      outline,
-      articlePrompt,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
-      maxTokens: 7200,
-    });
-    send('draft-prompt', { prompt: draftRes.prompt });
-    send('draft-response', { response: draftRes.raw });
+    let draftRes;
+    try {
+      draftRes = await generateDraft({
+        apiKey: env.OPENAI_API_KEY,
+        outline,
+        articlePrompt,
+        model: env.OPENAI_TEXT_MODEL || 'gpt-5',
+        maxTokens: 7200,
+      });
+      send('draft-prompt', { prompt: draftRes.prompt });
+      send('draft-response', { response: draftRes.raw });
+    } catch (err) {
+      send('draft-error', {
+        error: (err as Error).message,
+        prompt: (err as any).prompt,
+        response: (err as any).raw,
+      });
+      throw err;
+    }
     const draft = draftRes.draft;
     send('draft-end');
 
     send('edit-start');
-    const editRes = await editDraft({
-      apiKey: env.OPENAI_API_KEY,
-      draft,
-      outline,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
-      maxTokens: 7200,
-    });
-    send('edit-prompt', { prompt: editRes.prompt });
-    send('edit-response', { response: editRes.raw });
+    let editRes;
+    try {
+      editRes = await editDraft({
+        apiKey: env.OPENAI_API_KEY,
+        draft,
+        outline,
+        model: env.OPENAI_TEXT_MODEL || 'gpt-5',
+        maxTokens: 7200,
+      });
+      send('edit-prompt', { prompt: editRes.prompt });
+      send('edit-response', { response: editRes.raw });
+    } catch (err) {
+      send('edit-error', {
+        error: (err as Error).message,
+        prompt: (err as any).prompt,
+        response: (err as any).raw,
+      });
+      throw err;
+    }
     let edited = editRes.edited;
     send('edit-end', { title: edited.title });
 
     send('proofread-start');
-    const proofRes = await proofread({
-      apiKey: env.OPENAI_API_KEY,
-      edited,
-      model: env.OPENAI_TEXT_MODEL || 'gpt-5',
-      maxTokens: 7200,
-    });
-    send('proofread-prompt', { prompt: proofRes.prompt });
-    send('proofread-response', { response: proofRes.raw });
+    let proofRes;
+    try {
+      proofRes = await proofread({
+        apiKey: env.OPENAI_API_KEY,
+        edited,
+        model: env.OPENAI_TEXT_MODEL || 'gpt-5',
+        maxTokens: 7200,
+      });
+      send('proofread-prompt', { prompt: proofRes.prompt });
+      send('proofread-response', { response: proofRes.raw });
+    } catch (err) {
+      send('proofread-error', {
+        error: (err as Error).message,
+        prompt: (err as any).prompt,
+        response: (err as any).raw,
+      });
+      throw err;
+    }
     edited = proofRes.edited;
     send('proofread-end');
 

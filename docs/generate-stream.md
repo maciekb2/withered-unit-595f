@@ -12,6 +12,7 @@ Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JS
 
 - `recentTitles` – listę pobranych tytułów;
 - `prompt` / `response` – pełny prompt i odpowiedź z każdego etapu;
+- w razie problemów: `outline-error`, `draft-error`, `edit-error` lub `proofread-error` z polami `error`, `prompt`, `response`;
 - `awaitingTopic` – jeśli `true`, skrypt czeka na wybór tematu;
  - `articleTitle` – tytuł wygenerowanego artykułu;
  - `heroPrompt` – prompt użyty do stworzenia obrazka.
