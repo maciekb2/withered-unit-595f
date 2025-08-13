@@ -18,11 +18,13 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
         choices: [
           {
             message: {
-              content: JSON.stringify([
-                { title: 'Nowy tytuł 1', rationale: 'Polityka: satyryczny komentarz' },
-                { title: 'Nowy tytuł 2', rationale: 'Ekologia: ironiczny ton' },
-                { title: 'Nowy tytuł 3', rationale: 'Historia: patriotyczna nuta' },
-              ]),
+              parsed: {
+                results: [
+                  { title: 'Nowy tytuł 1', rationale: 'Polityka: satyryczny komentarz' },
+                  { title: 'Nowy tytuł 2', rationale: 'Ekologia: ironiczny ton' },
+                  { title: 'Nowy tytuł 3', rationale: 'Historia: patriotyczna nuta' },
+                ],
+              },
             },
           },
         ],
@@ -42,7 +44,9 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
   }
   const themes = new Set(res.suggestions.map(s => s.rationale.split(':')[0]));
   assert.ok(themes.size >= 2);
-  assert.ok(res.prompt.includes('Mam listę gorących tematów'));
+  assert.ok(
+    res.messages.some(m => m.role === 'user' && m.content.includes('Mam listę gorących tematów')),
+  );
   assert.ok(res.raw.length > 0);
 
   globalThis.fetch = originalFetch;

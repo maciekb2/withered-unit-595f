@@ -89,6 +89,9 @@ function startStream() {
     if (msg.log) {
       appendLog(msg.log);
     }
+  if (msg.error) {
+    appendLog(`❌ Błąd: ${msg.error}`);
+  }
   if (msg.warnings) {
     appendLog('⚠️ Ostrzeżenia:');
     const list = document.createElement('ul');
@@ -160,12 +163,20 @@ function startStream() {
     continueBtn.style.display = 'inline-block';
   }
   if (msg.prompt) {
-    appendLog('📝 Prompt:');
-    appendLog(msg.prompt);
+    appendLog('📝 Kontekst wysłany do OpenAI:');
+    appendLog(
+      typeof msg.prompt === 'string'
+        ? msg.prompt
+        : JSON.stringify(msg.prompt, null, 2),
+    );
   }
   if (msg.response) {
     appendLog('💬 Odpowiedź:');
     appendLog(msg.response);
+  }
+  if (msg.debug) {
+    appendLog('🐞 Debug:');
+    appendLog(typeof msg.debug === 'string' ? msg.debug : JSON.stringify(msg.debug, null, 2));
   }
   if (msg.heroPrompt) {
     appendLog('🎨 Prompt (obrazek):');
@@ -181,7 +192,7 @@ function startStream() {
   };
   es.onerror = (err) => {
     statusEl.textContent = 'Błąd połączenia (SSE)';
-    appendLog('❌ Błąd połączenia (SSE)');
+    appendLog(`❌ Błąd połączenia (SSE): ${err?.message || err}`);
     console.error('EventSource failed', err);
     sendLog('sse-error', { message: err.message });
     es.close();

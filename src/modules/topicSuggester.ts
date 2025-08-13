@@ -1,7 +1,7 @@
 import type { HotTopic } from '../utils/hotTopics';
 import { logEvent, logError } from '../utils/logger';
 import { extractJson } from '../utils/json';
-import { chat } from '../pipeline/openai';
+import { chat, type ChatMessage } from '../pipeline/openai';
 import { guardrails } from '../pipeline/guardrails';
 
 export interface SuggestedTopic {
@@ -11,7 +11,7 @@ export interface SuggestedTopic {
 
 export interface SuggestedTopicResult {
   suggestions: SuggestedTopic[];
-  prompt: string;
+  messages: ChatMessage[];
   raw: string;
 }
 
@@ -20,7 +20,7 @@ export async function suggestArticleTopic(
   recentTitles: string[],
   apiKey: string,
 ): Promise<SuggestedTopicResult> {
-  const prompt = [
+  const userPrompt = [
     'Mam listę gorących tematów:',
     ...hotTopics.map((t, i) => `${i + 1}. ${t.title} – ${t.url}`),
     '',
@@ -37,20 +37,33 @@ export async function suggestArticleTopic(
   }
 
   logEvent({ type: 'suggest-topic-start' });
+  const messages: ChatMessage[] = [
+    { role: 'system', content: guardrails() },
+    { role: 'user', content: userPrompt },
+  ];
   let raw = '';
+  let parsed: any;
   try {
     raw = await chat(apiKey, {
-      system: guardrails(),
-      user: prompt,
-      max_completion_tokens: 600,
+      messages,
+      max_completion_tokens: 2000,
       response_format: { type: 'json_object' },
+      response_style: 'brief',
     });
 
-    const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(raw);
+    parsed = extractJson<any>(raw);
+    logEvent({ type: 'suggest-topic-parsed', parsed });
+    const arr: SuggestedTopic[] = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.results)
+        ? parsed.results
+        : (() => {
+            throw new Error('Parsed response is not an array');
+          })();
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());
     const result: SuggestedTopic[] = [];
-    for (const s of parsed) {
+    for (const s of arr) {
       const lowerTitle = s.title.toLowerCase();
       if (!lowerRecent.includes(lowerTitle) && !result.some(r => r.title.toLowerCase() === lowerTitle)) {
         result.push(s);
@@ -58,10 +71,12 @@ export async function suggestArticleTopic(
     }
 
     logEvent({ type: 'suggest-topic-complete', count: result.length });
-    return { suggestions: result, prompt, raw };
+    return { suggestions: result, messages, raw };
   } catch (err) {
-    (err as any).prompt = prompt;
+    (err as any).prompt = userPrompt;
+    (err as any).messages = messages;
     (err as any).raw = raw;
+    if (parsed) (err as any).parsed = parsed;
     logError(err, { type: 'suggest-topic-error' });
     throw err;
   }
