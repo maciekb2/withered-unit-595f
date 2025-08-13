@@ -1,33 +1,41 @@
 import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
 
+export interface ChatMessage {
+  role: string;
+  content: string;
+}
+
 export interface ChatOptions {
-  system?: string;
-  user: string;
+  messages: ChatMessage[];
   max_completion_tokens: number;
   model?: string;
   response_format?: Record<string, unknown>;
+  response_style?: 'brief' | 'normal' | 'full';
 }
 
-export async function chat(apiKey: string, {
-  system,
-  user,
-  max_completion_tokens,
-  model = 'gpt-5',
-  response_format,
-}: ChatOptions): Promise<string> {
-  const messages: any[] = [];
-  if (system) messages.push({ role: 'system', content: system });
-  messages.push({ role: 'user', content: user });
-
+export async function chat(
+  apiKey: string,
+  {
+    messages,
+    max_completion_tokens,
+    model = 'gpt-5',
+    response_format,
+    response_style,
+  }: ChatOptions,
+): Promise<string> {
+  
   let tokens = max_completion_tokens;
   for (let attempt = 0; attempt < 2; attempt++) {
+    const userMsg = messages.findLast?.(m => m.role === 'user') || messages[messages.length - 1];
     logEvent({
       type: 'openai-request',
       model,
-      promptSnippet: user.slice(0, 100),
+      messages,
+      response_style,
       max_tokens: tokens,
       attempt,
+      promptSnippet: userMsg?.content?.slice(0, 100) || '',
     });
     try {
       const body: Record<string, unknown> = {
@@ -36,6 +44,7 @@ export async function chat(apiKey: string, {
         messages,
       };
       if (response_format) body.response_format = response_format;
+      if (response_style) body.response_style = response_style;
       const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {

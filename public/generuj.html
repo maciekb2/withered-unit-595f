@@ -163,8 +163,12 @@ function startStream() {
     continueBtn.style.display = 'inline-block';
   }
   if (msg.prompt) {
-    appendLog('📝 Prompt:');
-    appendLog(msg.prompt);
+    appendLog('📝 Kontekst wysłany do OpenAI:');
+    appendLog(
+      typeof msg.prompt === 'string'
+        ? msg.prompt
+        : JSON.stringify(msg.prompt, null, 2),
+    );
   }
   if (msg.response) {
     appendLog('💬 Odpowiedź:');

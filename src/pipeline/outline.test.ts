@@ -74,7 +74,9 @@ test('generateOutline exposes prompt and raw on error', async () => {
       await generateOutline({ apiKey: 'k', baseTopic: 'T' });
     },
     (err: any) => {
-      assert.ok(err.prompt.includes('Temat bazowy: T'));
+      assert.ok(
+        err.messages.some((m: any) => m.role === 'user' && m.content.includes('Temat bazowy: T')),
+      );
       assert.equal(err.raw, '');
       return /No JSON/.test(err.message);
     }
