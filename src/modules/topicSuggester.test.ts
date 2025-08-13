@@ -30,18 +30,20 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
       { status: 200 },
     ) as any;
 
-  const suggestions = await suggestArticleTopic(
+  const res = await suggestArticleTopic(
     mockHotTopics,
     recent,
     'test-key',
   );
 
-  assert.equal(suggestions.length, 3);
-  for (const s of suggestions) {
+  assert.equal(res.suggestions.length, 3);
+  for (const s of res.suggestions) {
     assert.ok(!recent.includes(s.title));
   }
-  const themes = new Set(suggestions.map(s => s.rationale.split(':')[0]));
+  const themes = new Set(res.suggestions.map(s => s.rationale.split(':')[0]));
   assert.ok(themes.size >= 2);
+  assert.ok(res.prompt.includes('Mam listę gorących tematów'));
+  assert.ok(res.raw.length > 0);
 
   globalThis.fetch = originalFetch;
 });

@@ -9,11 +9,17 @@ export interface SuggestedTopic {
   rationale: string;
 }
 
+export interface SuggestedTopicResult {
+  suggestions: SuggestedTopic[];
+  prompt: string;
+  raw: string;
+}
+
 export async function suggestArticleTopic(
   hotTopics: HotTopic[],
   recentTitles: string[],
   apiKey: string,
-): Promise<SuggestedTopic[]> {
+): Promise<SuggestedTopicResult> {
   const prompt = [
     'Mam listę gorących tematów:',
     ...hotTopics.map((t, i) => `${i + 1}. ${t.title} – ${t.url}`),
@@ -31,14 +37,15 @@ export async function suggestArticleTopic(
   }
 
   logEvent({ type: 'suggest-topic-start' });
+  let raw = '';
   try {
-    const text = await chat(apiKey, {
+    raw = await chat(apiKey, {
       system: guardrails(),
       user: prompt,
       max_completion_tokens: 600,
     });
 
-    const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(text);
+    const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(raw);
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());
     const result: SuggestedTopic[] = [];
@@ -50,8 +57,10 @@ export async function suggestArticleTopic(
     }
 
     logEvent({ type: 'suggest-topic-complete', count: result.length });
-    return result;
+    return { suggestions: result, prompt, raw };
   } catch (err) {
+    (err as any).prompt = prompt;
+    (err as any).raw = raw;
     logError(err, { type: 'suggest-topic-error' });
     throw err;
   }

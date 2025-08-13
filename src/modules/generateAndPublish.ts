@@ -56,11 +56,25 @@ export async function generateAndPublish(
     let baseTopic = hotTopics[0]?.title || 'Aktualny temat';
 
     if (promptPromise) {
-      const suggestions = await suggestArticleTopic(
-        hotTopics,
-        recent,
-        env.OPENAI_API_KEY,
-      );
+      send('suggest-topic-start');
+      let sugRes;
+      try {
+        sugRes = await suggestArticleTopic(
+          hotTopics,
+          recent,
+          env.OPENAI_API_KEY,
+        );
+        send('suggest-topic-prompt', { prompt: sugRes.prompt });
+        send('suggest-topic-response', { response: sugRes.raw });
+      } catch (err) {
+        send('suggest-topic-error', {
+          error: (err as Error).message,
+          prompt: (err as any).prompt,
+          response: (err as any).raw,
+        });
+        throw err;
+      }
+      const suggestions = sugRes.suggestions;
       send('💡 Propozycje tematów', { topicSuggestions: suggestions });
       send('✏️ Wybierz temat lub wpisz własny', {
         awaitingTopic: true,
