@@ -29,7 +29,7 @@ export async function suggestArticleTopic(
     '',
     'Zaproponuj 3 tytuły artykułów satyrycznych, ironicznych, w tonie centro-prawicowym (PL-patriotycznym), unikając powtórzeń z listy.',
     'Dla każdego dodaj krótkie uzasadnienie wyboru tematu.',
-    'Wynik parsuj jako JSON array { title, rationale }.',
+    'Odpowiedz TYLKO w formacie JSON array { title, rationale } bez dodatkowego tekstu.',
   ].join('\n');
 
   if (!apiKey) {
@@ -43,6 +43,7 @@ export async function suggestArticleTopic(
       system: guardrails(),
       user: prompt,
       max_completion_tokens: 600,
+      response_format: { type: 'json_object' },
     });
 
     const parsed: SuggestedTopic[] = extractJson<SuggestedTopic[]>(raw);

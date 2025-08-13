@@ -6,6 +6,7 @@ export interface ChatOptions {
   user: string;
   max_completion_tokens: number;
   model?: string;
+  response_format?: Record<string, unknown>;
 }
 
 export async function chat(apiKey: string, {
@@ -13,6 +14,7 @@ export async function chat(apiKey: string, {
   user,
   max_completion_tokens,
   model = 'gpt-5',
+  response_format,
 }: ChatOptions): Promise<string> {
   const messages: any[] = [];
   if (system) messages.push({ role: 'system', content: system });
@@ -20,13 +22,19 @@ export async function chat(apiKey: string, {
 
   logEvent({ type: 'openai-request', model, promptSnippet: user.slice(0, 100) });
   try {
+    const body: Record<string, unknown> = {
+      model,
+      max_completion_tokens,
+      messages,
+    };
+    if (response_format) body.response_format = response_format;
     const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, max_completion_tokens, messages }),
+      body: JSON.stringify(body),
       retries: 2,
       retryDelayMs: 1000,
     });
@@ -40,8 +48,11 @@ export async function chat(apiKey: string, {
     if (!data.choices || !data.choices[0]) {
       throw new Error('OpenAI response missing choices');
     }
-    const text = data.choices[0].message.content.trim();
+    const text = (data.choices[0].message.content || '').trim();
     logEvent({ type: 'openai-response-text', text });
+    if (!text) {
+      throw new Error('OpenAI response empty');
+    }
     return text;
   } catch (err) {
     logError(err, { type: 'openai-error' });
