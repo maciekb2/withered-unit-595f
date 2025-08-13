@@ -71,8 +71,10 @@ export async function chat(apiKey: string, {
 
     logEvent({ type: 'openai-response-text', text });
     if (!text) {
-      logEvent({ type: 'openai-response-debug', message });
-      throw new Error('OpenAI response empty');
+      logEvent({ type: 'openai-response-debug', message, data });
+      const err: any = new Error('OpenAI response empty');
+      err.debug = { message, data };
+      throw err;
     }
     return text;
   } catch (err) {
