@@ -24,14 +24,23 @@ export async function chat(
     response_style,
   }: ChatOptions,
 ): Promise<string> {
-  
+  let finalMessages = messages;
+  if (response_style) {
+    const styleMsg = { role: 'system', content: `response_style:${response_style}` };
+    if (messages.length && messages[0].role === 'system') {
+      finalMessages = [messages[0], styleMsg, ...messages.slice(1)];
+    } else {
+      finalMessages = [styleMsg, ...messages];
+    }
+  }
+
   let tokens = max_completion_tokens;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const userMsg = messages.findLast?.(m => m.role === 'user') || messages[messages.length - 1];
+    const userMsg = finalMessages.findLast?.(m => m.role === 'user') || finalMessages[finalMessages.length - 1];
     logEvent({
       type: 'openai-request',
       model,
-      messages,
+      messages: finalMessages,
       response_style,
       max_tokens: tokens,
       attempt,
@@ -41,10 +50,9 @@ export async function chat(
       const body: Record<string, unknown> = {
         model,
         max_completion_tokens: tokens,
-        messages,
+        messages: finalMessages,
       };
       if (response_format) body.response_format = response_format;
-      if (response_style) body.response_style = response_style;
       const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
