@@ -57,6 +57,7 @@ export async function generateAndPublish(
 
     if (promptPromise) {
       send('suggest-topic-start');
+      send('🧠 Generuję propozycje tematów przy użyciu OpenAI...');
       let sugRes;
       try {
         sugRes = await suggestArticleTopic(
@@ -64,13 +65,14 @@ export async function generateAndPublish(
           recent,
           env.OPENAI_API_KEY,
         );
-        send('suggest-topic-prompt', { prompt: sugRes.prompt });
+        send('suggest-topic-prompt', { prompt: sugRes.messages });
         send('suggest-topic-response', { response: sugRes.raw });
       } catch (err) {
         send('suggest-topic-error', {
           error: (err as Error).message,
-          prompt: (err as any).prompt,
+          prompt: (err as any).messages,
           response: (err as any).raw,
+          debug: (err as any).debug,
         });
         throw err;
       }
@@ -92,12 +94,12 @@ export async function generateAndPublish(
         baseTopic,
         model: env.OPENAI_TEXT_MODEL || 'gpt-5',
       });
-      send('outline-prompt', { prompt: outlineRes.prompt });
+      send('outline-prompt', { prompt: outlineRes.messages });
       send('outline-response', { response: outlineRes.raw });
     } catch (err) {
       send('outline-error', {
         error: (err as Error).message,
-        prompt: (err as any).prompt,
+        prompt: (err as any).messages,
         response: (err as any).raw,
       });
       throw err;
@@ -115,12 +117,12 @@ export async function generateAndPublish(
         model: env.OPENAI_TEXT_MODEL || 'gpt-5',
         maxTokens: 7200,
       });
-      send('draft-prompt', { prompt: draftRes.prompt });
+      send('draft-prompt', { prompt: draftRes.messages });
       send('draft-response', { response: draftRes.raw });
     } catch (err) {
       send('draft-error', {
         error: (err as Error).message,
-        prompt: (err as any).prompt,
+        prompt: (err as any).messages,
         response: (err as any).raw,
       });
       throw err;
@@ -138,12 +140,12 @@ export async function generateAndPublish(
         model: env.OPENAI_TEXT_MODEL || 'gpt-5',
         maxTokens: 7200,
       });
-      send('edit-prompt', { prompt: editRes.prompt });
+      send('edit-prompt', { prompt: editRes.messages });
       send('edit-response', { response: editRes.raw });
     } catch (err) {
       send('edit-error', {
         error: (err as Error).message,
-        prompt: (err as any).prompt,
+        prompt: (err as any).messages,
         response: (err as any).raw,
       });
       throw err;
@@ -160,12 +162,12 @@ export async function generateAndPublish(
         model: env.OPENAI_TEXT_MODEL || 'gpt-5',
         maxTokens: 7200,
       });
-      send('proofread-prompt', { prompt: proofRes.prompt });
+      send('proofread-prompt', { prompt: proofRes.messages });
       send('proofread-response', { response: proofRes.raw });
     } catch (err) {
       send('proofread-error', {
         error: (err as Error).message,
-        prompt: (err as any).prompt,
+        prompt: (err as any).messages,
         response: (err as any).raw,
       });
       throw err;
