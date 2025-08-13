@@ -48,10 +48,33 @@ export async function chat(apiKey: string, {
     if (!data.choices || !data.choices[0]) {
       throw new Error('OpenAI response missing choices');
     }
-    const text = (data.choices[0].message.content || '').trim();
+
+    const message = data.choices[0].message || {};
+    if (message.refusal) {
+      logEvent({ type: 'openai-response-refusal', refusal: message.refusal });
+      throw new Error(`OpenAI refusal: ${message.refusal}`);
+    }
+
+    let text = '';
+    const content = message.content;
+    if (Array.isArray(content)) {
+      text = content.map((c: any) => c.text || '').join('').trim();
+    } else if (typeof content === 'string') {
+      text = content.trim();
+    } else if (content && typeof content.text === 'string') {
+      text = content.text.trim();
+    } else if (message.parsed) {
+      try {
+        text = JSON.stringify(message.parsed).trim();
+      } catch {}
+    }
+
     logEvent({ type: 'openai-response-text', text });
     if (!text) {
-      throw new Error('OpenAI response empty');
+      logEvent({ type: 'openai-response-debug', message, data });
+      const err: any = new Error('OpenAI response empty');
+      err.debug = { message, data };
+      throw err;
     }
     return text;
   } catch (err) {
