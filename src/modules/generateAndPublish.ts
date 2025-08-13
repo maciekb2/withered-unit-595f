@@ -57,6 +57,7 @@ export async function generateAndPublish(
 
     if (promptPromise) {
       send('suggest-topic-start');
+      send('🧠 Generuję propozycje tematów przy użyciu OpenAI...');
       let sugRes;
       try {
         sugRes = await suggestArticleTopic(
@@ -71,6 +72,7 @@ export async function generateAndPublish(
           error: (err as Error).message,
           prompt: (err as any).prompt,
           response: (err as any).raw,
+          debug: (err as any).debug,
         });
         throw err;
       }
