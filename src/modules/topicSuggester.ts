@@ -52,14 +52,20 @@ export async function suggestArticleTopic(
     });
 
     parsed = extractJson<any>(raw);
-    logEvent({ type: 'suggest-topic-parsed', parsed });
+    const arrKey = Array.isArray(parsed)
+      ? null
+      : typeof parsed === 'object' && parsed
+        ? Object.keys(parsed).find(k => Array.isArray((parsed as any)[k])) || null
+        : null;
     const arr: SuggestedTopic[] = Array.isArray(parsed)
       ? parsed
-      : Array.isArray(parsed?.results)
-        ? parsed.results
+      : arrKey
+        ? (parsed as any)[arrKey]
         : (() => {
-            throw new Error('Parsed response is not an array');
+            const keys = parsed && typeof parsed === 'object' ? Object.keys(parsed).join(', ') : String(parsed);
+            throw new Error(`Parsed response is not an array (keys: ${keys})`);
           })();
+    logEvent({ type: 'suggest-topic-parsed', parsed, arrayKey: arrKey });
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());
     const result: SuggestedTopic[] = [];

@@ -19,7 +19,7 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
           {
             message: {
               parsed: {
-                results: [
+                articles: [
                   { title: 'Nowy tytuł 1', rationale: 'Polityka: satyryczny komentarz' },
                   { title: 'Nowy tytuł 2', rationale: 'Ekologia: ironiczny ton' },
                   { title: 'Nowy tytuł 3', rationale: 'Historia: patriotyczna nuta' },

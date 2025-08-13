@@ -73,6 +73,7 @@ export async function generateAndPublish(
           prompt: (err as any).messages,
           response: (err as any).raw,
           debug: (err as any).debug,
+          parsed: (err as any).parsed,
         });
         throw err;
       }

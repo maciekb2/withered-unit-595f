@@ -178,6 +178,10 @@ function startStream() {
     appendLog('🐞 Debug:');
     appendLog(typeof msg.debug === 'string' ? msg.debug : JSON.stringify(msg.debug, null, 2));
   }
+  if (msg.parsed) {
+    appendLog('📦 Parsed:');
+    appendLog(typeof msg.parsed === 'string' ? msg.parsed : JSON.stringify(msg.parsed, null, 2));
+  }
   if (msg.heroPrompt) {
     appendLog('🎨 Prompt (obrazek):');
     appendLog(msg.heroPrompt);
