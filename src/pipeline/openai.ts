@@ -53,6 +53,9 @@ export async function chat(apiKey: string, {
       }
       const data: any = await res.json();
       logEvent({ type: 'openai-response-received' });
+      if (data.usage) {
+        logEvent({ type: 'openai-usage', usage: data.usage });
+      }
       if (!data.choices || !data.choices[0]) {
         throw new Error('OpenAI response missing choices');
       }
