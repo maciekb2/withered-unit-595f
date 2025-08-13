@@ -89,6 +89,9 @@ function startStream() {
     if (msg.log) {
       appendLog(msg.log);
     }
+  if (msg.error) {
+    appendLog(`❌ Błąd: ${msg.error}`);
+  }
   if (msg.warnings) {
     appendLog('⚠️ Ostrzeżenia:');
     const list = document.createElement('ul');
