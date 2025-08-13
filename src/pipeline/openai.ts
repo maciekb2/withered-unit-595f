@@ -20,65 +20,87 @@ export async function chat(apiKey: string, {
   if (system) messages.push({ role: 'system', content: system });
   messages.push({ role: 'user', content: user });
 
-  logEvent({ type: 'openai-request', model, promptSnippet: user.slice(0, 100) });
-  try {
-    const body: Record<string, unknown> = {
+  let tokens = max_completion_tokens;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    logEvent({
+      type: 'openai-request',
       model,
-      max_completion_tokens,
-      messages,
-    };
-    if (response_format) body.response_format = response_format;
-    const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(body),
-      retries: 2,
-      retryDelayMs: 1000,
+      promptSnippet: user.slice(0, 100),
+      max_tokens: tokens,
+      attempt,
     });
-    logEvent({ type: 'openai-response-status', status: res.status });
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
-    }
-    const data: any = await res.json();
-    logEvent({ type: 'openai-response-received' });
-    if (!data.choices || !data.choices[0]) {
-      throw new Error('OpenAI response missing choices');
-    }
+    try {
+      const body: Record<string, unknown> = {
+        model,
+        max_completion_tokens: tokens,
+        messages,
+      };
+      if (response_format) body.response_format = response_format;
+      const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(body),
+        retries: 2,
+        retryDelayMs: 1000,
+      });
+      logEvent({ type: 'openai-response-status', status: res.status });
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
+      }
+      const data: any = await res.json();
+      logEvent({ type: 'openai-response-received' });
+      if (!data.choices || !data.choices[0]) {
+        throw new Error('OpenAI response missing choices');
+      }
 
-    const message = data.choices[0].message || {};
-    if (message.refusal) {
-      logEvent({ type: 'openai-response-refusal', refusal: message.refusal });
-      throw new Error(`OpenAI refusal: ${message.refusal}`);
-    }
+      const choice = data.choices[0];
+      const message = choice.message || {};
+      if (message.refusal) {
+        logEvent({ type: 'openai-response-refusal', refusal: message.refusal });
+        throw new Error(`OpenAI refusal: ${message.refusal}`);
+      }
 
-    let text = '';
-    const content = message.content;
-    if (Array.isArray(content)) {
-      text = content.map((c: any) => c.text || '').join('').trim();
-    } else if (typeof content === 'string') {
-      text = content.trim();
-    } else if (content && typeof content.text === 'string') {
-      text = content.text.trim();
-    } else if (message.parsed) {
-      try {
-        text = JSON.stringify(message.parsed).trim();
-      } catch {}
-    }
+      let text = '';
+      const content = message.content;
+      if (Array.isArray(content)) {
+        text = content.map((c: any) => c.text || '').join('').trim();
+      } else if (typeof content === 'string') {
+        text = content.trim();
+      } else if (content && typeof content.text === 'string') {
+        text = content.text.trim();
+      } else if (message.parsed) {
+        try {
+          text = JSON.stringify(message.parsed).trim();
+        } catch {}
+      }
 
-    logEvent({ type: 'openai-response-text', text });
-    if (!text) {
-      logEvent({ type: 'openai-response-debug', message, data });
+      logEvent({ type: 'openai-response-text', text });
+      if (text) return text;
+
+      const finish = choice.finish_reason;
+      logEvent({
+        type: 'openai-response-debug',
+        message,
+        data,
+        finish_reason: finish,
+      });
+      if (finish === 'length' && attempt === 0) {
+        tokens *= 2;
+        logEvent({ type: 'openai-retry-length', next_max_tokens: tokens });
+        continue;
+      }
+
       const err: any = new Error('OpenAI response empty');
-      err.debug = { message, data };
+      err.debug = { message, data, finish_reason: finish };
+      throw err;
+    } catch (err) {
+      logError(err, { type: 'openai-error' });
       throw err;
     }
-    return text;
-  } catch (err) {
-    logError(err, { type: 'openai-error' });
-    throw err;
   }
+  throw new Error('OpenAI response empty after retries');
 }
