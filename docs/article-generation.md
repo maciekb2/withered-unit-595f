@@ -9,8 +9,8 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 
 ## 2. Outline
 `generateOutline(baseTopic)` przygotowuje strukturę artykułu:
-- używa `chat()` (model gpt-5) z guardrails, `max_completion_tokens` 800 i `response_style=normal`,
-- zwraca `finalTitle`, `description` i 4–5 sekcji po 2–5 bulletów,
+- używa `chat()` (model gpt-5) z jednoliniowymi guardrails, `max_completion_tokens` 800, `response_style=normal` i `response_format=json_schema`,
+- zwraca `finalTitle`, `description` i **4 sekcje** po **2–3 bulletów**,
 - każdy bullet zawiera konkretną statystykę, datę lub nazwę raportu z wiarygodnym źródłem; w razie braku danych oznaczony jest `[[TODO-CLAIM]]`,
 - opis ≤200 znaków, bez znaków markdown; tytuł ≤100 znaków,
 - guardrails zawsze zawierają m.in. zakaz raportów bez źródła i ostrożność przy liczbach.
@@ -48,3 +48,33 @@ Po pozytywnej walidacji:
 2. `publishArticleToGitHub()` wysyła plik `.md` i grafikę oraz tworzy PR.
 
 W razie jakichkolwiek błędów proces przerywa się z czytelnym komunikatem SSE. Dzięki ujednoliconym parametrom `chat()` wszystkie zapytania do OpenAI korzystają z jednego schematu i tych samych mechanizmów guardrails.
+
+## 8. Evidence i przypisy
+Aby każda liczba i data miała potwierdzone źródło, model może korzystać z pętli
+agentowej z funkcjami `search_web` i `fetch_url`.
+1. **search_web(query, k)** – zwraca listę trafień `{url, title, snippet, date}`.
+2. **fetch_url(url)** – pobiera treść artykułu `{url, title, text, date, source_type}`.
+
+Po zebraniu źródeł model buduje strukturę:
+```json
+{
+  "evidence": {
+    "S1": {"url":"...","title":"...","date":"...","quotes":["..."]}
+  },
+  "draft": {
+    "finalTitle": "...",
+    "sections": [
+      {"h2":"...","paragraphs":[{"text":"...","refs":["S1"]}]}
+    ]
+  },
+  "bibliography": {
+    "S1": {"url":"...","title":"...","date":"..."}
+  }
+}
+```
+
+Każde zdanie z liczbą, datą lub twardą tezą musi mieć referencję w `refs`.
+Gdy brak pewnych danych, model używa `[[TODO-CLAIM]]` bez odnośnika. Po stronie
+serwera prosty regex sprawdza, czy każda wzmianka o liczbie posiada `refs`
+i w razie potrzeby prosi model o uzupełnienie. Przykładową implementację
+agentowej pętli znajdziesz w `src/pipeline/evidence.ts`.
