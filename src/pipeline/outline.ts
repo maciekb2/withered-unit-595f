@@ -23,7 +23,7 @@ const REQUIRED_GUARDRAILS = [
   'Dane liczbowe tylko jako trend/zakres albo z warunkami (jeśli brak źródła).',
 ];
 
-export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxTokens }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
   const userPrompt = `Temat bazowy: ${baseTopic}\nPrzygotuj konspekt satyrycznego artykułu (PL-patriotyczny).\n4 sekcje; każda 2–3 krótkie bullet’y.\nW 1–2 bulletach wpleć analogie z ostatnich 2 lat.\nKażdy bullet zawiera 1 konkretną statystykę/datę/nazwę raportu ze źródłem (np. GUS/Eurostat/NATO/BBC).\nGdy brak pewnych danych — wstaw dokładnie [[TODO-CLAIM]].\nDodaj listę guardrails (avoid) 3–6 pozycji.`;
   const systemPrompt = `${guardrails()} Zwracaj wyłącznie poprawny JSON { "finalTitle", "description", "sections": [{ "h2", "bullets": [string] }], "guardrails": [string] } bez markdownu i komentarzy.`;
   logEvent({ type: 'outline-start' });
@@ -35,7 +35,7 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxT
   try {
     text = await chat(apiKey, {
       messages,
-      max_completion_tokens: maxTokens ?? 800,
+      max_completion_tokens: maxTokens,
       model,
       response_style: 'normal',
       response_format: { type: 'json_schema', json_schema: { name: 'outline', schema: outlineJsonSchema } },
@@ -72,10 +72,12 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxT
     logEvent({ type: 'outline-complete', title: outline.finalTitle });
     return { outline, messages, raw: text };
   } catch (err) {
-    logError(err, { type: 'outline-error', raw: text });
+    const debug = (err as any).debug;
+    logError(err, { type: 'outline-error', raw: text, debug });
     (err as any).prompt = userPrompt;
     (err as any).messages = messages;
     (err as any).raw = text;
+    if (debug) (err as any).debug = debug;
     throw err;
   }
 }

@@ -94,6 +94,7 @@ export async function generateAndPublish(
         apiKey: env.OPENAI_API_KEY,
         baseTopic,
         model: env.OPENAI_TEXT_MODEL || 'gpt-5',
+        maxTokens: 2000,
       });
       send('outline-prompt', { prompt: outlineRes.messages });
       send('outline-response', { response: outlineRes.raw });
@@ -102,6 +103,7 @@ export async function generateAndPublish(
         error: (err as Error).message,
         prompt: (err as any).messages,
         response: (err as any).raw,
+        debug: (err as any).debug,
       });
       throw err;
     }
