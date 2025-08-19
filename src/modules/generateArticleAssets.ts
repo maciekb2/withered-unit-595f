@@ -35,7 +35,7 @@ export async function generateArticleAssets({
     recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
   );
 
-  const outlineRes = await generateOutline({ apiKey, baseTopic, model });
+  const outlineRes = await generateOutline({ apiKey, baseTopic, model, maxTokens: 2000 });
   const outline = outlineRes.outline;
   const draftRes = await generateDraft({
     apiKey,

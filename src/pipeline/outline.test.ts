@@ -22,11 +22,12 @@ const sampleResponse = {
   ]
 };
 
-test('generateOutline returns 4-5 sections', async () => {
+test('generateOutline returns exactly 4 sections with 2 bullets', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify(sampleResponse), { status: 200 }) as any;
   const res = await generateOutline({ apiKey: 'k', baseTopic: 'T' });
   assert.equal(res.outline.sections.length, 4);
+  assert.ok(res.outline.sections.every(s => s.bullets.length === 2));
   globalThis.fetch = original;
 });
 
@@ -74,7 +75,9 @@ test('generateOutline exposes prompt and raw on error', async () => {
       await generateOutline({ apiKey: 'k', baseTopic: 'T' });
     },
     (err: any) => {
-      assert.ok(err.prompt.includes('Temat bazowy: T'));
+      assert.ok(
+        err.messages.some((m: any) => m.role === 'user' && m.content.includes('Temat bazowy: T')),
+      );
       assert.equal(err.raw, '');
       return /No JSON/.test(err.message);
     }
