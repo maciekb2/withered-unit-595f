@@ -15,6 +15,12 @@ const obj2 = extractJson<any>(messy);
 assert.equal(obj2.finalTitle, 'X');
 assert.equal(obj2.description, 'Y');
 
+// Should not mangle colons inside string values
+const tricky = '{ markdown: "Karta UE CELEX:12012P/TXT oraz https://eur-lex.europa.eu" }';
+const obj3 = extractJson<any>(tricky);
+assert.ok(obj3.markdown.includes('CELEX:12012P/TXT'));
+assert.ok(obj3.markdown.includes('https://eur-lex.europa.eu'));
+
 // Should throw when no JSON present
 assert.throws(() => extractJson('```json\n```'), /No JSON/);
 

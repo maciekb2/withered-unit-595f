@@ -28,11 +28,6 @@ export function extractJson<T>(text: string): T {
     throw new Error(`No JSON found in input: ${original}`);
   }
 
-  // quote unquoted keys
-  jsonText = jsonText.replace(/([\{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":');
-  // remove trailing commas
-  jsonText = jsonText.replace(/,\s*([}\]])/g, '$1');
-
   try {
     return JSON.parse(jsonText);
   } catch (err) {
