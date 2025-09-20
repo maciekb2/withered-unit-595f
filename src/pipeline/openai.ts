@@ -14,6 +14,9 @@ export interface ChatOptions {
   response_style?: 'brief' | 'normal' | 'full';
 }
 
+const MAX_LENGTH_RETRIES = 5;
+const MAX_TOKEN_CAP = 12000;
+
 export async function chat(
   apiKey: string,
   {
@@ -34,8 +37,8 @@ export async function chat(
     }
   }
 
-  let tokens = max_completion_tokens;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  let tokens = Math.min(max_completion_tokens, MAX_TOKEN_CAP);
+  for (let attempt = 0; attempt < MAX_LENGTH_RETRIES; attempt++) {
     const userMsg = finalMessages.findLast?.(m => m.role === 'user') || finalMessages[finalMessages.length - 1];
     logEvent({
       type: 'openai-request',
@@ -92,9 +95,14 @@ export async function chat(
         text = content.trim();
       } else if (content && typeof content.text === 'string') {
         text = content.text.trim();
-      } else if (message.parsed) {
+      }
+
+      if (!text && message.parsed) {
         try {
-          text = JSON.stringify(message.parsed).trim();
+          text = (typeof message.parsed === 'string'
+            ? message.parsed
+            : JSON.stringify(message.parsed)
+          ).trim();
         } catch {}
       }
 
@@ -108,10 +116,13 @@ export async function chat(
         data,
         finish_reason: finish,
       });
-      if (finish === 'length' && attempt === 0) {
-        tokens *= 2;
-        logEvent({ type: 'openai-retry-length', next_max_tokens: tokens });
-        continue;
+      if (finish === 'length' && attempt < MAX_LENGTH_RETRIES - 1) {
+        const nextTokens = Math.min(tokens * 2, MAX_TOKEN_CAP);
+        if (nextTokens > tokens) {
+          tokens = nextTokens;
+          logEvent({ type: 'openai-retry-length', next_max_tokens: tokens, attempt });
+          continue;
+        }
       }
 
       const err: any = new Error('OpenAI response empty');
