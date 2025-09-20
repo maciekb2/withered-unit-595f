@@ -18,7 +18,7 @@ export interface ProofreadResult {
 }
 
 export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens }: ProofreadOptions): Promise<ProofreadResult> {
-  const userPrompt = `Sprawdź gramatykę, stylistykę i naturalność poniższego artykułu po polsku. Usuń powtórzenia, przeredaguj zdania tak, aby brzmiały płynnie w całym tekście, nie zmieniając znaczenia ani faktów. Zwróć JSON { markdown, title, description }.\n\nTytuł: ${edited.title}\nOpis: ${edited.description}\n\nArtykuł:\n${edited.markdown}`;
+  const userPrompt = `Sprawdź gramatykę, stylistykę i naturalność poniższego artykułu po polsku. Usuń powtórzenia, przeredaguj zdania tak, aby brzmiały płynnie w całym tekście, nie zmieniając znaczenia ani faktów. Zachowaj wszystkie adresy URL w identycznej formie jak w oryginale i nie zastępuj ich opisami w stylu „link powyżej”. Każde zdanie zawierające liczby, daty lub wzmiankę o raporcie musi nadal mieć konkretny link http(s) w tym samym zdaniu. Nie dodawaj nowych danych ani źródeł. Zwróć JSON { markdown, title, description }.\n\nTytuł: ${edited.title}\nOpis: ${edited.description}\n\nArtykuł:\n${edited.markdown}`;
   logEvent({ type: 'proofread-start' });
   const messages: ChatMessage[] = [
     { role: 'system', content: guardrails() },
