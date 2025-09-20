@@ -1,3 +1,5 @@
+import { jsonrepair } from 'jsonrepair';
+
 export function extractJson<T>(text: string): T {
   const original = text.trim();
   let jsonText = original;
@@ -34,6 +36,13 @@ export function extractJson<T>(text: string): T {
   try {
     return JSON.parse(jsonText);
   } catch (err) {
-    throw new Error(`Failed to parse JSON: ${(err as Error).message}. Input: ${jsonText}`);
+    try {
+      const repaired = jsonrepair(jsonText);
+      return JSON.parse(repaired);
+    } catch (repairErr) {
+      throw new Error(
+        `Failed to parse JSON: ${(repairErr as Error).message}. Original error: ${(err as Error).message}. Input: ${jsonText}`
+      );
+    }
   }
 }
