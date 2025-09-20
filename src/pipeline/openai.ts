@@ -88,25 +88,40 @@ export async function chat(
       }
 
       let text = '';
-      const content = message.content;
-      if (Array.isArray(content)) {
-        text = content.map((c: any) => c.text || '').join('').trim();
-      } else if (typeof content === 'string') {
-        text = content.trim();
-      } else if (content && typeof content.text === 'string') {
-        text = content.text.trim();
+      let usedParsed = false;
+
+      if (message.parsed !== undefined) {
+        try {
+          text =
+            typeof message.parsed === 'string'
+              ? message.parsed.trim()
+              : JSON.stringify(message.parsed);
+          usedParsed = true;
+        } catch (err) {
+          logError(err, { type: 'openai-parse-serialize-error' });
+          text = '';
+        }
       }
 
-      if (!text && message.parsed) {
+      if (!text) {
+        const content = message.content;
+        if (Array.isArray(content)) {
+          text = content.map((c: any) => c.text || '').join('').trim();
+        } else if (typeof content === 'string') {
+          text = content.trim();
+        } else if (content && typeof content.text === 'string') {
+          text = content.text.trim();
+        }
+      }
+
+      if (!text && message.parsed !== undefined) {
         try {
-          text = (typeof message.parsed === 'string'
-            ? message.parsed
-            : JSON.stringify(message.parsed)
-          ).trim();
+          text = JSON.stringify(message.parsed);
+          usedParsed = true;
         } catch {}
       }
 
-      logEvent({ type: 'openai-response-text', text });
+      logEvent({ type: 'openai-response-text', text, usedParsed });
       if (text) return text;
 
       const finish = choice.finish_reason;
