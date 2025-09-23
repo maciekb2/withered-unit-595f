@@ -14,6 +14,7 @@ import { proofread } from '../pipeline/proofread';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import type { FinalJson } from '../pipeline/types';
+import { logEvent, logError } from '../utils/logger';
 
 export interface GenerateAndPublishResult {
   article: FinalJson;
@@ -85,6 +86,30 @@ export async function generateAndPublish(
       });
       const res = await promptPromise;
       baseTopic = res.topic || baseTopic;
+    } else {
+      try {
+        logEvent({ type: 'auto-topic-suggest-start' });
+        const sugRes = await suggestArticleTopic(
+          hotTopics,
+          recent,
+          env.OPENAI_API_KEY,
+        );
+        const suggestions = sugRes.suggestions || [];
+        logEvent({
+          type: 'auto-topic-suggest-complete',
+          count: suggestions.length,
+          suggestions: suggestions.map(s => s.title),
+        });
+        const first = suggestions[0];
+        if (first?.title) {
+          baseTopic = first.title;
+          logEvent({ type: 'auto-topic-selected', topic: baseTopic });
+        } else {
+          logEvent({ type: 'auto-topic-fallback', topic: baseTopic });
+        }
+      } catch (err) {
+        logError(err, { type: 'auto-topic-error' });
+      }
     }
 
     send('outline-start', { baseTopic });
