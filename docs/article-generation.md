@@ -5,7 +5,7 @@ Ten projekt automatyzuje tworzenie satyrycznych wpisów na bloga. Poniżej opisa
 ## 1. Gorące tematy i wybór wątku
 1. Pobierz tytuły ostatnich artykułów z GitHuba.
 2. `getHotTopics()` zbiera wiadomości z RSS (BBC, Politico, PAP, Reuters). Lista jest wysyłana w logu SSE `🔥 Gorące tematy z ostatnich dni`.
-3. `suggestArticleTopic()` (max_completion_tokens 2000, `response_style=brief`) proponuje satyryczne tematy na podstawie gorących newsów i ostatnich wpisów. Użytkownik wybiera jedną z propozycji lub podaje własny temat bazowy.
+3. `suggestArticleTopic()` (max_completion_tokens 2000, `response_style=brief`) proponuje satyryczne tematy na podstawie gorących newsów i ostatnich wpisów. W trybie interaktywnym użytkownik wybiera jedną z propozycji lub podaje własny temat bazowy. Dla zadań wywołanych z crona Cloudflare Worker automatycznie wybiera pierwszą sugestię (lub wraca do najgorętszego tematu RSS przy błędzie), dzięki czemu publikacja przebiega bez udziału człowieka.
 
 ## 2. Outline
 `generateOutline(baseTopic)` przygotowuje strukturę artykułu:
