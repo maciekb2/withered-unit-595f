@@ -140,6 +140,17 @@ export async function chat(
         }
       }
 
+      if (attempt < MAX_LENGTH_RETRIES - 1) {
+        logEvent({
+          type: 'openai-retry-empty',
+          attempt,
+          next_attempt: attempt + 1,
+          finish_reason: finish,
+        });
+        await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)));
+        continue;
+      }
+
       const err: any = new Error('OpenAI response empty');
       err.debug = { message, data, finish_reason: finish };
       throw err;
