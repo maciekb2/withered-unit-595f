@@ -106,11 +106,30 @@ export async function chat(
       if (!text) {
         const content = message.content;
         if (Array.isArray(content)) {
-          text = content.map((c: any) => c.text || '').join('').trim();
+          text = content
+            .map((c: any) => {
+              if (!c) return '';
+              if (typeof c === 'string') return c;
+              if (typeof c.text === 'string') return c.text;
+              if (Array.isArray(c.output_text)) return c.output_text.join('');
+              if (typeof c.output_text === 'string') return c.output_text;
+              return '';
+            })
+            .join('')
+            .trim();
         } else if (typeof content === 'string') {
           text = content.trim();
         } else if (content && typeof content.text === 'string') {
           text = content.text.trim();
+        }
+      }
+
+      if (!text) {
+        const outputText = (message as any).output_text;
+        if (Array.isArray(outputText)) {
+          text = outputText.join('').trim();
+        } else if (typeof outputText === 'string') {
+          text = outputText.trim();
         }
       }
 
