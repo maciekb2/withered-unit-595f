@@ -1,5 +1,5 @@
 {
-  "name": "pseudointelekt2137-blog",
+  "name": "withered-unit-595f",
   "compatibility_date": "2024-11-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./dist/worker.js",
