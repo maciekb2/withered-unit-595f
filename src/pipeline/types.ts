@@ -1,8 +1,8 @@
 export interface Outline {
-  finalTitle: string;            // <= 100 znaków
-  description: string;           // <= 200, bez markdown
-  sections: { h2: string; bullets: string[] }[]; // 4 sekcje, 2–3 bulletów
-  guardrails: string[];          // lista “avoid” np. zakaz raportów bez źródła
+  finalTitle: string; // <= 100 znakow
+  description: string; // <= 200, bez markdown
+  sections: { h2: string; bullets: string[] }[]; // 3 sekcje, 2 bulletow
+  guardrails: string[]; // lista "avoid" np. zakaz raportow bez zrodla
 }
 
 export interface Draft { markdown: string; }

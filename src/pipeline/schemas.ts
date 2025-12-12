@@ -24,8 +24,8 @@ export const outlineJsonSchema = {
     description: { type: 'string', maxLength: 200, pattern: '^[^#*_`]*$' },
     sections: {
       type: 'array',
-      minItems: 4,
-      maxItems: 4,
+      minItems: 3,
+      maxItems: 3,
       items: {
         type: 'object',
         required: ['h2', 'bullets'],
@@ -35,7 +35,7 @@ export const outlineJsonSchema = {
           bullets: {
             type: 'array',
             minItems: 2,
-            maxItems: 3,
+            maxItems: 2,
             items: { type: 'string' },
           },
         },

@@ -10,7 +10,6 @@ import { suggestArticleTopic } from './topicSuggester';
 import { generateOutline } from '../pipeline/outline';
 import { generateDraft } from '../pipeline/draft';
 import { editDraft } from '../pipeline/edit';
-import { proofread } from '../pipeline/proofread';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import type { FinalJson } from '../pipeline/types';
@@ -34,7 +33,7 @@ export async function generateAndPublish(
 
   const keepAlive = setInterval(() => {
     controller?.enqueue(':keepalive\n\n');
-  }, 20000);
+  }, 10000);
 
   try {
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
@@ -180,28 +179,6 @@ export async function generateAndPublish(
     }
     let edited = editRes.edited;
     send('edit-end', { title: edited.title });
-
-    send('proofread-start');
-    let proofRes;
-    try {
-      proofRes = await proofread({
-        apiKey: env.OPENAI_API_KEY,
-        edited,
-        model: env.OPENAI_TEXT_MODEL || 'gpt-5',
-        maxTokens: 7200,
-      });
-      send('proofread-prompt', { prompt: proofRes.messages });
-      send('proofread-response', { response: proofRes.raw });
-    } catch (err) {
-      send('proofread-error', {
-        error: (err as Error).message,
-        prompt: (err as any).messages,
-        response: (err as any).raw,
-      });
-      throw err;
-    }
-    edited = proofRes.edited;
-    send('proofread-end');
 
     const validation = validateAntiHallucination(edited.markdown, outline);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));
