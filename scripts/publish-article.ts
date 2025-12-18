@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 async function main() {
   logEvent({ type: 'cli-start' });
   const articleTemplate = await fs.readFile('src/prompt/article-content.txt', 'utf8');
+  const editTemplate = await fs.readFile('src/prompt/article-edit.txt', 'utf8');
   const heroPromptTemplate = await fs.readFile('src/prompt/hero-image.txt', 'utf8');
 
   const recent = await getRecentTitlesFS();
@@ -20,6 +21,7 @@ async function main() {
   const { article, heroImage } = await generateArticleAssets({
     apiKey,
     articleTemplate,
+    editTemplate,
     heroTemplate: heroPromptTemplate,
     recentTitles: recent,
     maxTokens: 7200,

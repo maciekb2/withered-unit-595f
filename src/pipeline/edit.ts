@@ -5,11 +5,13 @@ import type { Outline, Draft, Edited } from './types';
 import { chat, type ChatMessage } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
+import { editedJsonSchema } from './schemas';
 
 export interface EditDraftOptions {
   apiKey: string;
   draft: Draft;
   outline: Outline;
+  editTemplate?: string;
   model?: string;
   maxTokens?: number;
 }
@@ -20,8 +22,8 @@ export interface EditDraftResult {
   raw: string;
 }
 
-export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
-  const userPrompt = buildEditPrompt(draft, outline);
+export async function editDraft({ apiKey, draft, outline, editTemplate, model = 'gpt-5', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
+  const userPrompt = buildEditPrompt(draft, outline, editTemplate);
   logEvent({ type: 'edit-start' });
   const messages: ChatMessage[] = [
     { role: 'system', content: guardrails() },
@@ -34,6 +36,7 @@ export async function editDraft({ apiKey, draft, outline, model = 'gpt-5', maxTo
       max_completion_tokens: maxTokens ?? 1000,
       model,
       response_style: 'full',
+      response_format: { type: 'json_schema', json_schema: { name: 'edited', schema: editedJsonSchema } },
     });
     const json: Edited = extractJson<Edited>(text);
     if (json.title.length > 100 || json.description.length > 200) {

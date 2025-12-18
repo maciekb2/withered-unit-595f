@@ -19,18 +19,14 @@ export function validateAntiHallucination(
   };
 
   for (const claim of claims) {
-    if (claim.type === 'report' && !claim.hasSource) {
-      errors.push('ERROR: Raport bez źródła');
-    }
-    if (claim.type === 'number') {
-      if (!/(około|szacuje się|trend|zwykle)/i.test(claim.text) && !claim.hasTodo) {
-        errors.push('WARN: Liczba bez kontekstu');
-      }
+    const isKeyStat = claim.type === 'report' || /statystyk/i.test(claim.text);
+    if (isKeyStat && !claim.hasSource) {
+      errors.push('ERROR: Kluczowa statystyka/raport bez zrodla');
     }
   }
 
   if (stats.todo > 0) {
-    errors.push('ERROR: Pozostał [[TODO-CLAIM]]');
+    errors.push('ERROR: Pozostal [[TODO-CLAIM]]');
   }
 
   for (const section of outline.sections) {

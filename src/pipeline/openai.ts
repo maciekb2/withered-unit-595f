@@ -14,7 +14,7 @@ export interface ChatOptions {
   response_style?: 'brief' | 'normal' | 'full';
 }
 
-const MAX_LENGTH_RETRIES = 5;
+const MAX_LENGTH_RETRIES = 3;
 const MAX_TOKEN_CAP = 12000;
 
 export async function chat(

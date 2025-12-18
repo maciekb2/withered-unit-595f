@@ -8,6 +8,7 @@ import { outlineJsonSchema } from './schemas';
 export interface GenerateOutlineOptions {
   apiKey: string;
   baseTopic: string;
+  topicContext?: string;
   model?: string;
   maxTokens?: number;
 }
@@ -19,13 +20,24 @@ export interface GenerateOutlineResult {
 }
 
 const REQUIRED_GUARDRAILS = [
-  'Nie cytuj ‘najnowszego raportu X’ bez źródła.',
-  'Dane liczbowe tylko jako trend/zakres albo z warunkami (jeśli brak źródła).',
+  'Nie cytuj najnowszego raportu bez zrodla.',
+  'Dane liczbowe tylko jako trend/zakres albo z warunkami (jesli brak zrodla).',
+  'Trzymaj sie jednego glownego tematu bez zmiany osi narracji.',
 ];
 
-export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
-  const userPrompt = `Temat bazowy: ${baseTopic}\nPrzygotuj konspekt satyrycznego artykułu (PL-patriotyczny).\n4 sekcje; każda 2–3 krótkie bullet’y.\nW 1–2 bulletach wpleć analogie z ostatnich 2 lat.\nKażdy bullet zawiera 1 konkretną statystykę/datę/nazwę raportu ze źródłem (np. GUS/Eurostat/NATO/BBC).\nGdy brak pewnych danych — wstaw dokładnie [[TODO-CLAIM]].\nDodaj listę guardrails (avoid) 3–6 pozycji.`;
-  const systemPrompt = `${guardrails()} Zwracaj wyłącznie poprawny JSON { "finalTitle", "description", "sections": [{ "h2", "bullets": [string] }], "guardrails": [string] } bez markdownu i komentarzy.`;
+export async function generateOutline({ apiKey, baseTopic, topicContext, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+  const ctxBlock = topicContext ? `Kontekst (JSON):\n${topicContext}\n\n` : '';
+  const userPrompt =
+    ctxBlock +
+    `Temat bazowy: ${baseTopic}\n` +
+    'Przygotuj konspekt satyrycznego artykulu (PL-patriotyczny).\n' +
+    '3 sekcje; kazda dokladnie 2 krotkie bullet-pointy.\n' +
+    'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
+    'W 1-2 bulletach wplec analogie z ostatnich 2 lat.\n' +
+    'W calym artykule 3-5 zrodel, maks 1 na sekcje; jesli podajesz zrodlo, podaj je jako pelny URL http(s)://... w tym samym bullecie.\n' +
+    'Gdy brak pewnych danych – wstaw dokladnie [[TODO-CLAIM]].\n' +
+    'Dodaj liste guardrails (avoid) 3-6 pozycji.';
+  const systemPrompt = `${guardrails()} Zwracaj wylacznie poprawny JSON { "finalTitle", "description", "sections": [{ "h2", "bullets": [string] }], "guardrails": [string] } bez markdownu i komentarzy.`;
   logEvent({ type: 'outline-start' });
   const messages: ChatMessage[] = [
     { role: 'system', content: systemPrompt },
@@ -60,12 +72,12 @@ export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxT
     if (/[#*_`]/.test(outline.description)) {
       throw new Error('Description contains markdown');
     }
-    if (outline.sections.length !== 4) {
-      throw new Error('Outline must have 4 sections');
+    if (outline.sections.length !== 3) {
+      throw new Error('Outline must have 3 sections');
     }
     for (const s of outline.sections) {
-      if (!s.bullets || s.bullets.length < 2 || s.bullets.length > 3) {
-        throw new Error('Each section needs 2–3 bullets');
+      if (!s.bullets || s.bullets.length !== 2) {
+        throw new Error('Each section needs exactly 2 bullets');
       }
     }
 

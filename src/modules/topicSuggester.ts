@@ -19,10 +19,14 @@ export async function suggestArticleTopic(
   hotTopics: HotTopic[],
   recentTitles: string[],
   apiKey: string,
+  model?: string,
 ): Promise<SuggestedTopicResult> {
   const userPrompt = [
     'Mam listę gorących tematów:',
-    ...hotTopics.map((t, i) => `${i + 1}. ${t.title} – ${t.url}`),
+    ...hotTopics.map((t, i) => {
+      const desc = (t as any).description ? `\n   Lead: ${(t as any).description}` : '';
+      return `${i + 1}. ${t.title} – ${t.url} (${t.source}, ${t.published})${desc}`;
+    }),
     '',
     'Oraz listę ostatnich artykułów:',
     ...recentTitles.map((t, i) => `${i + 1}. ${t}`),
@@ -47,6 +51,7 @@ export async function suggestArticleTopic(
     raw = await chat(apiKey, {
       messages,
       max_completion_tokens: 2000,
+      model,
       response_format: { type: 'json_object' },
       response_style: 'brief',
     });
@@ -87,4 +92,3 @@ export async function suggestArticleTopic(
     throw err;
   }
 }
-
