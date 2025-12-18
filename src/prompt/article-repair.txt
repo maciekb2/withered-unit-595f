@@ -1,0 +1,6 @@
+Naprawianie tekstu (gdy walidacja nie przechodzi):
+- Zachowaj tytuł/opis oraz nagłówki "## ..." bez zmian.
+- Usuń wszystkie [[TODO-CLAIM]] (zastąp uogólnieniem).
+- Dopilnuj, aby w tekście był dokładnie 1 URL: `leadSourceUrl` z KONTEKSTU (JSON) i żaden inny.
+- Nie dopisuj nowych faktów ani liczb; raczej skracaj i wygładzaj niż „dopowiadaj”.
+Zwróć wyłącznie JSON { "markdown": "...", "title": "...", "description": "..." }.

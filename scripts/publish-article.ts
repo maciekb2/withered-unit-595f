@@ -7,8 +7,9 @@ import { execSync } from 'node:child_process';
 
 async function main() {
   logEvent({ type: 'cli-start' });
-  const articleTemplate = await fs.readFile('src/prompt/article-content.txt', 'utf8');
-  const editTemplate = await fs.readFile('src/prompt/article-edit.txt', 'utf8');
+  const writeTemplate = await fs.readFile('src/prompt/article-write.txt', 'utf8');
+  const repairTemplate = await fs.readFile('src/prompt/article-repair.txt', 'utf8');
+  const styleGuide = await fs.readFile('src/prompt/style-guide.txt', 'utf8');
   const heroPromptTemplate = await fs.readFile('src/prompt/hero-image.txt', 'utf8');
 
   const recent = await getRecentTitlesFS();
@@ -18,12 +19,18 @@ async function main() {
     throw new Error('OPENAI_API_KEY is required');
   }
 
+  const baseTopic = process.env.BASE_TOPIC || 'Aktualny temat';
+  const leadSourceUrl = process.env.LEAD_SOURCE_URL;
+
   const { article, heroImage } = await generateArticleAssets({
     apiKey,
-    articleTemplate,
-    editTemplate,
+    writeTemplate,
+    repairTemplate,
+    styleGuide,
     heroTemplate: heroPromptTemplate,
     recentTitles: recent,
+    baseTopic,
+    leadSourceUrl,
     maxTokens: 7200,
   });
 

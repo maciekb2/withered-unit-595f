@@ -11,7 +11,9 @@ export interface RepairEditedOptions {
   edited: Edited;
   outline: Outline;
   errors: string[];
-  editTemplate?: string;
+  repairTemplate?: string;
+  styleGuide?: string;
+  contextPack?: string;
   model?: string;
   maxTokens?: number;
 }
@@ -22,9 +24,18 @@ export interface RepairEditedResult {
   raw: string;
 }
 
-function buildRepairPrompt(edited: Edited, outline: Outline, errors: string[], editTemplate = ''): string {
+function buildRepairPrompt(
+  edited: Edited,
+  outline: Outline,
+  errors: string[],
+  repairTemplate = '',
+  styleGuide = '',
+  contextPack = '',
+): string {
   const h2List = outline.sections.map(s => `- ## ${s.h2}`).join('\n');
-  const templateBlock = editTemplate.trim() ? `\n\nDodatkowe instrukcje:\n${editTemplate.trim()}\n` : '';
+  const ctx = contextPack.trim() ? `\n\nKONTEKST (JSON):\n${contextPack.trim()}\n` : '';
+  const style = styleGuide.trim() ? `\n\nSTYLE GUIDE:\n${styleGuide.trim()}\n` : '';
+  const templateBlock = repairTemplate.trim() ? `\n\nInstrukcje naprawy:\n${repairTemplate.trim()}\n` : '';
 
   return (
     `Napraw ponizszy artykul zgodnie z bledami walidacji. ` +
@@ -34,9 +45,11 @@ function buildRepairPrompt(edited: Edited, outline: Outline, errors: string[], e
     `Wymagane naglowki sekcji (musza wystapic w tekscie dokladnie jako linie zaczynajace sie od "## "):\n${h2List}\n\n` +
     `Twarde reguly:\n` +
     `- W finalnym tekscie nie moze pozostac [[TODO-CLAIM]].\n` +
-    `- Jesli w zdaniu pojawia sie liczba, data (np. rok 2024) albo slowo "raport"/"statystyk(a/i)" — to samo zdanie MUSI zawierac pelny URL http(s)://... do zrodla.\n` +
-    `- Jesli nie masz pewnego URL, usuń liczbe/date/wzmianke o raporcie i uogolnij zdanie. Nie wymyslaj danych ani linkow.\n` +
+    `- W calym tekscie ma byc dokladnie 1 URL: leadSourceUrl z kontekstu (i zadnych innych).\n` +
+    `- Jesli pojawia sie niepewna liczba/data/raport — uogolnij; nie dopisuj nowych danych.\n` +
     templateBlock +
+    ctx +
+    style +
     `\nTytul: ${edited.title}\nOpis: ${edited.description}\n\n` +
     `Artykul:\n${edited.markdown}\n\n` +
     `Zwracaj JSON { markdown, title, description } bez dodatkowego tekstu.`
@@ -48,11 +61,13 @@ export async function repairEdited({
   edited,
   outline,
   errors,
-  editTemplate,
+  repairTemplate,
+  styleGuide,
+  contextPack,
   model = 'gpt-5',
   maxTokens,
 }: RepairEditedOptions): Promise<RepairEditedResult> {
-  const userPrompt = buildRepairPrompt(edited, outline, errors, editTemplate);
+  const userPrompt = buildRepairPrompt(edited, outline, errors, repairTemplate, styleGuide, contextPack);
   logEvent({ type: 'repair-start', errorCount: errors.length });
 
   const messages: ChatMessage[] = [
@@ -90,4 +105,3 @@ export async function repairEdited({
     throw err;
   }
 }
-
