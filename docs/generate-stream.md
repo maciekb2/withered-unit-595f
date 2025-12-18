@@ -12,7 +12,7 @@ Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JS
 
 - `recentTitles` – listę pobranych tytułów;
 - `prompt` / `response` – pełny prompt i odpowiedź z każdego etapu;
-- w razie problemów: `outline-error`, `draft-error`, `edit-error` lub `proofread-error` z polami `error`, `prompt`, `response`;
+- w razie problemów: `outline-error`, `write-error` lub `repair-error` z polami `error`, `prompt`, `response`;
 - `awaitingTopic` – jeśli `true`, skrypt czeka na wybór tematu;
  - `articleTitle` – tytuł wygenerowanego artykułu;
  - `heroPrompt` – prompt użyty do stworzenia obrazka.
@@ -48,3 +48,11 @@ es.onmessage = (e) => {
 
 Podstrona `generuj.html` przesyła teraz własne zdarzenia pod endpoint `POST /api/client-log`,
 dzięki czemu wszystkie akcje z przeglądarki trafiają do bazy D1.
+
+## Etapy (log)
+Najczęściej zobaczysz kolejno:
+- `suggest-topic-*` (opcjonalnie) – propozycje tematów,
+- `outline-*` – konspekt (outline),
+- `write-*` – one-shot generacja finalnej treści (JSON `{ markdown, title, description }`),
+- `repair-*` – pojawia się tylko, gdy walidacja wykryje błąd (max 2 próby),
+- publikacja na GitHub + link do PR.
