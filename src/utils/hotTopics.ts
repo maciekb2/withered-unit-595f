@@ -3,6 +3,7 @@ export interface HotTopic {
   url: string;
   published: string;
   source: string;
+  description?: string;
 }
 
 const RSS_FEEDS = [
@@ -20,20 +21,34 @@ const FALLBACK_TOPICS: HotTopic[] = [
     url: 'https://example.com/fallback-1',
     published: new Date().toISOString(),
     source: 'fallback',
+    description: 'Fallback topic (no RSS description available).',
   },
   {
     title: 'Sample fallback topic 2',
     url: 'https://example.com/fallback-2',
     published: new Date().toISOString(),
     source: 'fallback',
+    description: 'Fallback topic (no RSS description available).',
   },
   {
     title: 'Sample fallback topic 3',
     url: 'https://example.com/fallback-3',
     published: new Date().toISOString(),
     source: 'fallback',
+    description: 'Fallback topic (no RSS description available).',
   },
 ];
+
+function stripHtml(s: string): string {
+  return s
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
 
 function parseItems(source: string, xml: string): HotTopic[] {
   const items: HotTopic[] = [];
@@ -45,12 +60,16 @@ function parseItems(source: string, xml: string): HotTopic[] {
       /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/.exec(item);
     const linkMatch = /<link>(.*?)<\/link>/.exec(item);
     const dateMatch = /<pubDate>(.*?)<\/pubDate>/.exec(item);
+    const descMatch =
+      /<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/.exec(item);
     const title = titleMatch?.[1] || titleMatch?.[2] || '';
     const url = linkMatch?.[1]?.trim() || '';
     const publishedRaw = dateMatch?.[1];
     const published = publishedRaw ? new Date(publishedRaw).toISOString() : '';
+    const descRaw = descMatch?.[1] || descMatch?.[2] || '';
+    const description = descRaw ? stripHtml(descRaw).slice(0, 420) : undefined;
     if (title && url && published) {
-      items.push({ title, url, published, source });
+      items.push({ title, url, published, source, description });
     }
   }
   return items;

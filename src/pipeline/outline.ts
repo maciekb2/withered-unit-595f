@@ -8,6 +8,7 @@ import { outlineJsonSchema } from './schemas';
 export interface GenerateOutlineOptions {
   apiKey: string;
   baseTopic: string;
+  topicContext?: string;
   model?: string;
   maxTokens?: number;
 }
@@ -24,14 +25,16 @@ const REQUIRED_GUARDRAILS = [
   'Trzymaj sie jednego glownego tematu bez zmiany osi narracji.',
 ];
 
-export async function generateOutline({ apiKey, baseTopic, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+export async function generateOutline({ apiKey, baseTopic, topicContext, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+  const ctxBlock = topicContext ? `Kontekst (JSON):\n${topicContext}\n\n` : '';
   const userPrompt =
+    ctxBlock +
     `Temat bazowy: ${baseTopic}\n` +
     'Przygotuj konspekt satyrycznego artykulu (PL-patriotyczny).\n' +
     '3 sekcje; kazda dokladnie 2 krotkie bullet-pointy.\n' +
     'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
     'W 1-2 bulletach wplec analogie z ostatnich 2 lat.\n' +
-    'W calym artykule 3-5 zrodel, maks 1 na sekcje; bullet moze miec 0-1 zrodlo (np. GUS/Eurostat/NATO/BBC).\n' +
+    'W calym artykule 3-5 zrodel, maks 1 na sekcje; jesli podajesz zrodlo, podaj je jako pelny URL http(s)://... w tym samym bullecie.\n' +
     'Gdy brak pewnych danych – wstaw dokladnie [[TODO-CLAIM]].\n' +
     'Dodaj liste guardrails (avoid) 3-6 pozycji.';
   const systemPrompt = `${guardrails()} Zwracaj wylacznie poprawny JSON { "finalTitle", "description", "sections": [{ "h2", "bullets": [string] }], "guardrails": [string] } bez markdownu i komentarzy.`;

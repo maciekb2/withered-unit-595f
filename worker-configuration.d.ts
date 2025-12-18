@@ -11,6 +11,11 @@ interface Env {
         pseudointelekt_likes: KVNamespace;
         WORKER_ID: string;
         OPENAI_TEXT_MODEL: string;
+        OPENAI_TOPIC_MODEL?: string;
+        OPENAI_OUTLINE_MODEL?: string;
+        OPENAI_DRAFT_MODEL?: string;
+        OPENAI_EDIT_MODEL?: string;
+        OPENAI_REPAIR_MODEL?: string;
         OPENAI_IMAGE_STYLE: string;
         OPENAI_IMAGE_QUALITY: string;
         pseudointelekt_logs_db: D1Database;

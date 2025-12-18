@@ -8,6 +8,7 @@ export interface GenerateDraftOptions {
   apiKey: string;
   outline: Outline;
   articlePrompt: string;
+  contextPack?: string;
   model?: string;
   maxTokens?: number;
 }
@@ -18,8 +19,8 @@ export interface GenerateDraftResult {
   raw: string;
 }
 
-export async function generateDraft({ apiKey, outline, articlePrompt, model = 'gpt-5', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
-  const userPrompt = buildDraftPrompt(outline, articlePrompt);
+export async function generateDraft({ apiKey, outline, articlePrompt, contextPack, model = 'gpt-5', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
+  const userPrompt = buildDraftPrompt(outline, articlePrompt, contextPack);
 
   logEvent({ type: 'draft-start' });
   const messages: ChatMessage[] = [

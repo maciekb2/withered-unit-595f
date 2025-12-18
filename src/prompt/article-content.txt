@@ -1,15 +1,14 @@
-Twoim zadaniem jest wygenerowanie artykułu na blog geopolityczny w formacie JSON. Postępuj zgodnie z poniższymi krokami:
+Twoim zadaniem jest wygenerowanie szkicu artykułu (Markdown) na blog geopolityczny. Postępuj zgodnie z poniższymi krokami:
 
-1.  **Analiza Tematu:** Zastanów się nad ironicznym i chwytliwym tytułem oraz krótkim opisem (description), który streszcza główną tezę w prześmiewczy sposób. Unikaj tematów z listy ostatnich wpisów: {recent_titles}. W każdej części korzystaj z wiarygodnych, aktualnych danych i podawaj źródła w nawiasach.
+1.  **Analiza Tematu:** Unikaj tematów z listy ostatnich wpisów: {recent_titles}. Trzymaj jeden główny wątek (bez zmiany osi narracji).
 2.  **Sposób pisania:** Stronę dywagacji którą przyjmujesz zachowaj zawsze centro prawicowe, ale nie bój się skomentować również konserwatywnego podejścia. Jeśli chodzi o Polskę, utrzymuj patriotyczny ton i profesjonalny styl. Poruszaj tematy z szerokiego spektrum międzynarodowego – od finansów po dyplomację – opierając się na rzetelnych informacjach.
-3.  **Generowanie Treści (content):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`, listy `-`). Treść powinna składać się z kilku dłuższych akapitów; każdy akapit rozwijający bullet z outline liczy około 12–20 zdań. W każdym akapicie przytocz przynajmniej jedną konkretną statystykę, datę lub raport z wiarygodnym źródłem; jeśli nie masz pewności, oznacz zdanie tokenem [[TODO-CLAIM]] i sformułuj je warunkowo. Unikaj krótkich sekcji po dwa zdania.
-4.  **Formatowanie Wyniku:** Zwróć wynik jako pojedynczy, poprawny obiekt JSON, bez żadnych dodatkowych komentarzy przed lub po nim. Upewnij się, że wszystkie stringi są poprawnie escapowane.
+3.  **Generowanie Treści (Markdown):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`). Unikaj list wypunktowanych w treści (poza outline). Treść powinna składać się z kilku dłuższych akapitów; każdy akapit rozwijający bullet z outline liczy około 6–10 zdań.
+
+**Źródła i twarde reguły (ważne):**
+- Jeżeli w zdaniu pojawia się liczba, data (np. rok 2024) albo słowo „raport” / „statystyk(a/i)” — to samo zdanie MUSI zawierać pełny URL `http(s)://...` do źródła.
+- Jeżeli nie masz pewnego źródła URL, nie podawaj konkretnej liczby/daty/nazwy raportu; zamiast tego uogólnij zdanie albo wstaw dokładnie `[[TODO-CLAIM]]` i sformułuj je warunkowo.
+- Nie wymyślaj źródeł ani konkretnych wartości.
 
 
 
-Format wyjściowy:
-{
-  "title": "...",
-  "description": "...",
-  "content": "..."
-}
+Zwróć wyłącznie treść artykułu w Markdown (bez JSON i bez komentarzy).

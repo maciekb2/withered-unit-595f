@@ -15,6 +15,23 @@ export const finalJsonSchema = {
 
 export type FinalJsonSchema = typeof finalJsonSchema;
 
+export const editedJsonSchema = {
+  type: 'object',
+  required: ['markdown', 'title', 'description'],
+  additionalProperties: false,
+  properties: {
+    markdown: { type: 'string', minLength: 800 },
+    title: { type: 'string', maxLength: 100 },
+    description: {
+      type: 'string',
+      maxLength: 200,
+      pattern: '^[^#*_`]*$'
+    },
+  },
+} as const;
+
+export type EditedJsonSchema = typeof editedJsonSchema;
+
 export const outlineJsonSchema = {
   type: 'object',
   required: ['finalTitle', 'description', 'sections', 'guardrails'],

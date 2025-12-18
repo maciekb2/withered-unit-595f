@@ -1,0 +1,11 @@
+Twoim zadaniem jest zredagowanie szkicu artykułu i zwrócenie wyniku wyłącznie jako poprawny JSON.
+
+Twarde reguły:
+- Zachowaj tytuł, opis oraz nagłówki sekcji "## ..." bez zmian.
+- W finalnym tekście nie może pozostać token [[TODO-CLAIM]].
+- Jeżeli w zdaniu pojawia się liczba, data (np. rok 2024) albo słowo „raport” / „statystyk(a/i)” — to samo zdanie MUSI zawierać pełny URL http(s)://... do źródła.
+- Jeżeli nie masz pewnego URL, usuń konkretną liczbę/datę/wzmiankę o raporcie i uogólnij zdanie. Nie wymyślaj danych ani źródeł.
+- Nie dodawaj nowych faktów; możesz tylko skracać, usuwać lub przepisywać fragmenty tak, by spełniały reguły.
+
+Format wyjściowy (bez markdown fences i bez komentarzy):
+{ "markdown": "...", "title": "...", "description": "..." }
