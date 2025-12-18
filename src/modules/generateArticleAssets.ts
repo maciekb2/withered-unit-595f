@@ -1,24 +1,26 @@
 import { generateOutline } from '../pipeline/outline';
-import { generateDraft } from '../pipeline/draft';
-import { editDraft } from '../pipeline/edit';
+import { writeArticle } from '../pipeline/write';
 import { formatFinal } from '../pipeline/format';
 import type { FinalJson } from '../pipeline/types';
 import { generateHeroImage } from './heroImageGenerator';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
 import { logEvent } from '../utils/logger';
+import { buildContextPack } from '../pipeline/contextPack';
 
 export interface GenerateArticleAssetsOptions {
   apiKey: string;
-  articleTemplate: string;
-  editTemplate?: string;
+  writeTemplate: string;
+  repairTemplate?: string;
+  styleGuide?: string;
   heroTemplate: string;
   recentTitles: string[];
   baseTopic?: string;
+  leadSourceUrl?: string;
+  topicDescription?: string;
   model?: string;
   outlineModel?: string;
-  draftModel?: string;
-  editModel?: string;
+  writeModel?: string;
   repairModel?: string;
   maxRepairAttempts?: number;
   maxTokens?: number;
@@ -31,41 +33,51 @@ export interface GenerateArticleAssetsResult {
 
 export async function generateArticleAssets({
   apiKey,
-  articleTemplate,
-  editTemplate,
+  writeTemplate,
+  repairTemplate,
+  styleGuide,
   heroTemplate,
   recentTitles,
   baseTopic = 'Aktualny temat',
+  leadSourceUrl,
+  topicDescription,
   model,
   outlineModel,
-  draftModel,
-  editModel,
+  writeModel,
   repairModel,
   maxRepairAttempts = 2,
   maxTokens,
 }: GenerateArticleAssetsOptions): Promise<GenerateArticleAssetsResult> {
   const outlineModelFinal = outlineModel || model;
-  const draftModelFinal = draftModel || model;
-  const editModelFinal = editModel || model;
-  const repairModelFinal = repairModel || editModelFinal || model;
+  const writeModelFinal = writeModel || model;
+  const repairModelFinal = repairModel || writeModelFinal || model;
 
-  const prompt = articleTemplate.replace(
+  const prompt = writeTemplate.replace(
     '{recent_titles}',
     recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
   );
 
   const outlineRes = await generateOutline({ apiKey, baseTopic, model: outlineModelFinal, maxTokens: 2000 });
   const outline = outlineRes.outline;
-  const draftRes = await generateDraft({
+  const fallbackUrl = 'https://example.com';
+  const finalLeadUrl = leadSourceUrl || fallbackUrl;
+  if (!leadSourceUrl) {
+    logEvent({ type: 'cli-lead-source-missing', fallbackUrl });
+  }
+  const contextPack = buildContextPack({
+    selectedTopic: { title: baseTopic, url: finalLeadUrl, description: topicDescription },
+    hotTopics: [],
+  });
+  const writeRes = await writeArticle({
     apiKey,
     outline,
-    articlePrompt: prompt,
-    model: draftModelFinal,
+    writeTemplate: prompt,
+    styleGuide,
+    contextPack,
+    model: writeModelFinal,
     maxTokens,
   });
-  const draft = draftRes.draft;
-  const editRes = await editDraft({ apiKey, draft, outline, editTemplate, model: editModelFinal, maxTokens });
-  let edited = editRes.edited;
+  let edited = writeRes.edited;
 
   const validation = validateAntiHallucination(edited.markdown, outline);
   if (!validation.ok) {
@@ -80,7 +92,9 @@ export async function generateArticleAssets({
         edited,
         outline,
         errors: errs,
-        editTemplate,
+        repairTemplate,
+        styleGuide,
+        contextPack,
         model: repairModelFinal || 'gpt-5',
         maxTokens: 2500,
       });

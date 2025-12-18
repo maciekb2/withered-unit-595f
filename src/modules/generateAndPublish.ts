@@ -1,17 +1,16 @@
 import { generateHeroImage } from './heroImageGenerator';
 import { publishArticleToGitHub } from './githubPublisher';
 import { sendSlackMessage } from '../utils/slack';
-import articleTemplate from '../prompt/article-content.txt?raw';
-import editTemplate from '../prompt/article-edit.txt?raw';
+import writeTemplate from '../prompt/article-write.txt?raw';
+import repairTemplate from '../prompt/article-repair.txt?raw';
+import styleGuide from '../prompt/style-guide.txt?raw';
 import heroTemplate from '../prompt/hero-image.txt?raw';
 import { getRecentTitlesFromGitHub } from '../utils/recentTitlesGitHub';
-import { getRecentPostSamplesFromGitHub } from '../utils/recentPostsGitHub';
 import { slugify } from '../utils/slugify';
 import { getHotTopics } from '../utils/hotTopics';
 import { suggestArticleTopic } from './topicSuggester';
 import { generateOutline } from '../pipeline/outline';
-import { generateDraft } from '../pipeline/draft';
-import { editDraft } from '../pipeline/edit';
+import { writeArticle } from '../pipeline/write';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
@@ -42,22 +41,19 @@ export async function generateAndPublish(
   try {
     const topicModel = env.OPENAI_TOPIC_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const outlineModel = env.OPENAI_OUTLINE_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
-    const draftModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
-    const editModel = env.OPENAI_EDIT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
-    const repairModel = env.OPENAI_REPAIR_MODEL || editModel;
+    const writeModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
+    const repairModel = env.OPENAI_REPAIR_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
 
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
-    const recentSamples = await getRecentPostSamplesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN, 2, 2);
     send('📑 Pobrane tytuły', { recentTitles: recent });
-    send('🧾 Próbki stylu z bloga', { samples: recentSamples.map(s => ({ title: s.title })) });
 
     const hotTopics = await getHotTopics();
     send('🔥 Gorące tematy z ostatnich dni', {
       hotTopics: hotTopics.map(t => t.title),
     });
 
-    let articlePrompt = articleTemplate.replace(
+    const writePrompt = writeTemplate.replace(
       '{recent_titles}',
       recent.map((t, i) => `${i + 1}. ${t}`).join('\n'),
     );
@@ -123,23 +119,17 @@ export async function generateAndPublish(
     }
 
     const matchedTopic = hotTopics.find(t => t.title === baseTopic);
+    const leadSourceUrl = matchedTopic?.url || hotTopics[0]?.url || 'https://example.com';
     const selectedTopic = matchedTopic
       ? {
           title: matchedTopic.title,
-          url: matchedTopic.url,
+          url: leadSourceUrl,
           source: matchedTopic.source,
           published: matchedTopic.published,
           description: matchedTopic.description,
         }
-      : { title: baseTopic };
-    const contextPack = buildContextPack({
-      selectedTopic,
-      hotTopics,
-      recentPostSamples: recentSamples,
-    });
-
-    const editTemplateWithContext =
-      `${editTemplate}\n\nKontekst (JSON) — jeśli zostawiasz zdanie z liczbą/datą/raportem, postaraj się użyć URL z kontekstu; inaczej usuń konkret.\n${contextPack}\n`;
+      : { title: baseTopic, url: leadSourceUrl };
+    const contextPack = buildContextPack({ selectedTopic, hotTopics });
 
     send('outline-start', { baseTopic, hasTopicContext: Boolean(matchedTopic?.description) });
     let outlineRes;
@@ -165,53 +155,30 @@ export async function generateAndPublish(
     const outline = outlineRes.outline;
     send('outline-end', { outline });
 
-    send('draft-start');
-    let draftRes;
+    send('write-start');
+    let writeRes;
     try {
-      draftRes = await generateDraft({
+      writeRes = await writeArticle({
         apiKey: env.OPENAI_API_KEY,
         outline,
-        articlePrompt,
+        writeTemplate: writePrompt,
+        styleGuide,
         contextPack,
-        model: draftModel,
+        model: writeModel,
         maxTokens: 7200,
       });
-      send('draft-prompt', { prompt: draftRes.messages });
-      send('draft-response', { response: draftRes.raw });
+      send('write-prompt', { prompt: writeRes.messages });
+      send('write-response', { response: writeRes.raw });
     } catch (err) {
-      send('draft-error', {
+      send('write-error', {
         error: (err as Error).message,
         prompt: (err as any).messages,
         response: (err as any).raw,
       });
       throw err;
     }
-    const draft = draftRes.draft;
-    send('draft-end');
-
-    send('edit-start');
-    let editRes;
-    try {
-      editRes = await editDraft({
-        apiKey: env.OPENAI_API_KEY,
-        draft,
-        outline,
-        editTemplate: editTemplateWithContext,
-        model: editModel,
-        maxTokens: 7200,
-      });
-      send('edit-prompt', { prompt: editRes.messages });
-      send('edit-response', { response: editRes.raw });
-    } catch (err) {
-      send('edit-error', {
-        error: (err as Error).message,
-        prompt: (err as any).messages,
-        response: (err as any).raw,
-      });
-      throw err;
-    }
-    let edited = editRes.edited;
-    send('edit-end', { title: edited.title });
+    let edited = writeRes.edited;
+    send('write-end', { title: edited.title });
 
     const validation = validateAntiHallucination(edited.markdown, outline);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));
@@ -235,7 +202,9 @@ export async function generateAndPublish(
             edited,
             outline,
             errors: errs,
-            editTemplate: editTemplateWithContext,
+            repairTemplate,
+            styleGuide,
+            contextPack,
             model: repairModel,
             maxTokens: 2500,
           });

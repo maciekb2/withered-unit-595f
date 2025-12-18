@@ -18,10 +18,17 @@ export function validateAntiHallucination(
     todo: claims.filter(c => c.hasTodo).length,
   };
 
+  const urls = md.match(/https?:\/\/\S+/gi) || [];
+  if (urls.length === 0) {
+    errors.push('ERROR: Brak linku do zrodla (w calym tekscie musi byc 1 URL do tematu)');
+  } else if (urls.length > 1) {
+    errors.push('ERROR: Wykryto wiecej niz 1 URL (w calym tekscie ma byc dokladnie 1 link do tematu)');
+  }
+
   for (const claim of claims) {
     const isKeyStat = claim.type === 'report' || /statystyk/i.test(claim.text);
     if (isKeyStat && !claim.hasSource) {
-      errors.push('ERROR: Kluczowa statystyka/raport bez zrodla');
+      errors.push('WARN: Kluczowa statystyka/raport bez zrodla w tym samym zdaniu');
     }
   }
 

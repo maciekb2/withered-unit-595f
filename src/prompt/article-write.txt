@@ -1,0 +1,11 @@
+Twoim zadaniem jest napisanie finalnego artykułu w Markdown na blog geopolityczny i zwrócenie wyniku jako poprawny JSON.
+
+Wymagania:
+- Unikaj tytułów/tematów z listy ostatnich wpisów: {recent_titles}.
+- Trzymaj się konspektu: dokładnie 3 sekcje, nagłówki dokładnie jak w outline ("## ...") i w tej samej kolejności.
+- Każdy bullet rozwiń w spójny akapit 6–10 zdań (bez list wypunktowanych w treści).
+- Nie dodawaj nowych faktów poza tym, co wynika z kontekstu i ogólnej wiedzy; jeśli brak pewności, uogólnij (nie wstawiaj [[TODO-CLAIM]] w finalnym wyniku).
+- W całym artykule ma się pojawić dokładnie 1 link URL do źródła tematu: użyj `leadSourceUrl` z KONTEKSTU (JSON). Nie dodawaj innych URL.
+
+Format wyjściowy (bez komentarzy i bez markdown fences):
+{ "markdown": "...", "title": "...", "description": "..." }

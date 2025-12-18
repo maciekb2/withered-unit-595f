@@ -4,7 +4,7 @@ import { generateAndPublish } from './modules/generateAndPublish';
 import { createDeferred } from './utils/deferred';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
-import articleTemplate from './prompt/article-content.txt?raw';
+import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
 
 const pendingPrompts = new Map<
@@ -166,7 +166,7 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
 async function handleGetPrompt(env: Env) {
   logEvent({ type: 'get-prompt' });
   const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
-  const prompt = articleTemplate.replace(
+  const prompt = writeTemplate.replace(
     '{recent_titles}',
     recent.map((t, i) => `${i + 1}. ${t}`).join('\n')
   );
