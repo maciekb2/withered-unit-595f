@@ -7,7 +7,6 @@ views: 0
 likes: 0
 ---
 
-# Globalny HR naiwności: gdy Kim wysyła CV, korporacja wreszcie czyta drobny druk
 
 ## Kiedy "Kim" klika Wyślij, HR widzi literki 6 pkt
 Gdy gigant technologiczny ogłasza, że hurtowo blokuje podejrzane aplikacje z dalekiej Północy, globalny HR nagle odkrywa, że „należyta staranność” to nie tylko slogan. Nagle lśnią filtry antyfraudowe, a rekruter, który wczoraj połykał hasła o „zwinności”, dziś prosi o skany i metadane. Zamiast zachwytu nad „rockstar developerem” pojawia się pytanie, czy to w ogóle jego portfolio. I tu pojawia się smutna puenta: system zadziałał dopiero wtedy, gdy ktoś nazwał problem wprost i głośno. Media dokładają swoje echo; klimat globalnych doniesień ilustruje choćby ten materiał (tak, szum informacyjny też ma znaczenie) [BBC](https://www.bbc.com/news/articles/c1lr1yvqge5o?at_medium=RSS&at_campaign=rss). Na koniec wychodzi, że ta cała „innowacja” w rekrutacji to często tylko stary dobry zdrowy rozsądek z nową naklejką. I że drabinka procedur, zdeptana w imię „szybkości”, wraca jak bumerang. Bo kiedy magia CV blednie, litery 6 pkt nagle stają się czytelne (nagle czcionka 6 pkt staje się czytelna).
