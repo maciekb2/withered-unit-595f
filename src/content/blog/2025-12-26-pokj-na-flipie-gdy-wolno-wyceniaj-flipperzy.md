@@ -7,7 +7,6 @@ views: 0
 likes: 0
 ---
 
-# Pokój na flipie: gdy wolność wyceniają flipperzy
 
 ## Flip na pokoju: cennik rozejmu
 Spece od nieruchomości patrzą na wojnę jak na remont generalny, tyle że kosztorys pisze artyleria, a protokół zdawczo-odbiorczy — bieg historii. W ich języku pokój to „zakres prac” z opcją na aneks do harmonogramu, bo front jak ściana nośna nie chce się przesunąć. Flip polega tu na kupnie ruin przed wiadomościami i sprzedaży ciszy po briefingu, byle przed końcem kwartału. Marża wpisuje się w m2 wolności, jakby granice dało się domalować fugą. Prąd, woda, godność — wszystko w pakiecie wykończeniowym, zależnie od standardu. Rynek lubi klarowność, więc rozejm staje się „produktem” z opisem, metrażem i zdjęciem pod złotą godzinę. A jeśli ktoś pyta o kaucję moralną, słyszy, że to nie jest pozycja budżetowa (kaucja za ciszę w ratach).
