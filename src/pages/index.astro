@@ -4,6 +4,33 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Hero from '../components/Hero.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort((a, b) => {
+        const dateDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+        return dateDiff === 0 ? b.id.localeCompare(a.id) : dateDiff;
+});
+
+const shortDateFormatter = new Intl.DateTimeFormat('pl-PL', {
+        day: '2-digit',
+        month: 'short',
+});
+
+const longDateFormatter = new Intl.DateTimeFormat('pl-PL', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+});
+
+const latestHeadlines = posts.slice(0, 6).map((post) => ({
+        title: post.data.title,
+        href: `/blog/${post.id}/`,
+        dateLabel: shortDateFormatter.format(post.data.pubDate),
+}));
+
+const lastPublishedLabel = posts[0]
+        ? longDateFormatter.format(posts[0].data.pubDate)
+        : undefined;
 ---
 
 <!doctype html>
@@ -56,8 +83,12 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         <body>
                 <Header />
                 <main class="full-width-banner">
-                        <Hero />
-                        <section class="intro">
+                        <Hero
+                                liveHeadlines={latestHeadlines}
+                                articleCount={posts.length}
+                                lastPublishedLabel={lastPublishedLabel}
+                        />
+                        <section class="intro" id="intro">
                                 <h2>🧠 Co to za pseudointelekt?</h2>
                                 <p>
                                         Pseudointelekt.pl to blog dla tych, którzy mają dość suchych analiz,
