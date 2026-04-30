@@ -492,7 +492,7 @@ pre {
       <div id="log" aria-live="polite"></div>
         <div id="access-callout" class="access-callout">
           <p>Sesja panelu działa, ale API generowania wymaga osobnej autoryzacji Cloudflare Access. To normalne, gdy panel i `/api/*` są w różnych aplikacjach Access.</p>
-          <a class="button small" href="/api/access-status?redirect=/generuj.html">Autoryzuj API i wróć do panelu</a>
+          <a class="button small" href="/api/get-prompt?redirect=/generuj.html">Autoryzuj API i wróć do panelu</a>
         </div>
       </div>
     </section>
@@ -673,7 +673,7 @@ async function prepareStream() {
 
 async function ensureApiAccess() {
   try {
-    const res = await fetch('/api/access-status', {
+    const res = await fetch('/api/get-prompt?preflight=1', {
       credentials: 'include',
       cache: 'no-store',
       redirect: 'manual',

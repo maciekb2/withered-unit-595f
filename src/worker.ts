@@ -297,26 +297,6 @@ export default {
         response = await handleContact(request, env, session.id);
       } else if (
         request.method === 'GET' &&
-        url.pathname === '/api/access-status'
-      ) {
-        logEvent({ type: 'access-status-ok', ...accessAuditContext });
-        const redirectTo = url.searchParams.get('redirect');
-        if (redirectTo?.startsWith('/')) {
-          response = new Response(null, {
-            status: 302,
-            headers: { Location: redirectTo },
-          });
-        } else {
-          response = new Response(JSON.stringify({
-            ok: true,
-            accessEmail: accessAuditContext.accessEmail,
-            accessAud: accessAuditContext.accessAud,
-          }), {
-            headers: { 'Content-Type': 'application/json' },
-          });
-        }
-      } else if (
-        request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
       ) {
         logEvent({ type: 'generate-stream-start', ...accessAuditContext });
@@ -390,7 +370,16 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/get-prompt'
       ) {
-        response = await handleGetPrompt(env, accessAuditContext);
+        const redirectTo = url.searchParams.get('redirect');
+        if (redirectTo?.startsWith('/')) {
+          logEvent({ type: 'get-prompt-auth-redirect', redirectTo, ...accessAuditContext });
+          response = new Response(null, {
+            status: 302,
+            headers: { Location: redirectTo },
+          });
+        } else {
+          response = await handleGetPrompt(env, accessAuditContext);
+        }
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')
