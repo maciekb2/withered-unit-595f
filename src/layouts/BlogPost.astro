@@ -70,9 +70,7 @@ const jsonLd = {
 <html lang="pl">
         <head>
                 <BaseHead title={title} description={description} image={heroImage} type="article" />
-                <script type="application/ld+json">
-                        {JSON.stringify(jsonLd)}
-                </script>
+                <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
                 <style>
                         main {
                                 width: 100%;
