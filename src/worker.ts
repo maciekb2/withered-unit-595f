@@ -6,7 +6,11 @@ import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
 import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
-import { isGenerationPath, requireCloudflareAccess } from './utils/accessAuth';
+import {
+  isGenerationPath,
+  requireCloudflareAccess,
+  type CloudflareAccessIdentity,
+} from './utils/accessAuth';
 
 const pendingPrompts = new Map<
   string,
@@ -261,8 +265,11 @@ async function handleGetLikes(env: Env, slugs: string[] = []) {
   });
 }
 
-async function handleGetPrompt(env: Env) {
-  logEvent({ type: 'get-prompt' });
+async function handleGetPrompt(
+  env: Env,
+  auditContext: Record<string, unknown> = {},
+) {
+  logEvent({ type: 'get-prompt', ...auditContext });
   const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
   const prompt = writeTemplate.replace(
     '{recent_titles}',
@@ -273,15 +280,31 @@ async function handleGetPrompt(env: Env) {
   });
 }
 
-async function handleClientLog(request: Request, sessionId: string) {
+async function handleClientLog(
+  request: Request,
+  sessionId: string,
+  auditContext: Record<string, unknown> = {},
+) {
   try {
     const data = (await request.json()) as Record<string, unknown>;
-    logEvent({ type: 'client-log', sessionId, ...data });
+    logEvent({ type: 'client-log', sessionId, ...auditContext, ...data });
     return new Response('OK');
   } catch (err) {
-    logError(err, { type: 'client-log-error' });
+    logError(err, { type: 'client-log-error', sessionId, ...auditContext });
     return new Response('Bad Request', { status: 400 });
   }
+}
+
+function buildAccessAuditContext(
+  sessionId: string,
+  identity?: CloudflareAccessIdentity,
+): Record<string, unknown> {
+  return {
+    sessionId,
+    accessEmail: identity?.email || 'unknown',
+    accessSub: identity?.sub || 'unknown',
+    accessAud: identity?.aud || 'unknown',
+  };
 }
 
 export default {
@@ -294,10 +317,13 @@ export default {
     }
     const url = new URL(request.url);
     try {
+      let accessIdentity: CloudflareAccessIdentity | undefined;
       if (isGenerationPath(url.pathname)) {
-        const authResponse = await requireCloudflareAccess(request, env);
-        if (authResponse) return authResponse;
+        const authResult = await requireCloudflareAccess(request, env);
+        if (authResult.response) return authResult.response;
+        accessIdentity = authResult.identity;
       }
+      const accessAuditContext = buildAccessAuditContext(session.id, accessIdentity);
 
       let response: Response;
       if (request.method === 'POST' && url.pathname === '/api/contact') {
@@ -306,7 +332,7 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
       ) {
-        logEvent({ type: 'generate-stream-start', sessionId: session.id });
+        logEvent({ type: 'generate-stream-start', ...accessAuditContext });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
         const ctrl = {
@@ -316,7 +342,10 @@ export default {
         const deferred = createDeferred<{ topic: string }>();
         pendingPrompts.set(session.id, deferred.resolve);
         ctx.waitUntil(
-          generateAndPublish(env, ctrl, deferred.promise)
+          generateAndPublish(env, ctrl, deferred.promise, {
+            source: 'manual-sse',
+            ...accessAuditContext,
+          })
             .catch(err => {
               console.error('Błąd w tle:', err);
               const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
@@ -336,19 +365,19 @@ export default {
         request.method === 'POST' &&
         url.pathname === '/api/client-log'
       ) {
-        response = await handleClientLog(request, session.id);
+        response = await handleClientLog(request, session.id, accessAuditContext);
       } else if (
         request.method === 'POST' &&
         url.pathname === '/api/update-prompt'
       ) {
         const resolver = pendingPrompts.get(session.id);
         if (!resolver) {
-          logEvent({ type: 'update-prompt-missing', sessionId: session.id });
+          logEvent({ type: 'update-prompt-missing', ...accessAuditContext });
           response = new Response('No pending prompt', { status: 400 });
         } else {
           const data = await request.json();
           const topic = (data as any).topic ?? '';
-          logEvent({ type: 'update-prompt', sessionId: session.id });
+          logEvent({ type: 'update-prompt', ...accessAuditContext, topic });
           resolver({ topic: String(topic) });
           response = new Response('OK');
         }
@@ -356,7 +385,7 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/get-prompt'
       ) {
-        response = await handleGetPrompt(env);
+        response = await handleGetPrompt(env, accessAuditContext);
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')

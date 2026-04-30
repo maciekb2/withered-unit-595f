@@ -1,6 +1,8 @@
 let logsDb: D1Database | undefined;
 let execCtx: ExecutionContext | undefined;
 let workerId: string | undefined;
+let logsTableReady: Promise<void> | undefined;
+let logsTableDb: D1Database | undefined;
 
 export function initLogger(
   db?: D1Database,
@@ -14,17 +16,28 @@ export function initLogger(
 
 function storeLog(entry: Record<string, unknown>): void {
   if (!logsDb) return;
+  const db = logsDb;
   const promise = (async () => {
-    await logsDb.exec(
-      'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)'
-    );
-    return logsDb
+    if (!logsTableReady || logsTableDb !== db) {
+      logsTableDb = db;
+      logsTableReady = db.exec(
+        'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)'
+      ).then(() => undefined);
+    }
+    await logsTableReady;
+    return db
       .prepare(
         'INSERT INTO logs (time, worker_id, data) VALUES (?1, ?2, ?3)'
       )
       .bind(new Date().toISOString(), workerId || 'unknown', JSON.stringify(entry))
       .run();
-  })();
+  })().catch(err => {
+    console.error(JSON.stringify({
+      time: new Date().toISOString(),
+      type: 'log-store-error',
+      error: err instanceof Error ? err.message : String(err),
+    }));
+  });
   if (execCtx) {
     execCtx.waitUntil(promise);
   }

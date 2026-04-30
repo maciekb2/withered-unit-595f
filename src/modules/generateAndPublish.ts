@@ -23,13 +23,29 @@ export interface GenerateAndPublishResult {
   slug: string;
 }
 
+export interface GenerationAuditContext {
+  source?: string;
+  sessionId?: string;
+  accessEmail?: string;
+  accessSub?: string;
+  accessAud?: string;
+  [key: string]: unknown;
+}
+
 export async function generateAndPublish(
   env: Env,
   controller?: { enqueue: (chunk: string) => void; close: () => void },
-  promptPromise?: Promise<{ topic: string }>
+  promptPromise?: Promise<{ topic: string }>,
+  auditContext: GenerationAuditContext = {},
 ): Promise<GenerateAndPublishResult> {
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
+    logEvent({
+      type: 'generation-stream-event',
+      ...auditContext,
+      log,
+      ...data,
+    });
     const message = JSON.stringify({ log, ...data });
     controller.enqueue(`data: ${message}\n\n`);
   };
@@ -39,6 +55,12 @@ export async function generateAndPublish(
   }, 10000);
 
   try {
+    logEvent({
+      type: 'generation-start',
+      mode: promptPromise ? 'manual' : 'auto',
+      ...auditContext,
+    });
+
     const topicModel = env.OPENAI_TOPIC_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const outlineModel = env.OPENAI_OUTLINE_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const writeModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
@@ -91,6 +113,11 @@ export async function generateAndPublish(
       });
       const res = await promptPromise;
       baseTopic = res.topic || baseTopic;
+      logEvent({
+        type: 'generation-topic-selected',
+        ...auditContext,
+        topic: baseTopic,
+      });
     } else {
       try {
         logEvent({ type: 'auto-topic-suggest-start' });
@@ -265,8 +292,21 @@ export async function generateAndPublish(
       url: prUrl,
     });
 
-    return { article, slug: slugify(article.title) };
+    const slug = slugify(article.title);
+    logEvent({
+      type: 'generation-complete',
+      ...auditContext,
+      title: article.title,
+      slug,
+      url: prUrl,
+    });
+
+    return { article, slug };
   } catch (err) {
+    logError(err, {
+      type: 'generation-error',
+      ...auditContext,
+    });
     send(`❌ Błąd: ${(err as Error).message}`);
     throw err;
   } finally {

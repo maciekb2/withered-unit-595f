@@ -4,6 +4,18 @@ import { logError, logEvent } from './logger';
 interface AccessPayload {
   email?: string;
   sub?: string;
+  aud?: string | string[];
+}
+
+export interface CloudflareAccessIdentity {
+  email?: string;
+  sub?: string;
+  aud?: string;
+}
+
+export interface CloudflareAccessResult {
+  response?: Response;
+  identity?: CloudflareAccessIdentity;
 }
 
 const GENERATION_PATHS = new Set([
@@ -64,9 +76,9 @@ function forbidden(message = 'Forbidden'): Response {
 export async function requireCloudflareAccess(
   request: Request,
   env: Env,
-): Promise<Response | null> {
+): Promise<CloudflareAccessResult> {
   if (isLocalDevelopmentRequest(request)) {
-    return null;
+    return { identity: { email: 'local-dev', sub: 'local-dev' } };
   }
 
   const issuer = normalizeIssuer(env.CF_ACCESS_TEAM_DOMAIN || '');
@@ -74,13 +86,15 @@ export async function requireCloudflareAccess(
 
   if (!issuer || audiences.length === 0) {
     logEvent({ type: 'access-auth-misconfigured' });
-    return forbidden('Cloudflare Access is not configured for this endpoint');
+    return {
+      response: forbidden('Cloudflare Access is not configured for this endpoint'),
+    };
   }
 
   const token = request.headers.get('cf-access-jwt-assertion');
   if (!token) {
     logEvent({ type: 'access-auth-missing-token' });
-    return forbidden('Missing Cloudflare Access token');
+    return { response: forbidden('Missing Cloudflare Access token') };
   }
 
   try {
@@ -96,6 +110,9 @@ export async function requireCloudflareAccess(
 
     const accessPayload = payload as AccessPayload;
     const email = accessPayload.email?.toLowerCase();
+    const aud = Array.isArray(accessPayload.aud)
+      ? accessPayload.aud.join(',')
+      : accessPayload.aud;
     const allowedEmails = parseAllowedEmails(env.CF_ACCESS_ALLOWED_EMAILS);
 
     if (allowedEmails.size > 0 && (!email || !allowedEmails.has(email))) {
@@ -103,17 +120,23 @@ export async function requireCloudflareAccess(
         type: 'access-auth-email-denied',
         email: email || 'unknown',
       });
-      return forbidden();
+      return { response: forbidden() };
     }
 
-    logEvent({
-      type: 'access-auth-ok',
+    const identity = {
       email: email || 'unknown',
       sub: accessPayload.sub || 'unknown',
+      aud: aud || 'unknown',
+    };
+    logEvent({
+      type: 'access-auth-ok',
+      email: identity.email,
+      sub: identity.sub,
+      aud: identity.aud,
     });
-    return null;
+    return { identity };
   } catch (err) {
     logError(err, { type: 'access-auth-invalid-token' });
-    return forbidden('Invalid Cloudflare Access token');
+    return { response: forbidden('Invalid Cloudflare Access token') };
   }
 }

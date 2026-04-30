@@ -6,7 +6,10 @@ export default {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
     logEvent({ type: 'cron-start', time: event.scheduledTime });
     try {
-      const { article, slug } = await generateAndPublish(env);
+      const { article, slug } = await generateAndPublish(env, undefined, undefined, {
+        source: 'cron',
+        scheduledTime: event.scheduledTime,
+      });
       logEvent({ type: 'cron-complete', title: article.title, slug });
     } catch (err) {
       logError(err, { type: 'cron-error' });
