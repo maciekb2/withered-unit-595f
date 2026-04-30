@@ -8,7 +8,7 @@ import { CONTACT_EMAIL } from '../consts';
 <!doctype html>
 <html lang="pl">
   <head>
-    <BaseHead title="Kontakt" description="Skontaktuj się z nami" />
+    <BaseHead title="Kontakt" description="Napisz do Pseudointelektu" />
     <style>
       form {
         display: flex;
@@ -33,21 +33,21 @@ import { CONTACT_EMAIL } from '../consts';
     <Header />
     <main>
       <h1>Kontakt</h1>
-      <p>Jeśli masz pytania, napisz na <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> lub skorzystaj z formularza poniżej.</p>
+      <p>Masz temat, uwagę albo chcesz po prostu napisać? Wyślij wiadomość przez formularz albo bezpośrednio na <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
       <form id="contact-form" action="/api/contact" method="post">
         <label>
-          Imię
+          Imię lub podpis
           <input type="text" name="name" maxlength="120" required />
         </label>
         <label>
-          Email
+          Adres email
           <input type="email" name="email" maxlength="254" required />
         </label>
         <label>
           Wiadomość
           <textarea name="message" rows="5" maxlength="4000" required></textarea>
         </label>
-        <button type="submit">Wyślij</button>
+        <button type="submit">Wyślij wiadomość</button>
       </form>
       <p id="status"></p>
     </main>
@@ -62,27 +62,27 @@ import { CONTACT_EMAIL } from '../consts';
         const email = data.get('email').trim();
         const message = data.get('message').trim();
         if (!name) {
-          status.textContent = 'Halo! Jak mamy Cię zawołać?';
+          status.textContent = 'Podaj imię albo podpis, żebym wiedział, do kogo odpisuję.';
           status.style.color = 'red';
           return;
         }
         if (!/^\S+@\S+\.\S+$/.test(email)) {
-          status.textContent = 'Podaj prawidłowy email – gołębie pocztowe nie obsługują tego formatu.';
+          status.textContent = 'Podaj poprawny adres email.';
           status.style.color = 'red';
           return;
         }
         if (!message) {
-          status.textContent = 'Serio nic nie napiszesz? Bez treści nie damy rady!';
+          status.textContent = 'Napisz chociaż kilka zdań, inaczej nie mam do czego się odnieść.';
           status.style.color = 'red';
           return;
         }
         const res = await fetch('/api/contact', { method: 'POST', body: data });
         if (res.ok) {
-          status.textContent = 'Wiadomość wysłana';
+          status.textContent = 'Wiadomość wysłana. Dzięki.';
           status.style.color = 'green';
           form.reset();
         } else {
-          status.textContent = 'Błąd wysyłania';
+          status.textContent = 'Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.';
           status.style.color = 'red';
         }
       });

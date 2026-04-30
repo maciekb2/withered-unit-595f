@@ -3,7 +3,7 @@
 
 
 export const SITE_TITLE = "pseudointelekt.pl";
-export const SITE_DESCRIPTION = "Blog Pseudointelekt";
-export const CONTACT_EMAIL = "info@pseidointelekt.pl";
+export const SITE_DESCRIPTION = "Geopolityka, komentarz i satyra bez zadęcia";
+export const CONTACT_EMAIL = "info@pseudointelekt.pl";
 export const SITE_KEYWORDS =
   "geopolityka, blog, komentarz, humor, polityka";
