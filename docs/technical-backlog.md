@@ -30,3 +30,9 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a safe text-generation provider abstraction so OpenAI remains the fallback while the Jetson gateway can be enabled with secrets and timeouts.
 - [x] Add a configurable image model setting and update the hero-image prompt/style defaults for consistent newer-model output.
 - [x] Verify the full generation flow through Cloudflare Access with audit logs still preserving prompts, client payloads, and Access identity/method.
+
+## UI and SEO polish
+
+- [x] Rebuild the blog index into a richer editorial archive with a featured article, descriptions, responsive cards, and local search.
+- [x] Improve the article page reading chrome: metadata bar, like/view controls, spacing, and article JSON-LD/BreadcrumbList details.
+- [ ] Upgrade the generation dashboard quality panel so it visualizes `quality-check` warnings and errors as a checklist.
