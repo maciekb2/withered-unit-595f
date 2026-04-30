@@ -23,6 +23,7 @@
 ## Kluczowe pliki
 - Orkiestracja: `src/modules/generateAndPublish.ts`, `src/worker.ts`, `src/cron-worker.ts`, `scripts/publish-article.ts`.
 - Odczyt logów audytowych: `scripts/query-generation-logs.mjs` (`npm run logs:audit -- --generation`).
+- Plan migracji providerów tekstu i obrazów: `docs/generation-provider-migration.md`.
 - Prompty: `src/prompt/article-write.txt`, `src/prompt/article-repair.txt`, `src/prompt/style-guide.txt`, `src/prompt/hero-image.txt`.
 - Pipeline treści: `src/pipeline/{outline,write,repair,format}.ts`, `src/pipeline/validators/content.ts`, `src/pipeline/contextPack.ts`, `src/pipeline/openai.ts`.
 - Publikacja/FS: `src/modules/{githubPublisher,articleAssembler}.ts`, `src/utils/{validators,slugify}.ts`.
