@@ -31,7 +31,7 @@ endpoint `POST /api/update-prompt` w formacie `{ "topic": "wybrany temat" }`.
 
 W katalogu `public/` dodano dashboard, który łączy się z powyższym strumieniem, pokazuje konfigurację uruchomienia, oś etapów, log streamu, wybór tematu, konspekt/walidację oraz prompt/odpowiedź modelu. Użytkownik wybiera temat spośród propozycji lub wpisuje własny i potwierdza przyciskiem.
 
-Dashboard przed uruchomieniem `EventSource` robi preflight przez `GET /api/get-prompt?preflight=1`, czyli endpoint objęty tą samą aplikacją Cloudflare Access co generowanie. Jeśli Cloudflare Access wymaga osobnej sesji dla `/api/*`, panel pokazuje przycisk autoryzacji API zamiast zgłaszać ogólny błąd połączenia SSE.
+Dashboard uruchamia `EventSource` bezpośrednio na `/api/generate-stream`. Cloudflare Access musi chronić panel i API w jednej aplikacji Access, z destynacjami `/generuj`, `/generuj.html` oraz `/api/*`; wtedy sesja z logowania do panelu działa też dla streamu SSE i pomocniczych endpointów.
 
 ```
 const es = new EventSource('/api/generate-stream');

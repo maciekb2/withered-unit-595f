@@ -370,16 +370,7 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/get-prompt'
       ) {
-        const redirectTo = url.searchParams.get('redirect');
-        if (redirectTo?.startsWith('/')) {
-          logEvent({ type: 'get-prompt-auth-redirect', redirectTo, ...accessAuditContext });
-          response = new Response(null, {
-            status: 302,
-            headers: { Location: redirectTo },
-          });
-        } else {
-          response = await handleGetPrompt(env, accessAuditContext);
-        }
+        response = await handleGetPrompt(env, accessAuditContext);
       } else if (
         request.method === 'POST' &&
         url.pathname.startsWith('/api/views-init/')
