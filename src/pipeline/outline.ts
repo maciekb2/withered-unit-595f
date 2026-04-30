@@ -59,7 +59,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
 
     const outline: Outline = {
       finalTitle: json.finalTitle,
-      description: json.description,
+      description: cleanDescription(json.description),
       sections: json.sections,
       guardrails: json.guardrails || [],
     };
@@ -94,4 +94,12 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     if (debug) (err as any).debug = debug;
     throw err;
   }
+}
+
+function cleanDescription(description: string): string {
+  return description
+    .replace(/^konspekt satyry o\b/i, 'Satyra o')
+    .replace(/^satyryczny konspekt o\b/i, 'Satyryczny tekst o')
+    .replace(/^konspekt artykułu o\b/i, 'Artykuł o')
+    .trim();
 }
