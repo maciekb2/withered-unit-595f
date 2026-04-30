@@ -28,6 +28,14 @@ const latestHeadlines = posts.slice(0, 6).map((post) => ({
         dateLabel: shortDateFormatter.format(post.data.pubDate),
 }));
 
+const latestArticles = posts.slice(0, 3).map((post) => ({
+        title: post.data.title,
+        description: post.data.description,
+        href: `/blog/${post.id}/`,
+        image: post.data.heroImage,
+        dateLabel: longDateFormatter.format(post.data.pubDate),
+}));
+
 const lastPublishedLabel = posts[0]
         ? longDateFormatter.format(posts[0].data.pubDate)
         : undefined;
@@ -45,23 +53,84 @@ const lastPublishedLabel = posts[0]
                                 padding: 0;
                         }
                         .intro {
-                                max-width: 720px;
+                                width: min(1120px, calc(100% - 2rem));
                                 margin: 0 auto;
-                                padding: 3em 1em;
-                                text-align: center;
+                                padding: clamp(3rem, 6vw, 5rem) 0;
+                        }
+                        .intro-grid {
+                                display: grid;
+                                grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.7fr);
+                                gap: clamp(1.5rem, 5vw, 4rem);
+                                align-items: start;
+                        }
+                        .intro-copy {
+                                max-width: 720px;
+                        }
+                        .section-label {
+                                margin: 0 0 0.65rem;
+                                color: var(--diplomatic-blue);
+                                font-size: 0.76rem;
+                                font-weight: 700;
+                                letter-spacing: 0.13em;
+                                text-transform: uppercase;
+                        }
+                        .intro h2,
+                        .latest h2 {
+                                margin-bottom: 0.75rem;
+                                font-size: clamp(1.75rem, 3vw, 2.55rem);
+                                color: var(--charcoal);
+                                text-wrap: balance;
+                        }
+                        .intro p {
+                                max-width: 64ch;
+                                color: rgba(var(--gray-dark), 0.94);
+                        }
+                        .brief-list {
+                                margin: 0;
+                                padding: 0;
+                                display: grid;
+                                gap: 0.75rem;
+                                list-style: none;
+                        }
+                        .brief-list li {
+                                display: grid;
+                                grid-template-columns: auto 1fr;
+                                gap: 0.75rem;
+                                align-items: start;
+                                padding: 0.9rem 0;
+                                border-top: 1px solid rgba(var(--gray-dark), 0.16);
+                        }
+                        .brief-list li:last-child {
+                                border-bottom: 1px solid rgba(var(--gray-dark), 0.16);
+                        }
+                        .brief-list strong {
+                                color: var(--charcoal);
+                        }
+                        .brief-mark {
+                                display: inline-grid;
+                                place-items: center;
+                                width: 2rem;
+                                height: 2rem;
+                                border-radius: 50%;
+                                color: var(--charcoal);
+                                background: var(--gold-accent);
+                                font-size: 0.92rem;
                         }
                         .intro .buttons {
                                 display: flex;
-                                justify-content: center;
                                 flex-wrap: wrap;
                                 gap: 1rem;
                                 margin-top: 2rem;
                         }
                         .intro .buttons a {
-                                padding: 0.75em 1.5em;
+                                display: inline-flex;
+                                align-items: center;
+                                min-height: 44px;
+                                padding: 0.6em 1.2em;
                                 text-decoration: none;
-                                border-radius: 4px;
-                                border: 2px solid var(--diplomatic-blue);
+                                border-radius: 999px;
+                                border: 1px solid var(--diplomatic-blue);
+                                font-weight: 700;
                         }
                         .intro .buttons a.primary {
                                 background: var(--diplomatic-blue);
@@ -78,6 +147,104 @@ const lastPublishedLabel = posts[0]
                         .intro .buttons a.secondary:hover {
                                 background: var(--dusty-beige);
                         }
+                        .latest {
+                                background: #fff;
+                                border-top: 1px solid rgba(var(--gray-dark), 0.12);
+                                border-bottom: 1px solid rgba(var(--gray-dark), 0.12);
+                        }
+                        .latest-inner {
+                                width: min(1120px, calc(100% - 2rem));
+                                margin: 0 auto;
+                                padding: clamp(2.6rem, 5vw, 4.5rem) 0;
+                        }
+                        .latest-header {
+                                display: flex;
+                                align-items: end;
+                                justify-content: space-between;
+                                gap: 1.5rem;
+                                margin-bottom: 1.4rem;
+                        }
+                        .latest-header p {
+                                max-width: 42ch;
+                                margin: 0;
+                                color: rgba(var(--gray-dark), 0.88);
+                        }
+                        .latest-grid {
+                                display: grid;
+                                grid-template-columns: repeat(3, minmax(0, 1fr));
+                                gap: 1rem;
+                        }
+                        .article-card {
+                                display: grid;
+                                grid-template-rows: auto 1fr;
+                                min-height: 100%;
+                                overflow: hidden;
+                                color: inherit;
+                                text-decoration: none;
+                                border: 1px solid rgba(var(--gray-dark), 0.14);
+                                border-radius: 8px;
+                                background: var(--ivory);
+                                box-shadow: 0 10px 26px rgba(var(--gray-dark), 0.08);
+                                transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+                        }
+                        .article-card:hover {
+                                transform: translateY(-3px);
+                                border-color: rgba(203, 161, 53, 0.55);
+                                box-shadow: 0 16px 34px rgba(var(--gray-dark), 0.14);
+                        }
+                        .article-card img {
+                                width: 100%;
+                                aspect-ratio: 16 / 10;
+                                object-fit: cover;
+                                border-radius: 0;
+                                background: var(--dusty-beige);
+                        }
+                        .article-card-body {
+                                display: grid;
+                                gap: 0.55rem;
+                                padding: 1rem;
+                        }
+                        .article-card time {
+                                color: var(--diplomatic-blue);
+                                font-size: 0.76rem;
+                                font-weight: 700;
+                                letter-spacing: 0.08em;
+                                text-transform: uppercase;
+                        }
+                        .article-card h3 {
+                                margin: 0;
+                                font-size: 1.05rem;
+                                line-height: 1.25;
+                                color: var(--charcoal);
+                        }
+                        .article-card p {
+                                margin: 0;
+                                color: rgba(var(--gray-dark), 0.9);
+                                font-size: 0.92rem;
+                                line-height: 1.5;
+                        }
+                        @media (max-width: 860px) {
+                                .intro-grid,
+                                .latest-grid {
+                                        grid-template-columns: 1fr;
+                                }
+                                .latest-header {
+                                        align-items: start;
+                                        flex-direction: column;
+                                }
+                        }
+                        @media (max-width: 520px) {
+                                .intro,
+                                .latest-inner {
+                                        width: min(100%, calc(100% - 1.2rem));
+                                }
+                                .intro .buttons {
+                                        display: grid;
+                                }
+                                .intro .buttons a {
+                                        justify-content: center;
+                                }
+                        }
                 </style>
         </head>
         <body>
@@ -89,31 +256,63 @@ const lastPublishedLabel = posts[0]
                                 lastPublishedLabel={lastPublishedLabel}
                         />
                         <section class="intro" id="intro">
-                                <h2>🧠 Co to za pseudointelekt?</h2>
-                                <p>
-                                        Pseudointelekt.pl to blog dla tych, którzy mają dość suchych analiz,
-                                        nadętych ekspertów i przewidywalnych wniosków z „mainstreamu”. U nas
-                                        geopolityka, konflikty, dyplomacja i cała światowa scena polityczna
-                                        dostają nieco inny filtr – filtr absurdu, ironii i zdrowego dystansu.
-                                </p>
-                                <p>
-                                        Nie udajemy, że wiemy wszystko. Ale też nie udajemy, że nie wiemy nic.
-                                        Gdzieś pośrodku między think-tankiem a memem z Putinem – tam jesteśmy.
-                                        Czasem przewidujemy przyszłość, czasem śmiejemy się z teraźniejszości.
-                                        Jedno jest pewne: nie będziesz się nudzić.
-                                </p>
-                                <h2>👀 Dla kogo to wszystko?</h2>
-                                <p>
-                                        Dla tych, którzy interesują się światem, ale niekoniecznie chcą go
-                                        czytać jak encyklopedię. Dla sceptyków, śmieszków, paranoików,
-                                        konspiratorów niedzielnych i fanów spisków (ale z umiarem). A także
-                                        dla każdego, kto lubi spojrzeć na sprawy globalne z lokalnej kanapy –
-                                        z piwem lub yerbą w ręku.
-                                </p>
-                                <div class="buttons">
-                                        <a href="/about" class="secondary">O mnie</a>
-                                        <a href="/blog" class="primary">Blog</a>
-                                        <a href="/contact" class="secondary">Kontakt</a>
+                                <div class="intro-grid">
+                                        <div class="intro-copy">
+                                                <p class="section-label">O stronie</p>
+                                                <h2>Geopolityka, ale bez konferencyjnego zadęcia</h2>
+                                                <p>
+                                                        Pseudointelekt.pl to blog dla tych, którzy mają dość suchych analiz,
+                                                        nadętych ekspertów i przewidywalnych wniosków z mainstreamu. Geopolityka,
+                                                        konflikty i dyplomacja dostają tu filtr absurdu, ironii i zdrowego dystansu.
+                                                </p>
+                                                <p>
+                                                        Nie udajemy, że wiemy wszystko. Ale też nie udajemy, że nie wiemy nic.
+                                                        Gdzieś pośrodku między think-tankiem a memem z Putinem znajduje się ton tej strony.
+                                                </p>
+                                                <div class="buttons">
+                                                        <a href="/blog" class="primary">Przejdź do bloga</a>
+                                                        <a href="/about" class="secondary">O autorze</a>
+                                                </div>
+                                        </div>
+                                        <ul class="brief-list" aria-label="Charakter publikacji">
+                                                <li>
+                                                        <span class="brief-mark">1</span>
+                                                        <span><strong>Szybki kontekst.</strong> Teksty łapią temat dnia, ale nie udają depeszy agencyjnej.</span>
+                                                </li>
+                                                <li>
+                                                        <span class="brief-mark">2</span>
+                                                        <span><strong>Satyryczny filtr.</strong> Patos wielkiej polityki dostaje tu trochę tarcia i kontrastu.</span>
+                                                </li>
+                                                <li>
+                                                        <span class="brief-mark">3</span>
+                                                        <span><strong>Czytelny format.</strong> Krótkie wejście, mocny obraz i komentarz do świata, który sam pisze puenty.</span>
+                                                </li>
+                                        </ul>
+                                </div>
+                        </section>
+                        <section class="latest" aria-labelledby="latest-title">
+                                <div class="latest-inner">
+                                        <div class="latest-header">
+                                                <div>
+                                                        <p class="section-label">Najnowsze teksty</p>
+                                                        <h2 id="latest-title">Ostatnie sygnały z frontu narracji</h2>
+                                                </div>
+                                                <p>Trzy najświeższe wpisy, zanim kolejny briefing zdąży zmienić dekoracje.</p>
+                                        </div>
+                                        <div class="latest-grid">
+                                                {latestArticles.map((article) => (
+                                                        <a class="article-card" href={article.href}>
+                                                                {article.image && (
+                                                                        <img src={article.image} alt="" loading="lazy" />
+                                                                )}
+                                                                <div class="article-card-body">
+                                                                        <time>{article.dateLabel}</time>
+                                                                        <h3>{article.title}</h3>
+                                                                        <p>{article.description}</p>
+                                                                </div>
+                                                        </a>
+                                                ))}
+                                        </div>
                                 </div>
                         </section>
                 </main>

@@ -25,8 +25,8 @@ import Menu from './Menu.astro';
 <style>
         header {
                 margin: 0;
-                padding: 0 1em;
-                background: rgba(var(--gray-light), 94%);
+                padding: 0 1rem;
+                background: rgba(248, 246, 241, 0.92);
                 border-bottom: 1px solid transparent;
                 box-shadow: 0 2px 8px rgba(var(--gray-dark), 8%);
                 position: sticky;
@@ -39,20 +39,23 @@ import Menu from './Menu.astro';
                 backdrop-filter: blur(8px);
         }
         header.is-scrolled {
-                background: rgba(var(--gray-light), 98%);
+                background: rgba(248, 246, 241, 0.98);
                 border-bottom-color: rgba(var(--gray-dark), 16%);
                 box-shadow: 0 10px 24px rgba(var(--gray-dark), 14%);
         }
         .logo {
+                flex: 0 0 auto;
                 display: flex;
                 align-items: center;
                 padding: 0;
-                height: 56px;
+                height: 52px;
+                min-width: 0;
         }
         .logo img {
                 display: block;
                 height: 100%;
                 width: auto;
+                max-width: min(260px, 46vw);
         }
         nav {
                 display: flex;
@@ -61,25 +64,82 @@ import Menu from './Menu.astro';
                 width: min(1100px, 100%);
                 min-height: 72px;
                 margin: 0 auto;
+                gap: 1rem;
+                min-width: 0;
         }
         nav a {
                 position: relative;
-                padding: 0 0.75em;
+                border-radius: 999px;
+                padding: 0.46rem 0.78rem;
                 color: var(--black);
                 text-decoration: none;
-                transition: color 0.3s, transform 0.2s;
-                display: flex;
+                transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+                display: inline-flex;
                 align-items: center;
-                height: 100%;
+                min-height: 38px;
+                line-height: 1;
+                white-space: nowrap;
         }
         nav a:hover:not(.logo) {
-                color: var(--accent);
-                box-shadow: inset 0 0 0 2px var(--accent);
-                transform: scale(1.05);
+                color: var(--accent-dark);
+                background: rgba(203, 161, 53, 0.16);
+                box-shadow: inset 0 0 0 1px rgba(203, 161, 53, 0.42);
         }
         nav a.active {
                 text-decoration: none;
-                box-shadow: inset 0 0 0 2px var(--accent);
+                color: var(--ivory);
+                background: var(--diplomatic-blue);
+                box-shadow: 0 8px 18px rgba(28, 61, 90, 0.18);
         }
 
+        @media (max-width: 760px) {
+                header {
+                        padding: 0 0.55rem;
+                        min-height: 112px;
+                        align-items: stretch;
+                }
+
+                nav {
+                        min-height: 112px;
+                        flex-direction: column;
+                        align-items: stretch;
+                        justify-content: center;
+                        gap: 0.5rem;
+                        padding: 0.55rem 0;
+                }
+
+                .logo {
+                        height: 44px;
+                        justify-content: center;
+                }
+
+                .logo img {
+                        max-width: min(280px, 78vw);
+                }
+
+                nav a {
+                        min-height: 36px;
+                        padding: 0.42rem 0.7rem;
+                        font-size: 0.88rem;
+                }
+        }
+
+        @media (max-width: 420px) {
+                header {
+                        min-height: 106px;
+                }
+
+                nav {
+                        min-height: 106px;
+                }
+
+                .logo {
+                        height: 40px;
+                }
+
+                nav a {
+                        font-size: 0.82rem;
+                        padding: 0.38rem 0.62rem;
+                }
+        }
 </style>
