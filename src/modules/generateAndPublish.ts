@@ -11,6 +11,7 @@ import { getHotTopics } from '../utils/hotTopics';
 import { suggestArticleTopic } from './topicSuggester';
 import { generateOutline } from '../pipeline/outline';
 import { writeArticle } from '../pipeline/write';
+import { writeArticleSectioned } from '../pipeline/sectionedWrite';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
@@ -67,6 +68,7 @@ export async function generateAndPublish(
     const writeModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const repairModel = env.OPENAI_REPAIR_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const textProvider = textGenerationProviderFromEnv(env);
+    const sectionedText = shouldUseSectionedText(env, textProvider);
 
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
@@ -187,19 +189,32 @@ export async function generateAndPublish(
     const outline = outlineRes.outline;
     send('outline-end', { outline });
 
-    send('write-start');
+    send(sectionedText ? 'sectioned-write-start' : 'write-start');
     let writeRes;
     try {
-      writeRes = await writeArticle({
-        apiKey: env.OPENAI_API_KEY,
-        outline,
-        writeTemplate: writePrompt,
-        styleGuide,
-        contextPack,
-        model: writeModel,
-        provider: textProvider,
-        maxTokens: 7200,
-      });
+      writeRes = sectionedText
+        ? await writeArticleSectioned({
+            apiKey: env.OPENAI_API_KEY,
+            outline,
+            writeTemplate: writePrompt,
+            styleGuide,
+            contextPack,
+            model: writeModel,
+            provider: textProvider,
+            leadSourceUrl,
+            paragraphsPerSection: Number.parseInt(env.TEXT_SECTION_PARAGRAPHS || '', 10) || 3,
+            maxTokensPerCall: Number.parseInt(env.TEXT_SECTION_MAX_TOKENS || '', 10) || 1800,
+          })
+        : await writeArticle({
+            apiKey: env.OPENAI_API_KEY,
+            outline,
+            writeTemplate: writePrompt,
+            styleGuide,
+            contextPack,
+            model: writeModel,
+            provider: textProvider,
+            maxTokens: 7200,
+          });
       send('write-prompt', { prompt: writeRes.messages });
       send('write-response', { response: writeRes.raw });
     } catch (err) {
@@ -281,8 +296,10 @@ export async function generateAndPublish(
     const heroImage = await generateHeroImage({
       apiKey: env.OPENAI_API_KEY,
       prompt: heroPrompt,
+      model: env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5',
+      size: (env.OPENAI_IMAGE_SIZE as any) || '1024x1024',
       style: (env.OPENAI_IMAGE_STYLE as any) || 'vivid',
-      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'hd',
+      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'medium',
     });
 
     send('📦 Publikuję na GitHubie...');
@@ -320,4 +337,11 @@ export async function generateAndPublish(
     clearInterval(keepAlive);
     controller?.close();
   }
+}
+
+function shouldUseSectionedText(env: Env, provider: ReturnType<typeof textGenerationProviderFromEnv>): boolean {
+  const mode = env.TEXT_ARTICLE_PIPELINE || 'auto';
+  if (mode === 'sectioned') return true;
+  if (mode === 'one-shot') return false;
+  return provider.type === 'jetson';
 }

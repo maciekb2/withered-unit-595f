@@ -7,7 +7,7 @@
 | Gorące tematy (RSS) | `getHotTopics` | `getHotTopics` | (nie używa) |
 | Sugestia tematu | `topicSuggester` (opcjonalnie; można wpisać własny) | `topicSuggester` (auto wybór) | (pomija; temat z `baseTopic` jeśli podany) |
 | Konspekt (outline) | `generateOutline` (+ context JSON) | `generateOutline` (+ context JSON) | `generateOutline` |
-| Generacja finalna (write) | `writeArticle` (one-shot JSON) | `writeArticle` (one-shot JSON) | `writeArticle` (one-shot JSON) |
+| Generacja finalna (write) | `writeArticle` albo `writeArticleSectioned` | `writeArticle` albo `writeArticleSectioned` | `writeArticle` |
 | Walidacja | `validateAntiHallucination` | `validateAntiHallucination` | `validateAntiHallucination` |
 | Naprawa (tylko przy błędzie) | `repairEdited` (max 2 próby) | `repairEdited` (max 2 próby) | `repairEdited` (max 2 próby) |
 | Format końcowy | `formatFinal` | `formatFinal` | `formatFinal` |
@@ -25,7 +25,7 @@
 - Odczyt logów audytowych: `scripts/query-generation-logs.mjs` (`npm run logs:audit -- --generation`).
 - Plan migracji providerów tekstu i obrazów: `docs/generation-provider-migration.md`.
 - Prompty: `src/prompt/article-write.txt`, `src/prompt/article-repair.txt`, `src/prompt/style-guide.txt`, `src/prompt/hero-image.txt`.
-- Pipeline treści: `src/pipeline/{outline,write,repair,format}.ts`, `src/pipeline/validators/content.ts`, `src/pipeline/contextPack.ts`, `src/pipeline/openai.ts`.
+- Pipeline treści: `src/pipeline/{outline,write,sectionedWrite,repair,format}.ts`, `src/pipeline/validators/content.ts`, `src/pipeline/contextPack.ts`, `src/pipeline/openai.ts`.
 - Publikacja/FS: `src/modules/{githubPublisher,articleAssembler}.ts`, `src/utils/{validators,slugify}.ts`.
 - Kontekst: `src/utils/{hotTopics,recentTitlesGitHub,recentTitlesFs}.ts`, `src/utils/{logger,retryFetch,slack}.ts`.
 
@@ -48,6 +48,7 @@ Kontekst jest podawany jako krótki JSON (tzw. context pack) i służy głównie
 Context pack jest dołączany do:
 - outline (`generateOutline`) jako dodatkowy blok “Kontekst (JSON)”;
 - write/repair (`writeArticle` / `repairEdited`) jako “KONTEKST (JSON)”.
+- sectioned write (`writeArticleSectioned`) jako kontekst dla leadu i każdej sekcji.
 
 ## Reguła linków i walidacja
 Walidator `validateAntiHallucination` wymusza teraz:

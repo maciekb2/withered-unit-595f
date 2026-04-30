@@ -7,6 +7,7 @@ import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
 import { logEvent } from '../utils/logger';
 import { buildContextPack } from '../pipeline/contextPack';
+import type { GenerateHeroOptions } from './heroImageGenerator';
 
 export interface GenerateArticleAssetsOptions {
   apiKey: string;
@@ -22,6 +23,10 @@ export interface GenerateArticleAssetsOptions {
   outlineModel?: string;
   writeModel?: string;
   repairModel?: string;
+  imageModel?: string;
+  imageSize?: GenerateHeroOptions['size'];
+  imageStyle?: GenerateHeroOptions['style'];
+  imageQuality?: GenerateHeroOptions['quality'];
   maxRepairAttempts?: number;
   maxTokens?: number;
 }
@@ -45,6 +50,10 @@ export async function generateArticleAssets({
   outlineModel,
   writeModel,
   repairModel,
+  imageModel,
+  imageSize,
+  imageStyle,
+  imageQuality,
   maxRepairAttempts = 2,
   maxTokens,
 }: GenerateArticleAssetsOptions): Promise<GenerateArticleAssetsResult> {
@@ -117,6 +126,13 @@ export async function generateArticleAssets({
 
   const article = formatFinal(edited);
   const heroPrompt = heroTemplate.replace('{title}', article.title);
-  const heroImage = await generateHeroImage({ apiKey, prompt: heroPrompt });
+  const heroImage = await generateHeroImage({
+    apiKey,
+    prompt: heroPrompt,
+    model: imageModel,
+    size: imageSize,
+    style: imageStyle,
+    quality: imageQuality,
+  });
   return { article, heroImage };
 }

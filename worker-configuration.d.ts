@@ -16,10 +16,15 @@ interface Env {
         OPENAI_DRAFT_MODEL?: string;
         OPENAI_EDIT_MODEL?: string;
         OPENAI_REPAIR_MODEL?: string;
+        OPENAI_IMAGE_MODEL?: string;
+        OPENAI_IMAGE_SIZE?: string;
         OPENAI_IMAGE_STYLE: string;
         OPENAI_IMAGE_QUALITY: string;
         TEXT_GENERATION_PROVIDER?: string;
         TEXT_GENERATION_FALLBACK?: string;
+        TEXT_ARTICLE_PIPELINE?: string;
+        TEXT_SECTION_PARAGRAPHS?: string;
+        TEXT_SECTION_MAX_TOKENS?: string;
         JETSON_GATEWAY_URL?: string;
         JETSON_GATEWAY_TOKEN?: string;
         JETSON_GATEWAY_MODEL?: string;

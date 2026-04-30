@@ -70,6 +70,30 @@ Adapter tekstu jest spięty przez `textGenerationProviderFromEnv(env)` w `src/pi
 - Jeśli `TEXT_GENERATION_FALLBACK=none`, błąd gatewaya przerywa generowanie.
 - Logi zapisują provider, model, status i host gatewaya, ale nie zapisują tokenów.
 
+## Architektura artykułów pod mały model
+
+Jetson nie powinien dostawać zadania "napisz cały artykuł naraz". Docelowy tryb dla `TEXT_GENERATION_PROVIDER=jetson` to etapowy pipeline:
+
+1. `generateOutline` tworzy krótki plan, tytuł, opis i trzy sekcje.
+2. `writeArticleSectioned` pisze lead jako osobne wywołanie.
+3. `writeArticleSectioned` pisze każdą sekcję osobno, przekazując:
+   - cały outline,
+   - aktualną sekcję i jej tezy,
+   - skrócony tekst poprzednich sekcji,
+   - style guide,
+   - context pack z tematem i źródłem.
+4. Kod składa artykuł deterministycznie: tytuł, opis, lead, sekcje `## ...`.
+5. Tylko jedno źródło URL jest dokładane deterministycznie w leadzie, żeby walidator nie musiał walczyć z nadmiarowymi linkami.
+6. Standardowy walidator i ewentualny repair zostają jako bramka jakości.
+
+Przełączniki:
+
+- `TEXT_ARTICLE_PIPELINE=auto`: używa trybu sekcyjnego automatycznie dla Jetsona, a one-shot dla OpenAI.
+- `TEXT_ARTICLE_PIPELINE=sectioned`: wymusza etapowy tryb także dla OpenAI/testów.
+- `TEXT_ARTICLE_PIPELINE=one-shot`: zostawia starą ścieżkę `writeArticle`.
+- `TEXT_SECTION_PARAGRAPHS`: liczba akapitów na sekcję, domyślnie `3`.
+- `TEXT_SECTION_MAX_TOKENS`: limit tokenów na pojedyncze wywołanie sekcji, domyślnie `1800`.
+
 ## Docelowy kontrakt obrazów
 
 Obrazki powinny dostać jawny model w konfiguracji:
@@ -80,6 +104,8 @@ Obrazki powinny dostać jawny model w konfiguracji:
 - `OPENAI_IMAGE_STYLE`
 
 Domyślny styl powinien być spójny dla całej strony: satyryczna ilustracja geopolityczna, redakcyjna, bez fotorealizmu udającego zdjęcie, bez tekstu na obrazie, z czytelną kompozycją pod kadr hero.
+
+Implementacja zostawia obrazy w OpenAI API i ustawia domyślnie `OPENAI_IMAGE_MODEL=gpt-image-1.5`. Dla kosztów można zejść do `gpt-image-1-mini`, a dla kompatybilności można wrócić do `dall-e-3`.
 
 Migracja modelu obrazów powinna być osobnym commitem po adapterze tekstu, bo dotyka innego API, kosztów i jakości wizualnej.
 

@@ -1,0 +1,268 @@
+import { logEvent, logError } from '../utils/logger';
+import type { Edited, Outline } from './types';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
+import { guardrails } from './guardrails';
+import { scrubTodoClaims } from './scrubTodoClaims';
+
+export interface SectionedWriteOptions {
+  apiKey: string;
+  outline: Outline;
+  writeTemplate: string;
+  styleGuide?: string;
+  contextPack?: string;
+  model?: string;
+  provider?: TextGenerationProvider;
+  leadSourceUrl?: string;
+  paragraphsPerSection?: number;
+  maxTokensPerCall?: number;
+}
+
+export interface SectionedWriteResult {
+  edited: Edited;
+  messages: ChatMessage[];
+  raw: string;
+  sections: { h2: string; raw: string; markdown: string }[];
+}
+
+const DEFAULT_PARAGRAPHS_PER_SECTION = 3;
+const DEFAULT_TOKENS_PER_CALL = 1800;
+const MAX_PROMPT_BLOCK = 2600;
+
+export async function writeArticleSectioned({
+  apiKey,
+  outline,
+  writeTemplate,
+  styleGuide = '',
+  contextPack = '',
+  model = 'gpt-5',
+  provider,
+  leadSourceUrl,
+  paragraphsPerSection = DEFAULT_PARAGRAPHS_PER_SECTION,
+  maxTokensPerCall = DEFAULT_TOKENS_PER_CALL,
+}: SectionedWriteOptions): Promise<SectionedWriteResult> {
+  logEvent({
+    type: 'sectioned-write-start',
+    title: outline.finalTitle,
+    sectionCount: outline.sections.length,
+    paragraphsPerSection,
+  });
+
+  const sourceUrl = leadSourceUrl || leadSourceUrlFromContext(contextPack) || 'https://example.com';
+  const messages: ChatMessage[] = [];
+  const rawParts: string[] = [];
+
+  const leadPrompt = buildLeadPrompt({
+    outline,
+    writeTemplate,
+    styleGuide,
+    contextPack,
+    sourceUrl,
+  });
+  const leadMessages = [
+    { role: 'system', content: systemPrompt() },
+    { role: 'user', content: leadPrompt },
+  ];
+  messages.push(...leadMessages);
+  const leadRaw = await chat(apiKey, {
+    messages: leadMessages,
+    max_completion_tokens: Math.min(maxTokensPerCall, 1200),
+    model,
+    provider,
+    response_style: 'normal',
+  });
+  rawParts.push(leadRaw);
+  const lead = sanitizeBodyText(leadRaw, sourceUrl);
+
+  const writtenSections: { h2: string; raw: string; markdown: string }[] = [];
+  for (let index = 0; index < outline.sections.length; index += 1) {
+    const section = outline.sections[index];
+    const prior = writtenSections
+      .map(s => `## ${s.h2}\n${s.markdown}`)
+      .join('\n\n')
+      .slice(-1800);
+    const sectionPrompt = buildSectionPrompt({
+      outline,
+      sectionIndex: index,
+      writeTemplate,
+      styleGuide,
+      contextPack,
+      prior,
+      paragraphsPerSection,
+    });
+    const sectionMessages = [
+      { role: 'system', content: systemPrompt() },
+      { role: 'user', content: sectionPrompt },
+    ];
+    messages.push(...sectionMessages);
+
+    try {
+      const sectionRaw = await chat(apiKey, {
+        messages: sectionMessages,
+        max_completion_tokens: maxTokensPerCall,
+        model,
+        provider,
+        response_style: 'full',
+      });
+      rawParts.push(sectionRaw);
+      writtenSections.push({
+        h2: section.h2,
+        raw: sectionRaw,
+        markdown: sanitizeBodyText(sectionRaw, sourceUrl),
+      });
+      logEvent({ type: 'sectioned-write-section-complete', h2: section.h2, index });
+    } catch (err) {
+      logError(err, { type: 'sectioned-write-section-error', h2: section.h2, index });
+      throw err;
+    }
+  }
+
+  const markdown = assembleMarkdown({
+    outline,
+    lead,
+    sections: writtenSections,
+    sourceUrl,
+  });
+  const { cleaned, removedCount } = scrubTodoClaims(markdown);
+  if (removedCount > 0) {
+    logEvent({ type: 'todo-claim-warning', removedCount, stage: 'sectioned-write' });
+  }
+
+  const edited = {
+    title: outline.finalTitle,
+    description: outline.description,
+    markdown: cleaned,
+  };
+  logEvent({
+    type: 'sectioned-write-complete',
+    title: edited.title,
+    length: edited.markdown.length,
+  });
+  return { edited, messages, raw: rawParts.join('\n\n---\n\n'), sections: writtenSections };
+}
+
+function systemPrompt(): string {
+  return [
+    guardrails(),
+    'Pisz po polsku w stylu Pseudointelektu: satyryczny, publicystyczny, geopolityczny, z ironią, ale spójny i czytelny.',
+    'Nie ujawniaj rozumowania. Zwracaj wyłącznie gotowy tekst artykułu, bez komentarzy technicznych.',
+  ].join(' ');
+}
+
+function buildLeadPrompt({
+  outline,
+  writeTemplate,
+  styleGuide,
+  contextPack,
+  sourceUrl,
+}: {
+  outline: Outline;
+  writeTemplate: string;
+  styleGuide: string;
+  contextPack: string;
+  sourceUrl: string;
+}): string {
+  return [
+    'Napisz lead do artykułu.',
+    `Tytuł: ${outline.finalTitle}`,
+    `Opis: ${outline.description}`,
+    `Jedyne dozwolone źródło URL w całym artykule: ${sourceUrl}`,
+    'Lead ma mieć 1-2 zwarte akapity, bez nagłówka, bez list i bez dodatkowych URL.',
+    'Nie streszczaj całego planu; ustaw główną tezę i ton.',
+    block('KONTEKST', contextPack),
+    block('STYLE GUIDE', styleGuide),
+    block('INSTRUKCJE OGÓLNE', clamp(writeTemplate, MAX_PROMPT_BLOCK)),
+  ].filter(Boolean).join('\n\n');
+}
+
+function buildSectionPrompt({
+  outline,
+  sectionIndex,
+  writeTemplate,
+  styleGuide,
+  contextPack,
+  prior,
+  paragraphsPerSection,
+}: {
+  outline: Outline;
+  sectionIndex: number;
+  writeTemplate: string;
+  styleGuide: string;
+  contextPack: string;
+  prior: string;
+  paragraphsPerSection: number;
+}): string {
+  const section = outline.sections[sectionIndex];
+  return [
+    'Napisz jedną sekcję artykułu. Nie pisz całego artykułu.',
+    `Tytuł artykułu: ${outline.finalTitle}`,
+    `Sekcja ${sectionIndex + 1}/${outline.sections.length}: ${section.h2}`,
+    `Tezy do rozwinięcia:\n${section.bullets.map(b => `- ${b}`).join('\n')}`,
+    `Napisz ${paragraphsPerSection} akapity po 4-6 zdań każdy.`,
+    'Nie dodawaj nagłówka sekcji; nagłówek zostanie dodany przez system.',
+    'Nie dodawaj żadnych URL, przypisów ani list wypunktowanych.',
+    'Trzymaj jeden wątek i nawiązuj do poprzednich sekcji bez powtarzania tych samych zdań.',
+    block('DOTYCHCZAS NAPISANE', prior),
+    block('KONTEKST', contextPack),
+    block('STYLE GUIDE', styleGuide),
+    block('INSTRUKCJE OGÓLNE', clamp(writeTemplate, MAX_PROMPT_BLOCK)),
+  ].filter(Boolean).join('\n\n');
+}
+
+function assembleMarkdown({
+  outline,
+  lead,
+  sections,
+  sourceUrl,
+}: {
+  outline: Outline;
+  lead: string;
+  sections: { h2: string; markdown: string }[];
+  sourceUrl: string;
+}): string {
+  const leadWithSource = `${withoutTrailingPunctuation(lead)}. Źródło tematu: ${sourceUrl}`;
+  return [
+    `# ${outline.finalTitle}`,
+    outline.description,
+    leadWithSource,
+    ...sections.flatMap(section => [`## ${section.h2}`, section.markdown]),
+  ]
+    .map(part => part.trim())
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+function sanitizeBodyText(text: string, allowedUrl: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/```[\s\S]*?```/g, block => block.replace(/```[a-z]*|```/gi, ''))
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !/^#{1,6}\s+/.test(line))
+    .map(line => line.replace(/^\s*[-*]\s+/, ''))
+    .join('\n\n')
+    .replace(/https?:\/\/\S+/gi, match => (match === allowedUrl ? match : ''))
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function leadSourceUrlFromContext(contextPack: string): string | undefined {
+  try {
+    const parsed = JSON.parse(contextPack);
+    return typeof parsed.leadSourceUrl === 'string' ? parsed.leadSourceUrl : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function block(label: string, value: string): string {
+  const trimmed = value.trim();
+  return trimmed ? `${label}:\n${trimmed}` : '';
+}
+
+function clamp(value: string, max: number): string {
+  return value.length > max ? value.slice(0, max) : value;
+}
+
+function withoutTrailingPunctuation(value: string): string {
+  return value.trim().replace(/[.!?…]+$/u, '');
+}
