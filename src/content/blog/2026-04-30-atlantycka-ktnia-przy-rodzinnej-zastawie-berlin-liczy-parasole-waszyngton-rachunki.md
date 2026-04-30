@@ -1,6 +1,6 @@
 ---
 title: "Atlantycka kłótnia przy rodzinnej zastawie: Berlin liczy parasole, Waszyngton rachunki"
-description: "Konspekt satyry o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki."
+description: "Satyra o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki."
 pubDate: "2026-04-30"
 heroImage: "/blog-images/2026-04-30-atlantycka-ktnia-przy-rodzinnej-zastawie-berlin-liczy-parasole-waszyngton-rachunki.png"
 views: 0
@@ -9,9 +9,9 @@ likes: 0
 
 # Atlantycka kłótnia przy rodzinnej zastawie: Berlin liczy parasole, Waszyngton rachunki
 
-Konspekt satyry o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki.
+Satyra o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki.
 
-Konspekt satyry o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki. Źródło tematu: https://www.bbc.com/news/articles/clyplg23l30o?at_medium=RSS&at_campaign=rss
+Satyra o transatlantyckim rachunku za bezpieczeństwo: Berlin liczy parasole, USA faktury, a Polska pilnuje wschodniej flanki. Źródło tematu: https://www.bbc.com/news/articles/clyplg23l30o?at_medium=RSS&at_campaign=rss
 
 ## Parasol z metką
 
