@@ -4,51 +4,118 @@ interface NavProps {
     next?: { id: string; data: { title: string } };
 }
 const { prev, next } = Astro.props as NavProps;
-const truncate = (title: string, len = 50) =>
-    title.length > len ? title.slice(0, len) + '…' : title;
 ---
-<nav class="post-nav">
+<nav class="post-nav" aria-label="Sąsiednie artykuły">
     {prev && (
         <a href={`/blog/${prev.id}/`} class="prev">
-            <span class="arrow" aria-hidden="true">←</span>
-            <span class="title">{truncate(prev.data.title)}</span>
+            <span class="direction">
+                <span class="arrow" aria-hidden="true">←</span>
+                <span>Poprzedni tekst</span>
+            </span>
+            <span class="title">{prev.data.title}</span>
         </a>
     )}
     {next && (
         <a href={`/blog/${next.id}/`} class="next">
-            <span class="title">{truncate(next.data.title)}</span>
-            <span class="arrow" aria-hidden="true">→</span>
+            <span class="direction">
+                <span>Następny tekst</span>
+                <span class="arrow" aria-hidden="true">→</span>
+            </span>
+            <span class="title">{next.data.title}</span>
         </a>
     )}
 </nav>
 <style>
 .post-nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 1em;
-    margin: 2em 0;
-    padding: 0 1em;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    width: min(100%, 640px);
+    margin: 3rem auto 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(var(--gray-dark), 0.18);
 }
 .post-nav a {
-    color: var(--accent);
+    min-height: 8rem;
+    color: rgb(var(--gray-dark));
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    padding: 0.25em 0;
-    flex: 1 1 45%;
+    display: grid;
+    align-content: space-between;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid rgba(var(--gray-dark), 0.2);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(var(--gray-light), 0.84)),
+        var(--ivory);
+    box-shadow: 0 10px 24px rgba(var(--gray-dark), 0.08);
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+}
+.post-nav a:hover,
+.post-nav a:focus-visible {
+    color: rgb(var(--gray-dark));
+    border-color: rgba(203, 161, 53, 0.76);
+    box-shadow: 0 14px 30px rgba(var(--gray-dark), 0.14);
+    transform: translateY(-2px);
+}
+.post-nav a:focus-visible {
+    outline: 3px solid rgba(203, 161, 53, 0.35);
+    outline-offset: 3px;
 }
 .post-nav a.next {
-    justify-content: flex-end;
     text-align: right;
 }
+.post-nav .direction {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: rgba(var(--gray-dark), 0.72);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+.post-nav a.next .direction {
+    justify-content: flex-end;
+}
 .post-nav .arrow {
-    font-size: 1.2em;
+    display: inline-grid;
+    place-items: center;
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 999px;
+    background: rgba(203, 161, 53, 0.18);
+    color: var(--accent-dark);
+    font-size: 1rem;
+    line-height: 1;
 }
 .post-nav .title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: block;
+    color: rgb(var(--black));
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
+
+@media (max-width: 640px) {
+    .post-nav {
+        grid-template-columns: 1fr;
+        width: 100%;
+        margin-top: 2.25rem;
+    }
+    .post-nav a {
+        min-height: 0;
+    }
+    .post-nav a.next {
+        text-align: left;
+    }
+    .post-nav a.next .direction {
+        justify-content: flex-start;
+    }
 }
 </style>
