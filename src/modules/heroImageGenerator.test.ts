@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateHeroImage } from './heroImageGenerator.js';
 
-test('generateHeroImage uses GPT Image model without DALL-E style parameter', async () => {
+test('generateHeroImage uses low-cost GPT Image model without DALL-E style parameter', async () => {
   const original = globalThis.fetch;
   let body: any;
   globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -17,14 +17,14 @@ test('generateHeroImage uses GPT Image model without DALL-E style parameter', as
     const image = await generateHeroImage({
       apiKey: 'k',
       prompt: 'prompt',
-      model: 'gpt-image-1.5',
-      quality: 'medium',
+      model: 'gpt-image-1-mini',
+      quality: 'low',
       style: 'vivid',
     });
 
     assert.equal(image.toString(), 'image');
-    assert.equal(body.model, 'gpt-image-1.5');
-    assert.equal(body.quality, 'medium');
+    assert.equal(body.model, 'gpt-image-1-mini');
+    assert.equal(body.quality, 'low');
     assert.equal(body.style, undefined);
   } finally {
     globalThis.fetch = original;

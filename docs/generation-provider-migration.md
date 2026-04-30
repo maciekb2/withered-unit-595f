@@ -14,8 +14,10 @@ Tekst jest generowany przez `src/pipeline/openai.ts`, które woła OpenAI Chat C
 - `repairEdited`
 - starsze ścieżki `generateDraft` / `editDraft`
 
-Obrazki hero są generowane przez `src/modules/heroImageGenerator.ts` i obecnie mają zaszyty model `dall-e-3`. `wrangler.json` konfiguruje tylko:
+Obrazki hero są generowane przez `src/modules/heroImageGenerator.ts`, a model i koszt jakości są teraz konfigurowalne przez:
 
+- `OPENAI_IMAGE_MODEL`
+- `OPENAI_IMAGE_SIZE`
 - `OPENAI_IMAGE_STYLE`
 - `OPENAI_IMAGE_QUALITY`
 
@@ -67,6 +69,7 @@ Adapter tekstu jest spięty przez `textGenerationProviderFromEnv(env)` w `src/pi
 - Domyślny provider to OpenAI, więc aktualna produkcja nie zmienia zachowania.
 - Provider `jetson` wysyła request na `/api/generate` z bearer tokenem i timeoutem.
 - Jeśli `TEXT_GENERATION_FALLBACK=openai`, błąd gatewaya przełącza pojedyncze wywołanie na OpenAI.
+- `TEXT_GENERATION_FALLBACK_MODEL` wybiera model używany po awarii Jetsona; obecny tymczasowy fallback to `gpt-5.5`.
 - Jeśli `TEXT_GENERATION_FALLBACK=none`, błąd gatewaya przerywa generowanie.
 - Logi zapisują provider, model, status i host gatewaya, ale nie zapisują tokenów.
 
@@ -105,9 +108,9 @@ Obrazki powinny dostać jawny model w konfiguracji:
 
 Domyślny styl powinien być spójny dla całej strony: satyryczna ilustracja geopolityczna, redakcyjna, bez fotorealizmu udającego zdjęcie, bez tekstu na obrazie, z czytelną kompozycją pod kadr hero.
 
-Implementacja zostawia obrazy w OpenAI API i ustawia domyślnie `OPENAI_IMAGE_MODEL=gpt-image-1.5`. Dla kosztów można zejść do `gpt-image-1-mini`, a dla kompatybilności można wrócić do `dall-e-3`.
+Implementacja zostawia obrazy w OpenAI API i ustawia domyślnie tani model `OPENAI_IMAGE_MODEL=gpt-image-1-mini` z `OPENAI_IMAGE_QUALITY=low`. Styl jest trzymany w promptcie, a nie w legacy parametrze DALL-E. Dla jakości można podnieść model do `gpt-image-1.5` albo jakość do `medium`.
 
-Migracja modelu obrazów powinna być osobnym commitem po adapterze tekstu, bo dotyka innego API, kosztów i jakości wizualnej.
+OpenAI docs wskazują `gpt-image-1-mini` jako kosztową wersję GPT Image, więc to jest preferowany fallback kosztowy zamiast wracania do legacy DALL-E.
 
 ## Blokery przed przełączeniem
 

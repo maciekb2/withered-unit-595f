@@ -22,6 +22,7 @@ interface Env {
         OPENAI_IMAGE_QUALITY: string;
         TEXT_GENERATION_PROVIDER?: string;
         TEXT_GENERATION_FALLBACK?: string;
+        TEXT_GENERATION_FALLBACK_MODEL?: string;
         TEXT_ARTICLE_PIPELINE?: string;
         TEXT_SECTION_PARAGRAPHS?: string;
         TEXT_SECTION_MAX_TOKENS?: string;

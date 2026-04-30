@@ -296,10 +296,10 @@ export async function generateAndPublish(
     const heroImage = await generateHeroImage({
       apiKey: env.OPENAI_API_KEY,
       prompt: heroPrompt,
-      model: env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5',
+      model: env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini',
       size: (env.OPENAI_IMAGE_SIZE as any) || '1024x1024',
       style: (env.OPENAI_IMAGE_STYLE as any) || 'vivid',
-      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'medium',
+      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'low',
     });
 
     send('📦 Publikuję na GitHubie...');

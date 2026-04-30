@@ -48,13 +48,15 @@ test('chat sends Jetson requests with bearer token and thinking disabled', async
 test('chat falls back from Jetson to OpenAI when fallback is enabled', async () => {
   const original = globalThis.fetch;
   const urls: string[] = [];
+  let openAiBody: any;
 
-  globalThis.fetch = (async (input: RequestInfo | URL) => {
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     urls.push(url);
     if (url.includes('jetson.example.test')) {
       return new Response('gateway unavailable', { status: 418 });
     }
+    openAiBody = JSON.parse(String(init?.body));
     return new Response(
       JSON.stringify({ choices: [{ message: { content: 'tekst z openai' } }] }),
       {
@@ -74,10 +76,12 @@ test('chat falls back from Jetson to OpenAI when fallback is enabled', async () 
         gatewayUrl: 'https://jetson.example.test',
         token: 'jetson-token',
         fallback: 'openai',
+        fallbackModel: 'gpt-5.5',
       },
     });
 
     assert.equal(result, 'tekst z openai');
+    assert.equal(openAiBody.model, 'gpt-5.5');
     assert.deepEqual(urls, [
       'https://jetson.example.test/api/generate',
       'https://api.openai.com/v1/chat/completions',
@@ -98,6 +102,7 @@ test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config w
     JETSON_GATEWAY_MODEL: 'qwen3:4b',
     JETSON_GATEWAY_TIMEOUT_MS: '5000',
     JETSON_GATEWAY_DISABLE_THINKING: 'false',
+    TEXT_GENERATION_FALLBACK_MODEL: 'gpt-5.5',
   } as Env);
 
   assert.deepEqual(provider, {
@@ -108,6 +113,7 @@ test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config w
     timeoutMs: 5000,
     disableThinking: false,
     fallback: 'none',
+    fallbackModel: 'gpt-5.5',
     accessClientId: undefined,
     accessClientSecret: undefined,
   });

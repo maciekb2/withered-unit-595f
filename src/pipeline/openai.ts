@@ -28,6 +28,7 @@ export type TextGenerationProvider =
       timeoutMs?: number;
       disableThinking?: boolean;
       fallback?: 'openai' | 'none';
+      fallbackModel?: string;
       accessClientId?: string;
       accessClientSecret?: string;
     };
@@ -45,6 +46,7 @@ export function textGenerationProviderFromEnv(env: Env): TextGenerationProvider 
     timeoutMs: Number.parseInt(env.JETSON_GATEWAY_TIMEOUT_MS || '', 10) || 120000,
     disableThinking: env.JETSON_GATEWAY_DISABLE_THINKING !== 'false',
     fallback: env.TEXT_GENERATION_FALLBACK === 'none' ? 'none' : 'openai',
+    fallbackModel: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
     accessClientId: env.JETSON_ACCESS_CLIENT_ID,
     accessClientSecret: env.JETSON_ACCESS_CLIENT_SECRET,
   };
@@ -83,7 +85,10 @@ export async function chat(
     } catch (err) {
       logError(err, { type: 'jetson-error', fallback: provider.fallback || 'openai' });
       if (provider.fallback !== 'none') {
-        logEvent({ type: 'text-provider-fallback', from: 'jetson', to: 'openai' });
+        if (provider.fallbackModel) {
+          model = provider.fallbackModel;
+        }
+        logEvent({ type: 'text-provider-fallback', from: 'jetson', to: 'openai', model });
       } else {
         throw err;
       }

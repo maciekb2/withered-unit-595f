@@ -22,10 +22,10 @@ export interface GenerateHeroOptions {
 export async function generateHeroImage({
   apiKey,
   prompt,
-  model = 'gpt-image-1.5',
+  model = 'gpt-image-1-mini',
   size = '1024x1024',
   style = 'vivid',
-  quality = 'medium',
+  quality = 'low',
 }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
   logEvent({ type: 'openai-image-request', model, size, quality, promptSnippet: prompt.slice(0, 100) });
