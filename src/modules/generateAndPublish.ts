@@ -14,6 +14,7 @@ import { writeArticle } from '../pipeline/write';
 import { writeArticleSectioned } from '../pipeline/sectionedWrite';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
+import { validateArticleQuality } from '../pipeline/validators/quality';
 import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
 import { textGenerationProviderFromEnv } from '../pipeline/openai';
@@ -356,6 +357,24 @@ export async function generateAndPublish(
     }
 
     const article = formatFinal(edited);
+    setStage('quality-check');
+    const quality = validateArticleQuality(article, outline);
+    send('quality-check', {
+      ok: quality.ok,
+      errors: quality.errors,
+      warnings: quality.warnings,
+      stats: quality.stats,
+    });
+    if (!quality.ok) {
+      throw new Error(`Quality validation failed: ${quality.errors.join('; ')}`);
+    }
+    if (quality.warnings.length > 0) {
+      send('⚠️ Ostrzeżenia jakości', {
+        warnings: quality.warnings,
+        stats: quality.stats,
+      });
+    }
+
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
     const heroPrompt = heroTemplate.replace('{title}', article.title);

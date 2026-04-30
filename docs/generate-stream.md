@@ -65,4 +65,5 @@ Najczęściej zobaczysz kolejno:
 - `write-*` – one-shot generacja finalnej treści (JSON `{ markdown, title, description }`),
 - `sectioned-write-*` – sekcyjne generowanie artykułu, używane automatycznie dla Jetsona albo po wymuszeniu `TEXT_ARTICLE_PIPELINE=sectioned`,
 - `repair-*` – pojawia się tylko, gdy walidacja wykryje błąd (max 2 próby),
+- `quality-check` – deterministyczna kontrola jakości przed obrazem i PR-em: długość, liczba sekcji, duplikaty akapitów i podobieństwo H2 do tytułu,
 - publikacja na GitHub + link do PR.
