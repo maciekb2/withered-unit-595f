@@ -28,7 +28,7 @@ Gateway Jetsona powinien być traktowany jako osobny provider tekstu, a OpenAI p
 Planowane zmienne:
 
 - `TEXT_GENERATION_PROVIDER`: `openai` albo `jetson`
-- `JETSON_GATEWAY_URL`: publiczny URL gatewaya, np. domena wystawiona przez Cloudflare
+- `JETSON_GATEWAY_URL`: publiczny URL gatewaya przez domenę Cloudflare, obecnie `https://jetson.senara-system.xyz`; nie używać prywatnego adresu ani lokalnego WARP jako produkcyjnego endpointu Workera
 - `JETSON_GATEWAY_TOKEN`: sekret Workera, nigdy wpisywany do repo
 - `JETSON_GATEWAY_MODEL`: domyślnie model zweryfikowany na gatewayu
 - `JETSON_GATEWAY_TIMEOUT_MS`: twardy timeout na jeden request
@@ -36,7 +36,7 @@ Planowane zmienne:
 
 Oczekiwany transport do zweryfikowania przed przełączeniem produkcji:
 
-- endpoint gatewaya: `/api/generate`
+- endpoint gatewaya: `/api/generate` pod domeną `https://jetson.senara-system.xyz`
 - autoryzacja: `Authorization: Bearer <JETSON_GATEWAY_TOKEN>`
 - Cloudflare Access/service headers, jeśli gateway wymaga ich oprócz bearer tokenu
 - payload zawiera `model`, `messages`, limit tokenów i opcjonalny wymóg JSON
@@ -116,7 +116,7 @@ OpenAI docs wskazują `gpt-image-1-mini` jako kosztową wersję GPT Image, więc
 
 Na tym etapie trzeba jeszcze odświeżyć live informacje o gatewayu Jetsona. Podczas rozpoczęcia migracji WARP był połączony, ale SSH do `jetson-home` (`192.168.1.41:22`) zakończył się timeoutem. Przed implementacją przełączenia tekstu trzeba sprawdzić:
 
-- aktywny publiczny URL gatewaya;
+- aktywny publiczny URL gatewaya przez domenę `https://jetson.senara-system.xyz`, nie prywatny adres WARP;
 - aktualny domyślny model;
 - dokładny payload `/api/generate`;
 - wymagane nagłówki do wyłączenia widocznego rozumowania;
