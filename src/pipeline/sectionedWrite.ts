@@ -151,7 +151,6 @@ function systemPrompt(): string {
 
 function buildLeadPrompt({
   outline,
-  writeTemplate,
   styleGuide,
   contextPack,
   sourceUrl,
@@ -169,16 +168,15 @@ function buildLeadPrompt({
     `Jedyne dozwolone źródło URL w całym artykule: ${sourceUrl}`,
     'Lead ma mieć 1-2 zwarte akapity, bez nagłówka, bez list i bez dodatkowych URL.',
     'Nie streszczaj całego planu; ustaw główną tezę i ton.',
+    'Zwróć wyłącznie gotowy lead po polsku. Bez JSON, bez komentarza, bez analizy i bez markdown fences.',
     block('KONTEKST', contextPack),
     block('STYLE GUIDE', styleGuide),
-    block('INSTRUKCJE OGÓLNE', clamp(writeTemplate, MAX_PROMPT_BLOCK)),
   ].filter(Boolean).join('\n\n');
 }
 
 function buildSectionPrompt({
   outline,
   sectionIndex,
-  writeTemplate,
   styleGuide,
   contextPack,
   prior,
@@ -202,10 +200,10 @@ function buildSectionPrompt({
     'Nie dodawaj nagłówka sekcji; nagłówek zostanie dodany przez system.',
     'Nie dodawaj żadnych URL, przypisów ani list wypunktowanych.',
     'Trzymaj jeden wątek i nawiązuj do poprzednich sekcji bez powtarzania tych samych zdań.',
+    'Zwróć wyłącznie gotowe akapity po polsku. Bez JSON, bez komentarza, bez analizy i bez markdown fences.',
     block('DOTYCHCZAS NAPISANE', prior),
     block('KONTEKST', contextPack),
     block('STYLE GUIDE', styleGuide),
-    block('INSTRUKCJE OGÓLNE', clamp(writeTemplate, MAX_PROMPT_BLOCK)),
   ].filter(Boolean).join('\n\n');
 }
 
@@ -220,7 +218,8 @@ function assembleMarkdown({
   sections: { h2: string; markdown: string }[];
   sourceUrl: string;
 }): string {
-  const leadWithSource = `${withoutTrailingPunctuation(lead)}. Źródło tematu: ${sourceUrl}`;
+  const leadText = lead || outline.description;
+  const leadWithSource = `${withoutTrailingPunctuation(leadText)}. Źródło tematu: ${sourceUrl}`;
   return [
     `# ${outline.finalTitle}`,
     outline.description,
@@ -233,7 +232,7 @@ function assembleMarkdown({
 }
 
 function sanitizeBodyText(text: string, allowedUrl: string): string {
-  return stripMetaPreamble(jsonMarkdownOrText(text))
+  const cleaned = stripMetaPreamble(jsonMarkdownOrText(text))
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/```[\s\S]*?```/g, block => block.replace(/```[a-z]*|```/gi, ''))
     .split('\n')
@@ -244,6 +243,7 @@ function sanitizeBodyText(text: string, allowedUrl: string): string {
     .replace(/https?:\/\/\S+/gi, match => (match === allowedUrl ? match : ''))
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+  return removeMetaParagraphs(cleaned);
 }
 
 function jsonMarkdownOrText(text: string): string {
@@ -279,7 +279,34 @@ function stripMetaPreamble(text: string): string {
 }
 
 function isLikelyModelMetaLine(line: string): boolean {
-  return /^(okay|let'?s|we need|i need|the user|this query|i should|need to|first,|next,|then,|finally,)/i.test(line);
+  return /^(okay|let'?s|we need|i need|the user|this query|i should|need to|first,|next,|then,|finally,|wait,|so,)/i.test(line);
+}
+
+function removeMetaParagraphs(text: string): string {
+  return text
+    .split(/\n{2,}/)
+    .map(part => part.trim())
+    .filter(part => part && !isLikelyMetaParagraph(part))
+    .join('\n\n')
+    .trim();
+}
+
+function isLikelyMetaParagraph(paragraph: string): boolean {
+  const lower = paragraph.toLowerCase();
+  if (/^(okay|wait|so,|the user|the key points|i need|let'?s|first,|but the user|the response)/i.test(paragraph)) {
+    return true;
+  }
+  const englishMetaHits = [
+    'json',
+    'response_style',
+    'format wyjściowy',
+    'the user',
+    'the lead',
+    'the article',
+    'guardrails',
+    'markdown fences',
+  ].filter(token => lower.includes(token)).length;
+  return englishMetaHits >= 2;
 }
 
 function leadSourceUrlFromContext(contextPack: string): string | undefined {
