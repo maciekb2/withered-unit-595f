@@ -22,6 +22,7 @@ export interface CloudflareAccessResult {
 const GENERATION_PATHS = new Set([
   '/generuj',
   '/generuj.html',
+  '/api/access-status',
   '/api/generate-stream',
   '/api/update-prompt',
   '/api/get-prompt',

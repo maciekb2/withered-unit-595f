@@ -31,6 +31,8 @@ endpoint `POST /api/update-prompt` w formacie `{ "topic": "wybrany temat" }`.
 
 W katalogu `public/` dodano dashboard, który łączy się z powyższym strumieniem, pokazuje konfigurację uruchomienia, oś etapów, log streamu, wybór tematu, konspekt/walidację oraz prompt/odpowiedź modelu. Użytkownik wybiera temat spośród propozycji lub wpisuje własny i potwierdza przyciskiem.
 
+Dashboard przed uruchomieniem `EventSource` sprawdza `GET /api/access-status`. Jeśli Cloudflare Access wymaga osobnej sesji dla `/api/*`, panel pokazuje przycisk autoryzacji API zamiast zgłaszać ogólny błąd połączenia SSE.
+
 ```
 const es = new EventSource('/api/generate-stream');
 es.onmessage = (e) => {

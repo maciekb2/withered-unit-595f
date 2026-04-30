@@ -20,6 +20,7 @@ function env(overrides: Partial<Env> = {}): Env {
 test('isGenerationPath matches only protected generation routes', () => {
   assert.equal(isGenerationPath('/generuj'), true);
   assert.equal(isGenerationPath('/generuj.html'), true);
+  assert.equal(isGenerationPath('/api/access-status'), true);
   assert.equal(isGenerationPath('/api/generate-stream'), true);
   assert.equal(isGenerationPath('/api/get-prompt'), true);
   assert.equal(isGenerationPath('/api/contact'), false);
