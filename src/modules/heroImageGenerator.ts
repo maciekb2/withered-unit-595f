@@ -1,6 +1,18 @@
 import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
 
+const PSEUDOINTELEKT_HERO_STYLE_LOCK = `
+
+STALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO:
+- zachowaj wyglad jak we wczesniejszych obrazkach generowanych przez DALL-E 3 w trybie vivid;
+- satyryczna, redakcyjna ilustracja geopolityczna, nie fotografia i nie render 3D;
+- komiksowo-publicystyczny charakter, wyrazny glowny motyw, dynamiczny kadr 1:1;
+- zywe nasycone kolory, wysoki kontrast, lekko przerysowane postacie, symbole panstwowe i instytucjonalne;
+- subtelna tekstura druku, ostre kontury, plakatowy charakter, energia komentarza politycznego;
+- bez tekstu, napisow, logo, znakow wodnych, podpisow, UI, ramek i realistycznych twarzy konkretnych osob;
+- obraz ma byc czytelny jako hero bloga po przycieciu i w miniaturze.
+`.trim();
+
 export interface GenerateHeroOptions {
   apiKey: string;
   prompt: string;
@@ -28,11 +40,12 @@ export async function generateHeroImage({
   quality = 'low',
 }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
-  logEvent({ type: 'openai-image-request', model, size, quality, promptSnippet: prompt.slice(0, 100) });
+  const finalPrompt = withPseudointelektHeroStyle(prompt);
+  logEvent({ type: 'openai-image-request', model, size, quality, promptSnippet: finalPrompt.slice(0, 100) });
   try {
     const body: Record<string, unknown> = {
       model,
-      prompt,
+      prompt: finalPrompt,
       n: 1,
       size,
       response_format: 'b64_json',
@@ -77,4 +90,11 @@ export async function generateHeroImage({
     logError(err, { type: 'generate-hero-error' });
     throw err;
   }
+}
+
+function withPseudointelektHeroStyle(prompt: string): string {
+  if (prompt.includes('STALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO')) {
+    return prompt;
+  }
+  return `${prompt.trim()}\n\n${PSEUDOINTELEKT_HERO_STYLE_LOCK}`;
 }
