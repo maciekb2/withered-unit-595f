@@ -1,4 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
+import { createOpenAIRequestError } from '../utils/openaiErrors';
 import { retryFetch } from '../utils/retryFetch';
 
 export interface ChatMessage {
@@ -114,7 +115,8 @@ export async function chat(
         messages: finalMessages,
       };
       if (response_format) body.response_format = response_format;
-      const res = await retryFetch('https://api.openai.com/v1/chat/completions', {
+      const endpoint = 'https://api.openai.com/v1/chat/completions';
+      const res = await retryFetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +129,7 @@ export async function chat(
       logEvent({ type: 'openai-response-status', status: res.status });
       if (!res.ok) {
         const msg = await res.text();
-        throw new Error(`OpenAI request failed: ${res.status} ${msg}`);
+        throw createOpenAIRequestError(endpoint, res.status, msg);
       }
       const data: any = await res.json();
       logEvent({ type: 'openai-response-received' });

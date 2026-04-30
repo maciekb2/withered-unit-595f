@@ -19,6 +19,7 @@ import { buildContextPack } from '../pipeline/contextPack';
 import { textGenerationProviderFromEnv } from '../pipeline/openai';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
+import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
 
 export interface GenerateAndPublishResult {
   article: FinalJson;
@@ -40,6 +41,7 @@ export async function generateAndPublish(
   promptPromise?: Promise<{ topic: string }>,
   auditContext: GenerationAuditContext = {},
 ): Promise<GenerateAndPublishResult> {
+  let currentStage = 'start';
   const send = (log: string, data: Record<string, unknown> = {}) => {
     if (!controller) return;
     logEvent({
@@ -50,6 +52,10 @@ export async function generateAndPublish(
     });
     const message = JSON.stringify({ log, ...data });
     controller.enqueue(`data: ${message}\n\n`);
+  };
+
+  const setStage = (stage: string) => {
+    currentStage = stage;
   };
 
   const keepAlive = setInterval(() => {
@@ -70,10 +76,12 @@ export async function generateAndPublish(
     const textProvider = textGenerationProviderFromEnv(env);
     const sectionedText = shouldUseSectionedText(env, textProvider);
 
+    setStage('recent-titles');
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
     send('📑 Pobrane tytuły', { recentTitles: recent });
 
+    setStage('hot-topics');
     const hotTopics = await getHotTopics();
     send('🔥 Gorące tematy z ostatnich dni', {
       hotTopics: hotTopics.map(t => t.title),
@@ -87,6 +95,7 @@ export async function generateAndPublish(
     let baseTopic = hotTopics[0]?.title || 'Aktualny temat';
 
     if (promptPromise) {
+      setStage('suggest-topic');
       send('suggest-topic-start');
       send('🧠 Generuję propozycje tematów przy użyciu OpenAI...');
       let sugRes;
@@ -125,6 +134,7 @@ export async function generateAndPublish(
       });
     } else {
       try {
+        setStage('auto-topic');
         logEvent({ type: 'auto-topic-suggest-start' });
         const sugRes = await suggestArticleTopic(
           hotTopics,
@@ -164,6 +174,7 @@ export async function generateAndPublish(
       : { title: baseTopic, url: leadSourceUrl };
     const contextPack = buildContextPack({ selectedTopic, hotTopics });
 
+    setStage('outline');
     send('outline-start', { baseTopic, hasTopicContext: Boolean(matchedTopic?.description) });
     let outlineRes;
     try {
@@ -180,6 +191,7 @@ export async function generateAndPublish(
     } catch (err) {
       send('outline-error', {
         error: (err as Error).message,
+        ...errorTelemetry(err, currentStage),
         prompt: (err as any).messages,
         response: (err as any).raw,
         debug: (err as any).debug,
@@ -189,6 +201,7 @@ export async function generateAndPublish(
     const outline = outlineRes.outline;
     send('outline-end', { outline });
 
+    setStage(sectionedText ? 'sectioned-write' : 'write');
     send(sectionedText ? 'sectioned-write-start' : 'write-start');
     let writeRes;
     try {
@@ -220,6 +233,7 @@ export async function generateAndPublish(
     } catch (err) {
       send('write-error', {
         error: (err as Error).message,
+        ...errorTelemetry(err, currentStage),
         prompt: (err as any).messages,
         response: (err as any).raw,
       });
@@ -228,6 +242,7 @@ export async function generateAndPublish(
     let edited = writeRes.edited;
     send('write-end', { title: edited.title });
 
+    setStage('content-validation');
     const validation = validateAntiHallucination(edited.markdown, outline);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));
     if (warns.length) {
@@ -242,6 +257,7 @@ export async function generateAndPublish(
 
       let fixed = false;
       for (let attempt = 1; attempt <= 2; attempt++) {
+        setStage(`repair-${attempt}`);
         send('repair-start', { attempt, errors: errs });
         let repairRes;
         try {
@@ -263,6 +279,7 @@ export async function generateAndPublish(
           send('repair-error', {
             attempt,
             error: (err as Error).message,
+            ...errorTelemetry(err, currentStage),
             prompt: (err as any).messages,
             response: (err as any).raw,
           });
@@ -292,6 +309,7 @@ export async function generateAndPublish(
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
     const heroPrompt = heroTemplate.replace('{title}', article.title);
+    setStage('hero-image');
     send('🎨 Tworzę obrazek do artykułu...', { heroPrompt });
     const heroImage = await generateHeroImage({
       apiKey: env.OPENAI_API_KEY,
@@ -302,10 +320,12 @@ export async function generateAndPublish(
       quality: (env.OPENAI_IMAGE_QUALITY as any) || 'low',
     });
 
+    setStage('github-publish');
     send('📦 Publikuję na GitHubie...');
     const prUrl = await publishArticleToGitHub({ env, article, heroImage });
 
     const snippet = article.content.slice(0, 300);
+    setStage('success-slack');
     await sendSlackMessage(
       env.SLACK_WEBHOOK_URL,
       `Nowy artykuł: ${article.title}\n${snippet}...\n${prUrl}`
@@ -327,16 +347,72 @@ export async function generateAndPublish(
 
     return { article, slug };
   } catch (err) {
+    const classified = classifyGenerationError(err);
     logError(err, {
       type: 'generation-error',
+      stage: currentStage,
+      errorCode: classified.code,
+      errorTitle: classified.title,
+      provider: classified.provider,
+      retryable: classified.retryable,
+      status: classified.status,
+      openAIErrorCode: classified.openAIErrorCode,
+      openAIErrorType: classified.openAIErrorType,
       ...auditContext,
     });
-    send(`❌ Błąd: ${(err as Error).message}`);
+    send(`❌ ${classified.title}: ${classified.message}`, {
+      failed: true,
+      stage: currentStage,
+      ...errorTelemetry(err, currentStage, classified),
+    });
+    if (classified.code === 'OPENAI_BILLING_QUOTA_EXCEEDED') {
+      await notifyOpenAIBillingFailure(env, classified, currentStage, auditContext);
+    }
     throw err;
   } finally {
     clearInterval(keepAlive);
     controller?.close();
   }
+}
+
+function errorTelemetry(
+  error: unknown,
+  stage: string,
+  classified: ClassifiedGenerationError = classifyGenerationError(error),
+): Record<string, unknown> {
+  return {
+    errorCode: classified.code,
+    errorTitle: classified.title,
+    errorMessage: classified.message,
+    stage,
+    retryable: classified.retryable,
+    status: classified.status,
+    provider: classified.provider,
+    openAIErrorCode: classified.openAIErrorCode,
+    openAIErrorType: classified.openAIErrorType,
+  };
+}
+
+async function notifyOpenAIBillingFailure(
+  env: Env,
+  classified: ClassifiedGenerationError,
+  stage: string,
+  auditContext: GenerationAuditContext,
+): Promise<void> {
+  const lines = [
+    '🚨 Pseudointelekt: generowanie zatrzymane przez billing OpenAI',
+    `Kod: ${classified.code}`,
+    `Etap: ${stage}`,
+    `Opis: ${classified.message}`,
+  ];
+
+  if (classified.status) lines.push(`HTTP status: ${classified.status}`);
+  if (classified.openAIErrorCode) lines.push(`OpenAI code: ${classified.openAIErrorCode}`);
+  if (auditContext.accessEmail) lines.push(`Użytkownik: ${auditContext.accessEmail}`);
+  if (auditContext.source) lines.push(`Źródło: ${auditContext.source}`);
+  if (auditContext.sessionId) lines.push(`Session: ${auditContext.sessionId}`);
+
+  await sendSlackMessage(env.SLACK_WEBHOOK_URL, lines.join('\n'));
 }
 
 function shouldUseSectionedText(env: Env, provider: ReturnType<typeof textGenerationProviderFromEnv>): boolean {

@@ -3,6 +3,7 @@ import cron from './cron-worker';
 import { generateAndPublish } from './modules/generateAndPublish';
 import { createDeferred } from './utils/deferred';
 import { initLogger, logRequest, logEvent, logError } from './utils/logger';
+import { classifyGenerationError } from './utils/openaiErrors';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
 import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
@@ -301,9 +302,13 @@ export default {
         logEvent({ type: 'generate-stream-start', ...accessAuditContext });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
+        let streamClosed = false;
         const ctrl = {
           enqueue: (chunk: string) => writer.write(new TextEncoder().encode(chunk)),
-          close: () => writer.close(),
+          close: () => {
+            streamClosed = true;
+            return writer.close();
+          },
         };
         const deferred = createDeferred<{ topic: string }>();
         pendingPrompts.set(session.id, deferred.resolve);
@@ -314,9 +319,23 @@ export default {
           })
             .catch(err => {
               console.error('Błąd w tle:', err);
-              const msg = JSON.stringify({ log: `❌ KRYTYCZNY BŁĄD: ${err.message}` });
-              ctrl.enqueue(`data: ${msg}\n\n`);
-              ctrl.close();
+              if (!streamClosed) {
+                const classified = classifyGenerationError(err);
+                const msg = JSON.stringify({
+                  log: `❌ ${classified.title}: ${classified.message}`,
+                  failed: true,
+                  errorCode: classified.code,
+                  errorTitle: classified.title,
+                  errorMessage: classified.message,
+                  retryable: classified.retryable,
+                  status: classified.status,
+                  provider: classified.provider,
+                  openAIErrorCode: classified.openAIErrorCode,
+                  openAIErrorType: classified.openAIErrorType,
+                });
+                ctrl.enqueue(`data: ${msg}\n\n`);
+                ctrl.close();
+              }
             })
             .finally(() => pendingPrompts.delete(session.id))
         );

@@ -13,11 +13,14 @@ Odpowiedzią jest strumień `text/event-stream`. Każda wiadomość to obiekt JS
 - `recentTitles` – listę pobranych tytułów;
 - `prompt` / `response` – pełny prompt i odpowiedź z każdego etapu;
 - w razie problemów: `outline-error`, `write-error` lub `repair-error` z polami `error`, `prompt`, `response`;
+- `failed`, `errorCode`, `errorTitle`, `errorMessage`, `stage` – ustrukturyzowany błąd kończący generowanie;
 - `awaitingTopic` – jeśli `true`, skrypt czeka na wybór tematu;
- - `articleTitle` – tytuł wygenerowanego artykułu;
- - `heroPrompt` – prompt użyty do stworzenia obrazka.
+- `articleTitle` – tytuł wygenerowanego artykułu;
+- `heroPrompt` – prompt użyty do stworzenia obrazka.
 
 Po zakończeniu wysyłany jest obiekt `{ done: true, url: '<link do PR>' }`.
+
+Gdy OpenAI zwróci błąd wskazujący na brak środków, limit billingowy albo wyczerpany kredyt, strumień zwraca `errorCode: "OPENAI_BILLING_QUOTA_EXCEEDED"`. Ten przypadek wysyła też osobny alert na Slacka z etapem, kodem błędu i kontekstem Access użytkownika, bez ujawniania sekretów.
 
 Jeśli pojawi się pole `awaitingTopic`, proces czeka na wysłanie wybranego tematu pod
 endpoint `POST /api/update-prompt` w formacie `{ "topic": "wybrany temat" }`.

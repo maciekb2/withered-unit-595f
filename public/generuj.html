@@ -89,6 +89,25 @@ function startStream() {
     if (msg.log) {
       appendLog(msg.log);
     }
+  if (msg.failed) {
+    statusEl.textContent = msg.errorTitle || 'Błąd generowania';
+    const details = [
+      msg.errorCode && `Kod: ${msg.errorCode}`,
+      msg.stage && `Etap: ${msg.stage}`,
+      msg.retryable === false && 'Wymagana interwencja operatora',
+    ].filter(Boolean).join(' | ');
+    if (details) appendLog(details);
+    sendLog('generation-failed', {
+      errorCode: msg.errorCode,
+      errorTitle: msg.errorTitle,
+      errorMessage: msg.errorMessage,
+      stage: msg.stage,
+      retryable: msg.retryable,
+      status: msg.status,
+      provider: msg.provider,
+    });
+    es.close();
+  }
   if (msg.error) {
     appendLog(`❌ Błąd: ${msg.error}`);
   }

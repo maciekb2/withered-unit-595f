@@ -1,4 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
+import { createOpenAIRequestError } from '../utils/openaiErrors';
 import { retryFetch } from '../utils/retryFetch';
 
 const PSEUDOINTELEKT_HERO_STYLE_LOCK = `
@@ -57,7 +58,8 @@ export async function generateHeroImage({
       body.quality = quality === 'hd' || quality === 'standard' ? 'medium' : quality;
     }
 
-    const res = await retryFetch('https://api.openai.com/v1/images/generations', {
+    const endpoint = 'https://api.openai.com/v1/images/generations';
+    const res = await retryFetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ export async function generateHeroImage({
 
     if (!res.ok) {
       const msg = await res.text();
-      throw new Error(`OpenAI image request failed: ${res.status} ${msg}`);
+      throw createOpenAIRequestError(endpoint, res.status, msg);
     }
 
     const data: any = await res.json();
