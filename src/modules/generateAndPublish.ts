@@ -47,10 +47,11 @@ export async function generateAndPublish(
     logEvent({
       type: 'generation-stream-event',
       ...auditContext,
+      stage: currentStage,
       log,
       ...data,
     });
-    const message = JSON.stringify({ log, ...data });
+    const message = JSON.stringify({ stage: currentStage, log, ...data });
     controller.enqueue(`data: ${message}\n\n`);
   };
 
@@ -75,6 +76,24 @@ export async function generateAndPublish(
     const repairModel = env.OPENAI_REPAIR_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const textProvider = textGenerationProviderFromEnv(env);
     const sectionedText = shouldUseSectionedText(env, textProvider);
+    send('generation-config', {
+      generationConfig: {
+        runMode: promptPromise ? 'manual' : 'auto',
+        textProvider: textProvider.type,
+        textProviderLabel: describeTextProvider(textProvider),
+        textFallback: textProvider.type === 'jetson' ? (textProvider.fallback || 'openai') : undefined,
+        topicModel,
+        outlineModel,
+        writeModel,
+        repairModel,
+        textPipeline: sectionedText ? 'sectioned' : 'one-shot',
+        paragraphsPerSection: Number.parseInt(env.TEXT_SECTION_PARAGRAPHS || '', 10) || 3,
+        sectionMaxTokens: Number.parseInt(env.TEXT_SECTION_MAX_TOKENS || '', 10) || 1800,
+        imageModel: env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini',
+        imageSize: env.OPENAI_IMAGE_SIZE || '1024x1024',
+        imageQuality: env.OPENAI_IMAGE_QUALITY || 'low',
+      },
+    });
 
     setStage('recent-titles');
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
@@ -97,7 +116,7 @@ export async function generateAndPublish(
     if (promptPromise) {
       setStage('suggest-topic');
       send('suggest-topic-start');
-      send('🧠 Generuję propozycje tematów przy użyciu OpenAI...');
+      send(`🧠 Generuję propozycje tematów: ${describeTextProvider(textProvider)}...`);
       let sugRes;
       try {
         sugRes = await suggestArticleTopic(
@@ -420,4 +439,11 @@ function shouldUseSectionedText(env: Env, provider: ReturnType<typeof textGenera
   if (mode === 'sectioned') return true;
   if (mode === 'one-shot') return false;
   return provider.type === 'jetson';
+}
+
+function describeTextProvider(provider: ReturnType<typeof textGenerationProviderFromEnv>): string {
+  if (provider.type === 'jetson') {
+    return `Jetson (${provider.model || 'model domyślny'})`;
+  }
+  return 'OpenAI';
 }

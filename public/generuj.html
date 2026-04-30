@@ -2,54 +2,585 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Generowanie artykułu</title>
 <style>
-body { font-family: sans-serif; padding: 2rem; }
-#log {
-  white-space: pre-wrap;
-  background: #f4f4f4;
-  padding: 1rem;
-  border-radius: 4px;
-  max-height: 60vh;
-  overflow-y: auto;
-  margin-top: 1em;
+:root {
+  --royal-green: #014421;
+  --diplomatic-blue: #1c3d5a;
+  --gold-accent: #cba135;
+  --ivory: #f8f6f1;
+  --charcoal: #2d2d2d;
+  --dusty-beige: #e5d8c3;
+  --muted-blue: #6d8395;
+  --line: rgba(28, 61, 90, 0.16);
+  --shadow: 0 18px 48px rgba(28, 61, 90, 0.12);
 }
-#panel {
-  margin-bottom: 1em;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 4px;
-  background: #fafafa;
-}
-#footer {
-  margin-top: 2em;
-}
-.home-button { display: inline-block; padding: 0.75em 1.5em; background: var(--diplomatic-blue, #1c3d5a); color: var(--ivory, #f8f6f1); border-radius: 4px; text-decoration: none; border: 2px solid var(--diplomatic-blue, #1c3d5a); margin-right: 1em; }
-.home-button:hover { background: var(--gold-accent, #cba135); color: var(--charcoal, #2d2d2d); }
 
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(248, 246, 241, 0.96), rgba(229, 216, 195, 0.38)),
+    var(--ivory);
+  color: var(--diplomatic-blue);
+  font-family: Atkinson, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+main {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 2rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+h1 {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  max-width: 720px;
+  margin: 0.65rem 0 0;
+  color: rgba(28, 61, 90, 0.78);
+  font-size: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.button,
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.55rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--diplomatic-blue);
+  border-radius: 8px;
+  background: var(--diplomatic-blue);
+  color: var(--ivory);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.button.secondary {
+  background: rgba(255, 255, 255, 0.64);
+  color: var(--diplomatic-blue);
+}
+
+.button:hover,
+button:hover,
+.button:focus-visible,
+button:focus-visible {
+  border-color: var(--gold-accent);
+  box-shadow: 0 10px 24px rgba(28, 61, 90, 0.14);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.62;
+  cursor: wait;
+  transform: none;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1rem 0;
+}
+
+.card h2 {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(203, 161, 53, 0.42);
+  border-radius: 999px;
+  background: rgba(203, 161, 53, 0.12);
+  color: var(--charcoal);
+  font-size: 0.78rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.status-dot {
+  width: 0.58rem;
+  height: 0.58rem;
+  border-radius: 999px;
+  background: var(--gold-accent);
+  box-shadow: 0 0 0 4px rgba(203, 161, 53, 0.16);
+}
+
+.status-pill.failed {
+  border-color: rgba(152, 36, 36, 0.44);
+  background: rgba(152, 36, 36, 0.1);
+}
+
+.status-pill.failed .status-dot { background: #982424; }
+.status-pill.done .status-dot { background: var(--royal-green); }
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.metric {
+  min-height: 5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 246, 241, 0.76);
+}
+
+.metric span {
+  display: block;
+  color: rgba(28, 61, 90, 0.7);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--charcoal);
+  font-size: 0.98rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.timeline {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 1.9rem 1fr auto;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgba(248, 246, 241, 0.48);
+}
+
+.step-marker {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(28, 61, 90, 0.2);
+  color: rgba(28, 61, 90, 0.66);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.step-title {
+  color: var(--charcoal);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.step-meta {
+  color: rgba(28, 61, 90, 0.66);
+  font-size: 0.78rem;
+}
+
+.step-state {
+  color: rgba(28, 61, 90, 0.66);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.step.active {
+  border-color: rgba(203, 161, 53, 0.62);
+  background: rgba(203, 161, 53, 0.12);
+}
+
+.step.active .step-marker {
+  border-color: var(--gold-accent);
+  background: var(--gold-accent);
+  color: var(--charcoal);
+}
+
+.step.done .step-marker {
+  border-color: var(--royal-green);
+  background: rgba(1, 68, 33, 0.12);
+  color: var(--royal-green);
+}
+
+.step.failed {
+  border-color: rgba(152, 36, 36, 0.5);
+  background: rgba(152, 36, 36, 0.08);
+}
+
+.step.failed .step-marker {
+  border-color: #982424;
+  background: rgba(152, 36, 36, 0.12);
+  color: #982424;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.78fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.panel-body { padding: 1rem; }
+
+#log {
+  height: 34rem;
+  overflow-y: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(45, 45, 45, 0.96);
+  color: #f8f6f1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+
+.log-line {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(248, 246, 241, 0.08);
+  overflow-wrap: anywhere;
+}
+
+.log-line.error { color: #ffd4d4; }
+.log-line.warn { color: #ffe7a3; }
+.log-line.success { color: #c9f4d6; }
+
+.data-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.data-list li {
+  padding: 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 246, 241, 0.68);
+  color: var(--charcoal);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.topic-options {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.topic-options label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 246, 241, 0.72);
+  color: var(--charcoal);
+  cursor: pointer;
+}
+
+.topic-options label:hover {
+  border-color: rgba(203, 161, 53, 0.7);
+}
+
+.topic-options input[type="text"] {
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(28, 61, 90, 0.24);
+  border-radius: 8px;
+  background: white;
+  color: var(--charcoal);
+  font: inherit;
+}
+
+details {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 246, 241, 0.62);
+}
+
+details + details { margin-top: 0.65rem; }
+
+summary {
+  padding: 0.75rem;
+  color: var(--charcoal);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+pre {
+  max-height: 22rem;
+  overflow: auto;
+  margin: 0;
+  padding: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: var(--charcoal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+}
+
+.empty {
+  margin: 0;
+  color: rgba(28, 61, 90, 0.64);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 940px) {
+  .topbar,
+  .dashboard,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar { display: grid; }
+  .actions { justify-content: flex-start; }
+  .config-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  main { width: min(100% - 1rem, 1180px); }
+  .card-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+  .status-pill {
+    justify-self: start;
+  }
+  .config-grid { grid-template-columns: 1fr; }
+  .step { grid-template-columns: 1.9rem 1fr; }
+  .step-state { grid-column: 2; }
+  #log { height: 24rem; }
+}
 </style>
 </head>
 <body>
-<h1>Generowanie artykułu</h1>
-<p>Wybierz temat i wygeneruj satyryczny wpis w tonie centro-prawicowym, PL-patriotycznym. Każda sekcja powinna zawierać spójny akapit około 10–20 linijek tekstu.</p>
-<div id="panel">
-  <div id="status">Oczekiwanie na dane...</div>
+<main>
+  <div class="topbar">
+    <div>
+      <h1>Generowanie artykułu</h1>
+      <p class="subtitle">Podgląd ręcznego uruchomienia pokazuje tryb tekstu, model obrazu, etap pipeline i najważniejsze dane diagnostyczne bez ujawniania sekretów.</p>
+    </div>
+    <div class="actions">
+      <a id="pr-link" class="button" style="display:none">Zobacz PR</a>
+      <a href="/" class="button secondary">Strona główna</a>
+    </div>
+  </div>
 
-  <div id="log"></div>
+  <section class="card">
+    <div class="card-header">
+      <h2>Status uruchomienia</h2>
+      <div id="status-pill" class="status-pill"><span class="status-dot"></span><span id="status">Łączenie...</span></div>
+    </div>
+    <div class="config-grid">
+      <div class="metric"><span>Tryb</span><strong id="metric-run-mode">Ręczny</strong></div>
+      <div class="metric"><span>Tekst</span><strong id="metric-provider">Oczekiwanie</strong></div>
+      <div class="metric"><span>Pipeline</span><strong id="metric-pipeline">Oczekiwanie</strong></div>
+      <div class="metric"><span>Obraz</span><strong id="metric-image">Oczekiwanie</strong></div>
+    </div>
+  </section>
 
-  <button id="continue-btn" style="display:none">Kontynuuj</button>
-</div>
-<div id="footer">
-  <a id="pr-link" class="home-button" style="display:none">Zobacz PR</a>
-  <a href="/" class="home-button">Strona główna</a>
-</div>
+  <div class="dashboard">
+    <section class="card">
+      <div class="card-header">
+        <h2>Etapy generowania</h2>
+        <span class="step-meta" id="current-stage-label">start</span>
+      </div>
+      <div id="timeline" class="timeline"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Wybór tematu</h2>
+        <button id="continue-btn" style="display:none">Kontynuuj</button>
+      </div>
+      <div class="panel-body" id="topic-panel">
+        <p class="empty">Po wygenerowaniu propozycji pojawi się lista tematów oraz pole na własny temat.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="content-grid">
+    <section class="card">
+      <div class="card-header">
+        <h2>Log streamu</h2>
+        <span class="step-meta" id="event-counter">0 zdarzeń</span>
+      </div>
+      <div class="panel-body">
+        <div id="log" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Szczegóły</h2>
+      </div>
+      <div class="panel-body">
+        <details open>
+          <summary>Tematy i źródła</summary>
+          <ul class="data-list" id="topic-data"><li>Brak danych.</li></ul>
+        </details>
+        <details>
+          <summary>Konspekt i walidacja</summary>
+          <pre id="outline-data">Brak danych.</pre>
+        </details>
+        <details>
+          <summary>Prompt / odpowiedź modelu</summary>
+          <pre id="model-data">Brak danych.</pre>
+        </details>
+      </div>
+    </section>
+  </div>
+</main>
 
 <script>
+const STAGES = [
+  { id: 'recent-titles', title: 'Ostatnie tytuły', meta: 'GitHub: unikanie powtórek' },
+  { id: 'hot-topics', title: 'Gorące tematy', meta: 'Źródła i kontekst dnia' },
+  { id: 'suggest-topic', title: 'Propozycje tematów', meta: 'Ręczny wybór operatora' },
+  { id: 'outline', title: 'Konspekt', meta: 'Struktura i guardraile' },
+  { id: 'write', title: 'Treść artykułu', meta: 'One-shot albo sekcje' },
+  { id: 'content-validation', title: 'Walidacja', meta: 'Źródła, TODO i spójność' },
+  { id: 'repair', title: 'Naprawa', meta: 'Tylko gdy walidacja wymaga poprawek' },
+  { id: 'hero-image', title: 'Obraz', meta: 'OpenAI image model + styl strony' },
+  { id: 'github-publish', title: 'Publikacja', meta: 'Branch, pliki i PR' },
+  { id: 'success-slack', title: 'Slack i zakończenie', meta: 'Powiadomienie i link do PR' },
+];
+
+const timelineOrder = STAGES.map(stage => stage.id);
 const logEl = document.getElementById('log');
 const statusEl = document.getElementById('status');
+const statusPill = document.getElementById('status-pill');
 const prLinkEl = document.getElementById('pr-link');
 const continueBtn = document.getElementById('continue-btn');
+const topicPanel = document.getElementById('topic-panel');
+const topicData = document.getElementById('topic-data');
+const outlineData = document.getElementById('outline-data');
+const modelData = document.getElementById('model-data');
+const eventCounter = document.getElementById('event-counter');
+const currentStageLabel = document.getElementById('current-stage-label');
+const timelineEl = document.getElementById('timeline');
 let topicForm;
+let eventCount = 0;
+let currentStage = 'start';
+const stageStates = Object.fromEntries(STAGES.map(stage => [stage.id, 'pending']));
+
+renderTimeline();
+startStream();
+
+function normalizeStage(stage) {
+  if (!stage) return currentStage;
+  if (stage === 'sectioned-write') return 'write';
+  if (stage.startsWith('repair-')) return 'repair';
+  if (stage === 'auto-topic') return 'suggest-topic';
+  return stage;
+}
+
+function setStatus(text, kind = 'active') {
+  statusEl.textContent = text;
+  statusPill.classList.toggle('failed', kind === 'failed');
+  statusPill.classList.toggle('done', kind === 'done');
+}
+
+function updateStage(stage, state = 'active') {
+  const normalized = normalizeStage(stage);
+  if (!stageStates[normalized]) return;
+  currentStage = normalized;
+  const activeIndex = timelineOrder.indexOf(normalized);
+  timelineOrder.forEach((id, index) => {
+    if (index < activeIndex && stageStates[id] !== 'failed') stageStates[id] = 'done';
+    if (index === activeIndex) stageStates[id] = state;
+  });
+  currentStageLabel.textContent = stage;
+  renderTimeline();
+}
+
+function renderTimeline() {
+  timelineEl.innerHTML = '';
+  STAGES.forEach((stage, index) => {
+    const state = stageStates[stage.id] || 'pending';
+    const row = document.createElement('div');
+    row.className = `step ${state}`;
+    row.dataset.stage = stage.id;
+    row.innerHTML = `
+      <div class="step-marker">${state === 'done' ? '✓' : index + 1}</div>
+      <div>
+        <div class="step-title">${stage.title}</div>
+        <div class="step-meta">${stage.meta}</div>
+      </div>
+      <div class="step-state">${labelState(state)}</div>
+    `;
+    timelineEl.appendChild(row);
+  });
+}
+
+function labelState(state) {
+  if (state === 'done') return 'gotowe';
+  if (state === 'active') return 'teraz';
+  if (state === 'failed') return 'błąd';
+  return 'czeka';
+}
 
 function sendLog(event, details = {}) {
   fetch('/api/client-log', {
@@ -61,197 +592,213 @@ function sendLog(event, details = {}) {
   }).catch(() => {});
 }
 
-startStream();
-
-function appendLog(text) {
+function appendLog(text, kind = '') {
   const div = document.createElement('div');
+  div.className = `log-line ${kind}`.trim();
   div.textContent = text;
   logEl.appendChild(div);
   logEl.scrollTop = logEl.scrollHeight;
 }
 
-function appendLogElement(el) {
-  logEl.appendChild(el);
-  logEl.scrollTop = logEl.scrollHeight;
+function updateCounter() {
+  eventCount += 1;
+  eventCounter.textContent = `${eventCount} ${eventCount === 1 ? 'zdarzenie' : 'zdarzeń'}`;
+}
+
+function formatData(value) {
+  return typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+}
+
+function setMetric(id, value) {
+  document.getElementById(id).textContent = value || 'brak';
+}
+
+function applyConfig(config) {
+  setMetric('metric-run-mode', config.runMode === 'manual' ? 'Ręczny' : 'Automatyczny');
+  const fallback = config.textFallback && config.textFallback !== 'none'
+    ? `, fallback ${config.textFallback}`
+    : '';
+  setMetric('metric-provider', `${config.textProviderLabel || config.textProvider}${fallback}`);
+  setMetric('metric-pipeline', config.textPipeline === 'sectioned'
+    ? `Sekcyjny (${config.paragraphsPerSection} akapity/sekcję)`
+    : 'One-shot');
+  setMetric('metric-image', `${config.imageModel} · ${config.imageQuality} · ${config.imageSize}`);
+}
+
+function replaceList(el, title, items) {
+  el.innerHTML = '';
+  const header = document.createElement('li');
+  header.textContent = title;
+  header.style.fontWeight = '700';
+  el.appendChild(header);
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    el.appendChild(li);
+  });
 }
 
 function startStream() {
-  appendLog('🔗 Łączenie z /api/generate-stream...');
+  appendLog('Łączenie z /api/generate-stream...');
+  setStatus('Łączenie...');
   sendLog('connect', { endpoint: '/api/generate-stream' });
   const es = new EventSource('/api/generate-stream');
   es.addEventListener('open', () => {
-    appendLog('🔌 Połączono z serwerem');
+    appendLog('Połączono z serwerem', 'success');
+    setStatus('Połączono');
     sendLog('sse-open');
   });
   es.onmessage = (e) => {
     const msg = JSON.parse(e.data);
-    sendLog('sse-message', msg);
-    if (msg.log) {
-      appendLog(msg.log);
-    }
-  if (msg.failed) {
-    statusEl.textContent = msg.errorTitle || 'Błąd generowania';
-    const details = [
-      msg.errorCode && `Kod: ${msg.errorCode}`,
-      msg.stage && `Etap: ${msg.stage}`,
-      msg.retryable === false && 'Wymagana interwencja operatora',
-    ].filter(Boolean).join(' | ');
-    if (details) appendLog(details);
-    sendLog('generation-failed', {
-      errorCode: msg.errorCode,
-      errorTitle: msg.errorTitle,
-      errorMessage: msg.errorMessage,
-      stage: msg.stage,
-      retryable: msg.retryable,
-      status: msg.status,
-      provider: msg.provider,
-    });
-    es.close();
-  }
-  if (msg.error) {
-    appendLog(`❌ Błąd: ${msg.error}`);
-  }
-  if (msg.warnings) {
-    appendLog('⚠️ Ostrzeżenia:');
-    const list = document.createElement('ul');
-    msg.warnings.forEach(w => {
-      const li = document.createElement('li');
-      li.textContent = w;
-      list.appendChild(li);
-    });
-    appendLogElement(list);
-  }
-  if (msg.errors) {
-    appendLog('❌ Błędy:');
-    const list = document.createElement('ul');
-    msg.errors.forEach(er => {
-      const li = document.createElement('li');
-      li.textContent = er;
-      list.appendChild(li);
-    });
-    appendLogElement(list);
-  }
-  if (msg.stats) {
-    appendLog(`📊 Statystyki: roszczenia=${msg.stats.claims}, ze źródłem=${msg.stats.withSource}, todo=${msg.stats.todo}`);
-  }
-  if (msg.recentTitles) {
-    appendLog('📚 Ostatnie tytuły:');
-    const list = document.createElement('ul');
-    msg.recentTitles.forEach(t => {
-      const li = document.createElement('li');
-      li.textContent = t;
-      list.appendChild(li);
-    });
-    appendLogElement(list);
-  }
-  if (msg.hotTopics) {
-    appendLog('🔥 Gorące tematy:');
-    const list = document.createElement('ul');
-    msg.hotTopics.forEach(t => {
-      const li = document.createElement('li');
-      li.textContent = t;
-      list.appendChild(li);
-    });
-    appendLogElement(list);
-  }
-  if (msg.topicSuggestions && !topicForm) {
-    appendLog('💡 Propozycje tematów:');
-    topicForm = document.createElement('div');
-    msg.topicSuggestions.forEach((s) => {
-      const label = document.createElement('label');
-      const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'topic';
-      radio.value = s.title;
-      label.appendChild(radio);
-      label.appendChild(document.createTextNode(`${s.title} – ${s.rationale}`));
-      topicForm.appendChild(label);
-      topicForm.appendChild(document.createElement('br'));
-    });
-    const custom = document.createElement('input');
-    custom.type = 'text';
-    custom.id = 'custom-topic';
-    custom.placeholder = 'Własny temat';
-    topicForm.appendChild(custom);
-    appendLogElement(topicForm);
-  }
-  if (msg.articleTitle) {
-    appendLog(`📰 Nowy artykuł: ${msg.articleTitle}`);
-  }
-  if (msg.awaitingTopic) {
-    continueBtn.style.display = 'inline-block';
-  }
-  if (msg.prompt) {
-    appendLog('📝 Kontekst wysłany do OpenAI:');
-    appendLog(
-      typeof msg.prompt === 'string'
-        ? msg.prompt
-        : JSON.stringify(msg.prompt, null, 2),
-    );
-  }
-  if (msg.response) {
-    appendLog('💬 Odpowiedź:');
-    appendLog(msg.response);
-  }
-  if (msg.debug) {
-    appendLog('🐞 Debug:');
-    appendLog(typeof msg.debug === 'string' ? msg.debug : JSON.stringify(msg.debug, null, 2));
-  }
-  if (msg.parsed) {
-    appendLog('📦 Parsed:');
-    appendLog(typeof msg.parsed === 'string' ? msg.parsed : JSON.stringify(msg.parsed, null, 2));
-  }
-  if (msg.heroPrompt) {
-    appendLog('🎨 Prompt (obrazek):');
-    appendLog(msg.heroPrompt);
-  }
-    if (msg.done) {
-      statusEl.textContent = 'Zakończono!';
-      prLinkEl.href = msg.url;
-      prLinkEl.style.display = 'inline-block';
-      sendLog('sse-complete', { url: msg.url });
-      es.close();
-    }
+    updateCounter();
+    sendLog('sse-message', summarizeMessage(msg));
+    if (msg.stage) updateStage(msg.stage);
+    handleMessage(msg, es);
   };
   es.onerror = (err) => {
-    statusEl.textContent = 'Błąd połączenia (SSE)';
-    appendLog(`❌ Błąd połączenia (SSE): ${err?.message || err}`);
-    console.error('EventSource failed', err);
-    sendLog('sse-error', { message: err.message });
+    setStatus('Błąd połączenia SSE', 'failed');
+    appendLog(`Błąd połączenia SSE: ${err?.message || 'EventSource closed'}`, 'error');
+    sendLog('sse-error', { message: err?.message || 'EventSource closed' });
     es.close();
   };
 
   continueBtn.addEventListener('click', async () => {
     continueBtn.disabled = true;
     try {
-      appendLog('📨 Wysyłam wybrany temat do /api/update-prompt...');
+      appendLog('Wysyłam wybrany temat do /api/update-prompt...');
       sendLog('update-prompt-send', { endpoint: '/api/update-prompt' });
       const res = await fetch('/api/update-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: (() => {
-            if (topicForm) {
-              const checked = topicForm.querySelector('input[name="topic"]:checked');
-              if (checked) return checked.value;
-              const custom = document.getElementById('custom-topic');
-              if (custom) return custom.value;
-            }
-            return '';
-          })(),
-        }),
+        body: JSON.stringify({ topic: selectedTopic() }),
         credentials: 'include',
       });
       if (!res.ok) throw new Error('status ' + res.status);
       sendLog('update-prompt-response', { status: res.status });
-      appendLog('⏭ Kontynuuję tworzenie...');
+      appendLog('Temat wysłany. Kontynuuję tworzenie...', 'success');
       continueBtn.style.display = 'none';
+      setStatus('Generuję artykuł');
     } catch (err) {
-      appendLog(`❌ Błąd podczas wysyłania tematu: ${err}`);
+      appendLog(`Błąd podczas wysyłania tematu: ${err}`, 'error');
       sendLog('update-prompt-error', { message: String(err) });
       continueBtn.disabled = false;
     }
   });
+}
+
+function handleMessage(msg, es) {
+  if (msg.log && msg.log !== 'generation-config') {
+    appendLog(msg.log, logKind(msg));
+  }
+  if (msg.generationConfig) {
+    applyConfig(msg.generationConfig);
+    appendLog(`Konfiguracja: ${msg.generationConfig.textProviderLabel}, ${msg.generationConfig.textPipeline}, obraz ${msg.generationConfig.imageModel}`);
+  }
+  if (msg.failed) {
+    updateStage(msg.stage || currentStage, 'failed');
+    setStatus(msg.errorTitle || 'Błąd generowania', 'failed');
+    appendLog([
+      msg.errorCode && `Kod: ${msg.errorCode}`,
+      msg.stage && `Etap: ${msg.stage}`,
+      msg.retryable === false && 'Wymagana interwencja operatora',
+    ].filter(Boolean).join(' | '), 'error');
+    sendLog('generation-failed', summarizeMessage(msg));
+    es.close();
+  }
+  if (msg.error) appendLog(`Błąd: ${msg.error}`, 'error');
+  if (msg.warnings) appendValidation('Ostrzeżenia walidatora', msg.warnings, msg.stats);
+  if (msg.errors) appendValidation('Błędy walidatora', msg.errors, msg.stats);
+  if (msg.stats) appendLog(`Statystyki: roszczenia=${msg.stats.claims}, ze źródłem=${msg.stats.withSource}, todo=${msg.stats.todo}`);
+  if (msg.recentTitles) replaceList(topicData, 'Ostatnie tytuły', msg.recentTitles);
+  if (msg.hotTopics) replaceList(topicData, 'Gorące tematy', msg.hotTopics);
+  if (msg.topicSuggestions && !topicForm) renderTopicForm(msg.topicSuggestions);
+  if (msg.outline) outlineData.textContent = formatData(msg.outline);
+  if (msg.articleTitle) appendLog(`Nowy artykuł: ${msg.articleTitle}`, 'success');
+  if (msg.awaitingTopic) {
+    continueBtn.style.display = 'inline-flex';
+    setStatus('Czeka na wybór tematu');
+  }
+  if (msg.prompt) appendModelBlock('Prompt', msg.prompt);
+  if (msg.response) appendModelBlock('Odpowiedź', msg.response);
+  if (msg.debug) appendModelBlock('Debug', msg.debug);
+  if (msg.parsed) appendModelBlock('Parsed', msg.parsed);
+  if (msg.heroPrompt) appendModelBlock('Prompt obrazu', msg.heroPrompt);
+  if (msg.done) {
+    timelineOrder.forEach(id => stageStates[id] = 'done');
+    renderTimeline();
+    setStatus('Zakończono', 'done');
+    prLinkEl.href = msg.url;
+    prLinkEl.style.display = 'inline-flex';
+    appendLog(`Publikacja zakończona: ${msg.url}`, 'success');
+    sendLog('sse-complete', { url: msg.url });
+    es.close();
+  }
+}
+
+function renderTopicForm(suggestions) {
+  topicPanel.innerHTML = '';
+  topicForm = document.createElement('div');
+  topicForm.className = 'topic-options';
+  suggestions.forEach((s, index) => {
+    const label = document.createElement('label');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'topic';
+    radio.value = s.title;
+    if (index === 0) radio.checked = true;
+    const text = document.createElement('span');
+    text.textContent = `${s.title} — ${s.rationale}`;
+    label.appendChild(radio);
+    label.appendChild(text);
+    topicForm.appendChild(label);
+  });
+  const custom = document.createElement('input');
+  custom.type = 'text';
+  custom.id = 'custom-topic';
+  custom.placeholder = 'Własny temat';
+  topicForm.appendChild(custom);
+  topicPanel.appendChild(topicForm);
+}
+
+function selectedTopic() {
+  if (!topicForm) return '';
+  const custom = document.getElementById('custom-topic');
+  if (custom?.value.trim()) return custom.value.trim();
+  const checked = topicForm.querySelector('input[name="topic"]:checked');
+  return checked ? checked.value : '';
+}
+
+function appendValidation(title, entries, stats) {
+  outlineData.textContent = `${title}\n${entries.join('\n')}\n\n${formatData(stats || {})}`;
+  appendLog(`${title}: ${entries.length}`, title.startsWith('Błędy') ? 'error' : 'warn');
+}
+
+function appendModelBlock(label, value) {
+  const next = `${label}\n${formatData(value)}`;
+  modelData.textContent = modelData.textContent === 'Brak danych.'
+    ? next
+    : `${modelData.textContent}\n\n---\n${next}`;
+}
+
+function logKind(msg) {
+  const text = String(msg.log || '').toLowerCase();
+  if (msg.failed || text.includes('błąd') || text.includes('error')) return 'error';
+  if (text.includes('ostrzeż')) return 'warn';
+  if (msg.done || text.includes('ok') || text.includes('sukces')) return 'success';
+  return '';
+}
+
+function summarizeMessage(msg) {
+  return {
+    log: msg.log,
+    stage: msg.stage,
+    failed: msg.failed,
+    done: msg.done,
+    errorCode: msg.errorCode,
+    errorTitle: msg.errorTitle,
+    retryable: msg.retryable,
+    provider: msg.provider,
+  };
 }
 </script>
 </body>
