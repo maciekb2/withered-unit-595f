@@ -1,3 +1,5 @@
+import { XMLParser } from 'fast-xml-parser';
+
 export interface HotTopic {
   title: string;
   url: string;
@@ -40,39 +42,96 @@ const FALLBACK_TOPICS: HotTopic[] = [
 ];
 
 function stripHtml(s: string): string {
-  return s
+  return decodeEntities(s)
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
     .trim();
 }
 
-function parseItems(source: string, xml: string): HotTopic[] {
-  const items: HotTopic[] = [];
-  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-  let match: RegExpExecArray | null;
-  while ((match = itemRegex.exec(xml))) {
-    const item = match[1];
-    const titleMatch =
-      /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/.exec(item);
-    const linkMatch = /<link>(.*?)<\/link>/.exec(item);
-    const dateMatch = /<pubDate>(.*?)<\/pubDate>/.exec(item);
-    const descMatch =
-      /<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/.exec(item);
-    const title = titleMatch?.[1] || titleMatch?.[2] || '';
-    const url = linkMatch?.[1]?.trim() || '';
-    const publishedRaw = dateMatch?.[1];
-    const published = publishedRaw ? new Date(publishedRaw).toISOString() : '';
-    const descRaw = descMatch?.[1] || descMatch?.[2] || '';
-    const description = descRaw ? stripHtml(descRaw).slice(0, 420) : undefined;
-    if (title && url && published) {
-      items.push({ title, url, published, source, description });
-    }
+const xmlParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: '@_',
+  textNodeName: '#text',
+  cdataPropName: '#cdata',
+  trimValues: true,
+  parseTagValue: false,
+  parseAttributeValue: false,
+});
+
+function asArray<T>(value: T | T[] | undefined): T[] {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function textValue(value: unknown): string {
+  if (typeof value === 'string') return decodeEntities(value).trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return textValue(record['#cdata'] || record['#text'] || record.value || '');
   }
-  return items;
+  return '';
+}
+
+function decodeEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+function linkValue(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+  if (Array.isArray(value)) {
+    const alternate = value.find(item => {
+      const rel = (item as Record<string, unknown>)?.['@_rel'];
+      return rel == null || rel === 'alternate';
+    });
+    return linkValue(alternate || value[0]);
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return textValue(record['@_href'] || record['#text'] || record['#cdata'] || '');
+  }
+  return '';
+}
+
+function toIsoDate(value: string): string {
+  if (!value) return '';
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : '';
+}
+
+function itemToHotTopic(source: string, item: Record<string, unknown>): HotTopic | null {
+  const title = textValue(item.title);
+  const url = linkValue(item.link || item.guid);
+  const published = toIsoDate(
+    textValue(item.pubDate || item.published || item.updated || item['dc:date']),
+  );
+  const descRaw = textValue(
+    item.description || item.summary || item.content || item['content:encoded'],
+  );
+  const description = descRaw ? stripHtml(descRaw).slice(0, 420) : undefined;
+
+  if (!title || !url || !published) return null;
+  return { title, url, published, source, description };
+}
+
+export function parseHotTopicsFromXml(source: string, xml: string): HotTopic[] {
+  const parsed = xmlParser.parse(xml) as Record<string, unknown>;
+  const rss = parsed.rss as Record<string, unknown> | undefined;
+  const channel = rss?.channel as Record<string, unknown> | undefined;
+  const feed = parsed.feed as Record<string, unknown> | undefined;
+  const rssItems = asArray(channel?.item as Record<string, unknown> | Record<string, unknown>[] | undefined);
+  const atomEntries = asArray(feed?.entry as Record<string, unknown> | Record<string, unknown>[] | undefined);
+
+  return [...rssItems, ...atomEntries]
+    .map(item => itemToHotTopic(source, item))
+    .filter((item): item is HotTopic => item !== null);
 }
 
 export async function getHotTopics(limit = 8): Promise<HotTopic[]> {
@@ -83,7 +142,7 @@ export async function getHotTopics(limit = 8): Promise<HotTopic[]> {
         const res = await fetch(feed.url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const xml = await res.text();
-        allItems.push(...parseItems(feed.source, xml));
+        allItems.push(...parseHotTopicsFromXml(feed.source, xml));
       } catch (err) {
         try {
           const loggerPath = './logger.js';

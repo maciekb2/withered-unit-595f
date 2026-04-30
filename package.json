@@ -18,6 +18,7 @@
     "@astrojs/rss": "4.0.11",
     "@astrojs/sitemap": "3.2.1",
     "astro": "5.1.3",
+    "fast-xml-parser": "^4.5.6",
     "jose": "^5.10.0",
     "jsonrepair": "^3.13.1",
     "node-html-parser": "^7.0.1",
@@ -29,7 +30,7 @@
   },
   "scripts": {
     "astro": "astro",
-    "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --conditions=worker,browser --external:./_worker.js --outfile=dist/worker.js",
+    "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --main-fields=module,main --conditions=worker,browser --external:./_worker.js --outfile=dist/worker.js",
     "check": "npm run build && tsc && wrangler deploy --dry-run",
     "db:migrations:apply": "wrangler d1 migrations apply pseudointelekt_logs --remote",
     "deploy": "npm run build && wrangler deploy",
