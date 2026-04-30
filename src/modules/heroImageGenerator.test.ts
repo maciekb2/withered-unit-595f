@@ -26,6 +26,7 @@ test('generateHeroImage uses low-cost GPT Image model without DALL-E style param
     assert.equal(body.model, 'gpt-image-1-mini');
     assert.equal(body.quality, 'low');
     assert.equal(body.style, undefined);
+    assert.equal(body.response_format, undefined);
     assert.match(body.prompt, /wczesniejszych obrazkach generowanych przez DALL-E 3/);
     assert.match(body.prompt, /bez tekstu, napisow, logo/);
   } finally {
@@ -80,6 +81,7 @@ test('generateHeroImage keeps DALL-E style compatibility', async () => {
     assert.equal(body.model, 'dall-e-3');
     assert.equal(body.quality, 'hd');
     assert.equal(body.style, 'natural');
+    assert.equal(body.response_format, 'b64_json');
   } finally {
     globalThis.fetch = original;
   }

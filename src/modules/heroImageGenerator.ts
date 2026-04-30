@@ -49,9 +49,9 @@ export async function generateHeroImage({
       prompt: finalPrompt,
       n: 1,
       size,
-      response_format: 'b64_json',
     };
     if (model.startsWith('dall-e-3')) {
+      body.response_format = 'b64_json';
       body.style = style;
       body.quality = quality === 'hd' ? 'hd' : 'standard';
     } else {
@@ -83,11 +83,22 @@ export async function generateHeroImage({
       throw new Error('OpenAI image response missing data');
     }
     const b64 = data.data[0].b64_json as string | undefined;
-    if (!b64) {
-      throw new Error('OpenAI image response missing b64_json');
+    if (b64) {
+      logEvent({ type: 'generate-hero-complete' });
+      return Buffer.from(b64, 'base64');
     }
-    logEvent({ type: 'generate-hero-complete' });
-    return Buffer.from(b64, 'base64');
+
+    const imageUrl = data.data[0].url as string | undefined;
+    if (imageUrl) {
+      const imageRes = await retryFetch(imageUrl, { retries: 2, retryDelayMs: 1000 });
+      if (!imageRes.ok) {
+        throw new Error(`OpenAI image URL fetch failed: ${imageRes.status}`);
+      }
+      logEvent({ type: 'generate-hero-complete' });
+      return Buffer.from(await imageRes.arrayBuffer());
+    }
+
+    throw new Error('OpenAI image response missing b64_json or url');
   } catch (err) {
     logError(err, { type: 'generate-hero-error' });
     throw err;

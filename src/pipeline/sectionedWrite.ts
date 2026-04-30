@@ -3,6 +3,7 @@ import type { Edited, Outline } from './types';
 import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { scrubTodoClaims } from './scrubTodoClaims';
+import { extractJson } from '../utils/json';
 
 export interface SectionedWriteOptions {
   apiKey: string;
@@ -232,7 +233,7 @@ function assembleMarkdown({
 }
 
 function sanitizeBodyText(text: string, allowedUrl: string): string {
-  return text
+  return stripMetaPreamble(jsonMarkdownOrText(text))
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/```[\s\S]*?```/g, block => block.replace(/```[a-z]*|```/gi, ''))
     .split('\n')
@@ -243,6 +244,42 @@ function sanitizeBodyText(text: string, allowedUrl: string): string {
     .replace(/https?:\/\/\S+/gi, match => (match === allowedUrl ? match : ''))
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+function jsonMarkdownOrText(text: string): string {
+  try {
+    const parsed = extractJson<unknown>(text);
+    if (parsed && typeof parsed === 'object') {
+      const markdown = (parsed as Record<string, unknown>).markdown;
+      const content = (parsed as Record<string, unknown>).content;
+      const textValue = (parsed as Record<string, unknown>).text;
+      if (typeof markdown === 'string') return markdown;
+      if (typeof content === 'string') return content;
+      if (typeof textValue === 'string') return textValue;
+    }
+  } catch {
+    // Plain-text section responses are expected for Jetson.
+  }
+  return text;
+}
+
+function stripMetaPreamble(text: string): string {
+  const cleaned = text.trim();
+  const separatorIndex = cleaned.lastIndexOf('\n---');
+  if (separatorIndex !== -1) {
+    return cleaned.slice(separatorIndex).replace(/^-+\s*/m, '').trim();
+  }
+
+  const lines = cleaned.split('\n');
+  const firstContentIndex = lines.findIndex(line => {
+    const trimmed = line.trim();
+    return trimmed.length > 0 && !isLikelyModelMetaLine(trimmed);
+  });
+  return firstContentIndex > 0 ? lines.slice(firstContentIndex).join('\n').trim() : cleaned;
+}
+
+function isLikelyModelMetaLine(line: string): boolean {
+  return /^(okay|let'?s|we need|i need|the user|this query|i should|need to|first,|next,|then,|finally,)/i.test(line);
 }
 
 function leadSourceUrlFromContext(contextPack: string): string | undefined {

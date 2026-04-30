@@ -194,7 +194,7 @@ export async function generateAndPublish(
       }
     }
 
-    const matchedTopic = hotTopics.find(t => t.title === baseTopic);
+    const matchedTopic = hotTopics.find(t => t.title === baseTopic) || inferClosestTopic(baseTopic, hotTopics);
     const leadSourceUrl = matchedTopic?.url || hotTopics[0]?.url || 'https://example.com';
     const selectedTopic = matchedTopic
       ? {
@@ -461,3 +461,48 @@ function describeTextProvider(provider: ReturnType<typeof textGenerationProvider
   }
   return 'OpenAI';
 }
+
+function inferClosestTopic(baseTopic: string, hotTopics: Awaited<ReturnType<typeof getHotTopics>>[number][]) {
+  const queryTokens = topicTokens(baseTopic);
+  if (queryTokens.size === 0) return undefined;
+
+  let best: { topic: (typeof hotTopics)[number]; score: number } | undefined;
+  for (const topic of hotTopics) {
+    const haystack = topicTokens(`${topic.title} ${topic.description || ''}`);
+    let score = 0;
+    for (const token of queryTokens) {
+      if (haystack.has(token)) score += 1;
+    }
+    if (!best || score > best.score) best = { topic, score };
+  }
+
+  return best && best.score >= 2 ? best.topic : undefined;
+}
+
+function topicTokens(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(/[^a-z0-9]+/i)
+      .filter(token => token.length >= 4 && !COMMON_TOPIC_TOKENS.has(token)),
+  );
+}
+
+const COMMON_TOPIC_TOKENS = new Set([
+  'gdy',
+  'jak',
+  'jest',
+  'przy',
+  'temat',
+  'article',
+  'news',
+  'says',
+  'said',
+  'with',
+  'from',
+  'that',
+  'this',
+  'will',
+]);
