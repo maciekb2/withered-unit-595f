@@ -37,8 +37,9 @@ test('chat sends Jetson requests with bearer token and thinking disabled', async
     assert.equal(result, 'tekst z jetsona');
     assert.equal(capturedUrl, 'https://jetson.example.test/api/generate');
     assert.equal(capturedHeaders.get('Authorization'), 'Bearer jetson-token');
-    assert.equal(capturedHeaders.get('X-Disable-Thinking'), 'true');
+    assert.equal(capturedHeaders.get('x-openclaw-disable-thinking'), 'true');
     assert.equal(capturedBody.model, 'qwen3:4b');
+    assert.equal(capturedBody.options.num_predict, 100);
     assert.deepEqual(capturedBody.messages, [{ role: 'user', content: 'Napisz lead' }]);
   } finally {
     globalThis.fetch = original;

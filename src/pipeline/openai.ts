@@ -261,7 +261,7 @@ async function chatJetson(
     Authorization: `Bearer ${provider.token}`,
   };
   if (provider.disableThinking) {
-    headers['X-Disable-Thinking'] = 'true';
+    headers['x-openclaw-disable-thinking'] = 'true';
   }
   if (provider.accessClientId && provider.accessClientSecret) {
     headers['CF-Access-Client-Id'] = provider.accessClientId;
@@ -288,6 +288,9 @@ async function chatJetson(
         model,
         messages,
         max_completion_tokens,
+        options: {
+          num_predict: max_completion_tokens,
+        },
         response_format,
         response_style,
         stream: false,
@@ -318,21 +321,27 @@ async function chatJetson(
 }
 
 function extractJetsonText(data: any): string {
-  if (typeof data === 'string') return data.trim();
+  if (typeof data === 'string') return stripThinking(data);
   if (!data || typeof data !== 'object') return '';
 
-  if (typeof data.response === 'string') return data.response.trim();
-  if (typeof data.text === 'string') return data.text.trim();
-  if (typeof data.content === 'string') return data.content.trim();
-  if (typeof data.output === 'string') return data.output.trim();
-  if (typeof data.message?.content === 'string') return data.message.content.trim();
+  if (typeof data.response === 'string') return stripThinking(data.response);
+  if (typeof data.text === 'string') return stripThinking(data.text);
+  if (typeof data.content === 'string') return stripThinking(data.content);
+  if (typeof data.output === 'string') return stripThinking(data.output);
+  if (typeof data.message?.content === 'string') return stripThinking(data.message.content);
   if (Array.isArray(data.choices) && data.choices[0]) {
     const choice = data.choices[0];
-    if (typeof choice.text === 'string') return choice.text.trim();
+    if (typeof choice.text === 'string') return stripThinking(choice.text);
     if (typeof choice.message?.content === 'string') {
-      return choice.message.content.trim();
+      return stripThinking(choice.message.content);
     }
   }
 
   return '';
+}
+
+function stripThinking(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .trim();
 }
