@@ -162,3 +162,13 @@ npm run logs:audit -- --topic "wybrany temat" --full
 ```
 
 Skrypt wymaga zmiennych `CLOUDFLARE_API_TOKEN`/`CF_API_TOKEN` oraz `CLOUDFLARE_ACCOUNT_ID`/`CF_ACCOUNT_ID` i czyta `database_id` z `wrangler.json`. Domyślny widok jest skrócony; `--full` oraz `--json` pokazują pełny payload, w tym prompty, odpowiedzi modeli, dane klienta i pola Cloudflare Access (`accessEmail`, `accessSub`, `accessAud`).
+
+## Liczniki views i likes
+
+Publiczne endpointy liczników używają D1 zamiast read-modify-write w KV:
+
+- `engagement_counters` trzyma atomowe liczniki `view` i `like`,
+- `engagement_like_sessions` blokuje ponowne polubienie tego samego artykułu w tej samej sesji,
+- dotychczasowe wartości KV `view-<slug>` i `like-<slug>` są używane jako baseline przy pierwszym odczycie lub zapisie danego slug-a.
+
+KV pozostaje tylko źródłem kompatybilności/migracji dla starych liczników i starych znaczników sesji.

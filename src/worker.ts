@@ -11,6 +11,13 @@ import {
   requireCloudflareAccess,
   type CloudflareAccessIdentity,
 } from './utils/accessAuth';
+import {
+  ensureCounter,
+  getCounter,
+  getCounters,
+  incrementCounter,
+  markLikeIfFirst,
+} from './utils/engagementCounters';
 
 const pendingPrompts = new Map<
   string,
@@ -152,15 +159,7 @@ async function handleContact(request: Request, env: Env, sessionId: string) {
 }
 
 async function handleView(request: Request, env: Env, slug: string) {
-  const key = `view-${slug}`;
-  let value = await env.pseudointelekt_views.get(key);
-  if (value == null) {
-    await env.pseudointelekt_views.put(key, '0');
-    value = '0';
-  }
-  const current = parseInt(value);
-  const updated = current + 1;
-  await env.pseudointelekt_views.put(key, updated.toString());
+  const updated = await incrementCounter(env, 'view', slug);
   return new Response(JSON.stringify({ views: updated }), {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -169,43 +168,21 @@ async function handleView(request: Request, env: Env, slug: string) {
 async function handleInitView(request: Request, env: Env, slug: string) {
   const url = new URL(request.url);
   const initial = parseInt(url.searchParams.get('value') || '0');
-  const key = `view-${slug}`;
-  const existing = await env.pseudointelekt_views.get(key);
-  if (!existing) {
-    await env.pseudointelekt_views.put(key, initial.toString());
-    return new Response(JSON.stringify({ views: initial }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-  const current = parseInt(existing);
+  const current = await ensureCounter(env, 'view', slug, initial);
   return new Response(JSON.stringify({ views: current }), {
     headers: { 'Content-Type': 'application/json' },
   });
 }
 
 async function handleGetView(env: Env, slug: string) {
-  const key = `view-${slug}`;
-  let value = await env.pseudointelekt_views.get(key);
-  if (value == null) {
-    await env.pseudointelekt_views.put(key, '0');
-    value = '0';
-  }
-  const current = parseInt(value);
+  const current = await ensureCounter(env, 'view', slug);
   return new Response(JSON.stringify({ views: current }), {
     headers: { 'Content-Type': 'application/json' },
   });
 }
 
 async function handleGetViews(env: Env) {
-  const list = await env.pseudointelekt_views.list();
-  const data: Record<string, number> = {};
-  for (const { name } of list.keys) {
-    const value = await env.pseudointelekt_views.get(name);
-    if (value) {
-      const slug = name.replace(/^view-/, '');
-      data[slug] = parseInt(value);
-    }
-  }
+  const data = await getCounters(env, 'view');
   return new Response(JSON.stringify(data), {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -217,48 +194,31 @@ async function handleLike(
   slug: string,
   sessionId: string,
 ) {
-  const key = `like-${slug}`;
-  let value = await env.pseudointelekt_likes.get(key);
-  if (value == null) {
-    await env.pseudointelekt_likes.put(key, '0');
-    value = '0';
-  }
-
-  const sessionKey = `liked-${sessionId}-${slug}`;
-  const alreadyLiked = await env.pseudointelekt_likes.get(sessionKey);
-  const current = parseInt(value);
-  if (alreadyLiked) {
+  const current = await ensureCounter(env, 'like', slug);
+  const legacySessionKey = `liked-${sessionId}-${slug}`;
+  const legacyAlreadyLiked = await env.pseudointelekt_likes.get(legacySessionKey);
+  if (legacyAlreadyLiked) {
     return new Response(JSON.stringify({ likes: current }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const updated = current + 1;
-  await env.pseudointelekt_likes.put(key, updated.toString());
-  await env.pseudointelekt_likes.put(sessionKey, '1');
+  const firstLike = await markLikeIfFirst(env, slug, sessionId);
+  if (!firstLike) {
+    const updatedCurrent = await getCounter(env, 'like', slug);
+    return new Response(JSON.stringify({ likes: updatedCurrent }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const updated = await incrementCounter(env, 'like', slug);
   return new Response(JSON.stringify({ likes: updated }), {
     headers: { 'Content-Type': 'application/json' },
   });
 }
 
 async function handleGetLikes(env: Env, slugs: string[] = []) {
-  const list = await env.pseudointelekt_likes.list({ prefix: 'like-' });
-  const data: Record<string, number> = {};
-
-  for (const { name } of list.keys) {
-    const value = await env.pseudointelekt_likes.get(name);
-    if (value) {
-      const slug = name.replace(/^like-/, '');
-      data[slug] = parseInt(value);
-    }
-  }
-
-  for (const slug of slugs) {
-    if (data[slug] == null) {
-      await env.pseudointelekt_likes.put(`like-${slug}`, '0');
-      data[slug] = 0;
-    }
-  }
+  const data = await getCounters(env, 'like', slugs);
 
   return new Response(JSON.stringify(data), {
     headers: { 'Content-Type': 'application/json' },
