@@ -59,6 +59,40 @@ test('generateOutline rejects markdown in description', async () => {
   globalThis.fetch = original;
 });
 
+test('generateOutline replaces section headings that repeat the title', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                finalTitle: 'Atlantycka kłótnia przy rodzinnej zastawie',
+                description: 'Opis',
+                sections: [
+                  { h2: 'Atlantycka kłótnia przy rodzinnej zastawie', bullets: ['a', 'b'] },
+                  { h2: 'Rachunek pod obrusem', bullets: ['a', 'b'] },
+                  { h2: 'Polska puenta', bullets: ['a', 'b'] },
+                ],
+                guardrails: [],
+              }),
+            },
+          },
+        ],
+      }),
+      { status: 200 },
+    ) as any;
+
+  try {
+    const res = await generateOutline({ apiKey: 'k', baseTopic: 'T' });
+    assert.equal(res.outline.sections[0].h2, 'Oś sporu');
+    assert.equal(res.outline.sections[1].h2, 'Rachunek pod obrusem');
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test('generateOutline exposes prompt and raw on error', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = async () =>

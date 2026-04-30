@@ -33,6 +33,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     `Temat bazowy: ${baseTopic}\n` +
     'Przygotuj konspekt satyrycznego artykulu (PL-patriotyczny).\n' +
     '3 sekcje; kazda dokladnie 2 krotkie bullet-pointy.\n' +
+    'Naglowki sekcji h2 maja byc krotkimi etykietami watku, nie moga powtarzac finalTitle ani jego duzych fragmentow.\n' +
     'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
     'W 1-2 bulletach wplec analogie z ostatnich 2 lat.\n' +
     'W calym artykule 3-5 zrodel, maks 1 na sekcje; jesli podajesz zrodlo, podaj je jako pelny URL http(s)://... w tym samym bullecie.\n' +
@@ -60,7 +61,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     const outline: Outline = {
       finalTitle: json.finalTitle,
       description: cleanDescription(json.description),
-      sections: json.sections,
+      sections: cleanSectionHeadings(json.finalTitle, json.sections),
       guardrails: json.guardrails || [],
     };
 
@@ -103,3 +104,87 @@ function cleanDescription(description: string): string {
     .replace(/^konspekt artykułu o\b/i, 'Artykuł o')
     .trim();
 }
+
+function cleanSectionHeadings(
+  finalTitle: string,
+  sections: { h2: string; bullets: string[] }[],
+): { h2: string; bullets: string[] }[] {
+  const used = new Set<string>();
+  return sections.map((section, index) => {
+    const fallback = uniqueHeading(fallbackHeading(index), used);
+    const h2 = sectionHeadingTooClose(finalTitle, section.h2)
+      ? fallback
+      : uniqueHeading(section.h2, used);
+    return { ...section, h2 };
+  });
+}
+
+function sectionHeadingTooClose(finalTitle: string, h2: string): boolean {
+  const title = normalizeHeading(finalTitle);
+  const heading = normalizeHeading(h2);
+  if (!title || !heading) return false;
+  if (title === heading) return true;
+  if (title.includes(heading) && heading.length >= 14) return true;
+  if (heading.includes(title) && title.length >= 14) return true;
+
+  const titleTokens = meaningfulTokens(finalTitle);
+  const headingTokens = meaningfulTokens(h2);
+  if (headingTokens.length < 2) return false;
+  const common = headingTokens.filter(token => titleTokens.includes(token)).length;
+  return common / headingTokens.length >= 0.75 && common >= 2;
+}
+
+function normalizeHeading(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function meaningfulTokens(value: string): string[] {
+  return normalizeHeading(value)
+    .split(/\s+/)
+    .filter(token => token.length >= 4 && !HEADING_STOPWORDS.has(token));
+}
+
+function uniqueHeading(value: string, used: Set<string>): string {
+  let candidate = value.trim() || fallbackHeading(0);
+  const base = candidate;
+  let counter = 2;
+  while (used.has(normalizeHeading(candidate))) {
+    candidate = `${base} ${counter}`;
+    counter += 1;
+  }
+  used.add(normalizeHeading(candidate));
+  return candidate;
+}
+
+function fallbackHeading(index: number): string {
+  return SECTION_HEADING_FALLBACKS[index] || `Wątek ${index + 1}`;
+}
+
+const SECTION_HEADING_FALLBACKS = [
+  'Oś sporu',
+  'Rachunek za bezpieczeństwo',
+  'Polska puenta',
+];
+
+const HEADING_STOPWORDS = new Set([
+  'oraz',
+  'przy',
+  'jest',
+  'jako',
+  'czyli',
+  'ktory',
+  'ktora',
+  'ktore',
+  'nad',
+  'pod',
+  'dla',
+  'bez',
+  'jak',
+  'gdy',
+  'sie',
+]);
