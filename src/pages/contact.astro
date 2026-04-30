@@ -10,80 +10,597 @@ import { CONTACT_EMAIL } from '../consts';
   <head>
     <BaseHead title="Kontakt" description="Napisz do Pseudointelektu" />
     <style>
+      main.contact-page {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .contact-hero {
+        position: relative;
+        isolation: isolate;
+        width: 100%;
+        min-height: calc(100vh - 78px);
+        padding: clamp(2.4rem, 5vw, 5rem) 1rem;
+        display: grid;
+        place-items: center;
+        color: var(--ivory);
+        background:
+          radial-gradient(circle at 18% 22%, rgba(203, 161, 53, 0.28), transparent 28rem),
+          radial-gradient(circle at 82% 12%, rgba(67, 121, 93, 0.34), transparent 32rem),
+          linear-gradient(135deg, #0f2d22 0%, var(--royal-green) 42%, #15314a 100%);
+      }
+
+      .contact-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        background-image:
+          linear-gradient(rgba(248, 246, 241, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(248, 246, 241, 0.08) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 86%);
+      }
+
+      .contact-hero::after {
+        content: "";
+        position: absolute;
+        width: 22rem;
+        aspect-ratio: 1;
+        right: max(-8rem, -12vw);
+        bottom: -9rem;
+        z-index: -1;
+        border: 1px solid rgba(203, 161, 53, 0.32);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 3.5rem rgba(203, 161, 53, 0.08),
+          0 0 0 7rem rgba(248, 246, 241, 0.04);
+        animation: signalPulse 7s ease-in-out infinite;
+      }
+
+      .contact-shell {
+        width: min(1120px, 100%);
+        display: grid;
+        grid-template-columns: minmax(0, 0.86fr) minmax(360px, 1fr);
+        gap: clamp(1.5rem, 5vw, 4rem);
+        align-items: center;
+        min-width: 0;
+      }
+
+      .contact-copy {
+        max-width: 560px;
+        min-width: 0;
+        animation: riseIn 480ms ease-out both;
+      }
+
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin: 0 0 1rem;
+        padding: 0.38rem 0.72rem;
+        border: 1px solid rgba(203, 161, 53, 0.34);
+        border-radius: 999px;
+        color: rgba(248, 246, 241, 0.78);
+        background: rgba(17, 36, 52, 0.2);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .kicker::before {
+        content: "";
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: var(--gold-accent);
+        box-shadow: 0 0 18px rgba(203, 161, 53, 0.72);
+      }
+
+      h1 {
+        max-width: 11ch;
+        margin: 0 0 1rem;
+        color: var(--ivory);
+        font-size: clamp(2.6rem, 6vw, 5rem);
+        letter-spacing: 0;
+        text-wrap: balance;
+      }
+
+      .lead {
+        max-width: 54ch;
+        margin: 0 0 1.4rem;
+        color: rgba(248, 246, 241, 0.82);
+        font-size: clamp(1rem, 1.8vw, 1.18rem);
+      }
+
+      .contact-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        min-height: 44px;
+        padding: 0.5rem 0.88rem;
+        border: 1px solid rgba(203, 161, 53, 0.38);
+        border-radius: 999px;
+        color: var(--ivory);
+        text-decoration: none;
+        background: rgba(17, 36, 52, 0.24);
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .contact-link:hover,
+      .contact-link:focus-visible {
+        color: var(--ivory);
+        transform: translateY(-2px);
+        border-color: rgba(203, 161, 53, 0.82);
+        background: rgba(17, 36, 52, 0.42);
+        outline: none;
+      }
+
+      .contact-notes {
+        display: grid;
+        gap: 0.75rem;
+        margin: 2rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .contact-notes li {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        color: rgba(248, 246, 241, 0.78);
+      }
+
+      .note-mark {
+        flex: 0 0 auto;
+        display: inline-grid;
+        place-items: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        color: var(--charcoal);
+        background: var(--gold-accent);
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .contact-card {
+        position: relative;
+        min-width: 0;
+        padding: clamp(1.15rem, 3vw, 1.65rem);
+        border: 1px solid rgba(248, 246, 241, 0.22);
+        border-radius: 8px;
+        background: rgba(248, 246, 241, 0.96);
+        color: var(--charcoal);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+        animation: riseIn 540ms 90ms ease-out both;
+      }
+
+      .contact-card::before {
+        content: "";
+        position: absolute;
+        inset: 0.7rem;
+        z-index: -1;
+        border-radius: 8px;
+        background: rgba(203, 161, 53, 0.22);
+        filter: blur(28px);
+      }
+
+      .form-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.1rem;
+      }
+
+      .form-heading h2 {
+        margin: 0;
+        color: var(--charcoal);
+        font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+      }
+
+      .secure-pill {
+        flex: 0 0 auto;
+        padding: 0.32rem 0.62rem;
+        border-radius: 999px;
+        color: var(--diplomatic-blue);
+        background: rgba(28, 61, 90, 0.08);
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
       form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5em;
-        margin-top: 1em;
+        display: grid;
+        gap: 0.9rem;
       }
+
       label {
+        display: grid;
+        gap: 0.38rem;
+        color: var(--diplomatic-blue);
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid rgba(28, 61, 90, 0.24);
+        border-radius: 8px;
+        padding: 0.82rem 0.9rem;
+        color: var(--charcoal);
+        background:
+          linear-gradient(90deg, rgba(203, 161, 53, 0.12), transparent) 0 100% / 0 2px no-repeat,
+          #fff;
+        box-shadow: 0 1px 0 rgba(28, 61, 90, 0.06);
+        font: inherit;
+        font-size: 1rem;
+        line-height: 1.45;
+        transition:
+          border-color 160ms ease,
+          box-shadow 160ms ease,
+          background-size 220ms ease,
+          transform 160ms ease;
+      }
+
+      textarea {
+        min-height: 9.5rem;
+        resize: vertical;
+      }
+
+      input:hover,
+      textarea:hover {
+        border-color: rgba(28, 61, 90, 0.42);
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--gold-accent);
+        background-size: 100% 2px;
+        box-shadow: 0 0 0 4px rgba(203, 161, 53, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .submit-row {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: 0.2rem;
       }
-      input, textarea {
-        padding: 0.5em;
-      }
+
       button {
-        width: max-content;
-        padding: 0.5em 1em;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0.72rem 1.18rem;
+        overflow: hidden;
+        border: 1px solid var(--diplomatic-blue);
+        border-radius: 999px;
+        color: var(--ivory);
+        background: var(--diplomatic-blue);
+        box-shadow: 0 12px 24px rgba(28, 61, 90, 0.2);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        line-height: 1;
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      }
+
+      button::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-120%);
+        background: linear-gradient(90deg, transparent, rgba(248, 246, 241, 0.34), transparent);
+        transition: transform 420ms ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-2px);
+        background: #234b6d;
+        box-shadow: 0 16px 30px rgba(28, 61, 90, 0.28);
+        outline: none;
+      }
+
+      button:hover::after,
+      button:focus-visible::after {
+        transform: translateX(120%);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.78;
+        transform: none;
+      }
+
+      .status {
+        min-height: 2.65rem;
+        margin: 0;
+        padding: 0.65rem 0.8rem;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: rgba(var(--gray-dark), 0.78);
+        background: rgba(28, 61, 90, 0.06);
+        font-size: 0.92rem;
+        line-height: 1.4;
+        opacity: 0.86;
+        transition:
+          opacity 160ms ease,
+          transform 180ms ease,
+          background 180ms ease,
+          border-color 180ms ease;
+      }
+
+      .status.is-visible {
+        opacity: 1;
+        transform: translateY(-1px);
+        animation: statusIn 260ms ease-out both;
+      }
+
+      .status.is-success {
+        color: #19432e;
+        border-color: rgba(1, 68, 33, 0.22);
+        background: rgba(1, 68, 33, 0.1);
+      }
+
+      .status.is-error {
+        color: #7a261b;
+        border-color: rgba(151, 49, 31, 0.22);
+        background: rgba(151, 49, 31, 0.1);
+      }
+
+      .contact-card.is-sent {
+        animation: sentGlow 760ms ease-out;
+      }
+
+      @keyframes riseIn {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes statusIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(-1px);
+        }
+      }
+
+      @keyframes sentGlow {
+        0% {
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+        }
+        42% {
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26), 0 0 0 6px rgba(203, 161, 53, 0.28);
+        }
+        100% {
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+        }
+      }
+
+      @keyframes signalPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.76;
+        }
+        50% {
+          transform: scale(1.04);
+          opacity: 1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          transition-duration: 1ms !important;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .contact-hero {
+          min-height: auto;
+          padding: 2.2rem 0.8rem 2.8rem;
+          place-items: stretch;
+        }
+
+        .contact-shell {
+          width: 100%;
+          grid-template-columns: 1fr;
+        }
+
+        .contact-copy {
+          max-width: none;
+        }
+
+        h1 {
+          max-width: 13ch;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .contact-hero {
+          padding-inline: 0.6rem;
+        }
+
+        h1 {
+          font-size: clamp(2.1rem, 11vw, 2.65rem);
+        }
+
+        .lead,
+        .contact-notes li {
+          font-size: 0.96rem;
+          line-height: 1.55;
+        }
+
+        .contact-copy,
+        .contact-card {
+          width: 100%;
+        }
+
+        .lead,
+        .contact-notes li,
+        .contact-link {
+          overflow-wrap: anywhere;
+        }
+
+        .form-heading {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .submit-row,
+        button {
+          width: 100%;
+        }
+
+        .contact-link {
+          width: 100%;
+          justify-content: center;
+        }
       }
     </style>
   </head>
   <body>
     <Header />
-    <main>
-      <h1>Kontakt</h1>
-      <p>Masz temat, uwagę albo chcesz po prostu napisać? Wyślij wiadomość przez formularz albo bezpośrednio na <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
-      <form id="contact-form" action="/api/contact" method="post">
-        <label>
-          Imię lub podpis
-          <input type="text" name="name" maxlength="120" required />
-        </label>
-        <label>
-          Adres email
-          <input type="email" name="email" maxlength="254" required />
-        </label>
-        <label>
-          Wiadomość
-          <textarea name="message" rows="5" maxlength="4000" required></textarea>
-        </label>
-        <button type="submit">Wyślij wiadomość</button>
-      </form>
-      <p id="status"></p>
+    <main class="contact-page">
+      <section class="contact-hero" aria-labelledby="contact-title">
+        <div class="contact-shell">
+          <div class="contact-copy">
+            <p class="kicker">Kanał kontaktowy</p>
+            <h1 id="contact-title">Napisz bez ceremonii</h1>
+            <p class="lead">
+              Masz temat, uwagę albo chcesz po prostu napisać? Wyślij wiadomość przez formularz
+              albo bezpośrednio na maila. Jeśli sprawa ma sens, wrócę z odpowiedzią.
+            </p>
+            <a class="contact-link" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            <ul class="contact-notes" aria-label="Informacje o kontakcie">
+              <li>
+                <span class="note-mark">1</span>
+                <span>Najlepiej działają konkretne tematy, źródła i krótkie wyjaśnienie kontekstu.</span>
+              </li>
+              <li>
+                <span class="note-mark">2</span>
+                <span>Formularz zapisuje wiadomość po stronie serwisu i nie publikuje jej na stronie.</span>
+              </li>
+              <li>
+                <span class="note-mark">3</span>
+                <span>Spam, gotowe oferty SEO i automatyczne zachwyty zwykle nie przechodzą selekcji.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="contact-card" data-contact-card>
+            <div class="form-heading">
+              <h2>Sygnał do redakcji</h2>
+              <span class="secure-pill">Formularz</span>
+            </div>
+            <form id="contact-form" action="/api/contact" method="post">
+              <label>
+                Imię lub podpis
+                <input type="text" name="name" maxlength="120" autocomplete="name" required />
+              </label>
+              <label>
+                Adres email
+                <input type="email" name="email" maxlength="254" autocomplete="email" required />
+              </label>
+              <label>
+                Wiadomość
+                <textarea name="message" rows="5" maxlength="4000" required></textarea>
+              </label>
+              <div class="submit-row">
+                <button type="submit" data-submit-label>Wyślij wiadomość</button>
+                <p id="status" class="status" role="status" aria-live="polite">Czekam na treść wiadomości.</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
     </main>
     <Footer />
     <script type="module">
       const form = document.getElementById('contact-form');
       const status = document.getElementById('status');
+      const card = document.querySelector('[data-contact-card]');
+      const submitButton = form?.querySelector('button[type="submit"]');
+
+      const setStatus = (message, type = 'neutral') => {
+        if (!(status instanceof HTMLElement)) return;
+        status.textContent = message;
+        status.classList.remove('is-success', 'is-error', 'is-visible');
+        status.classList.add('is-visible');
+        if (type === 'success') status.classList.add('is-success');
+        if (type === 'error') status.classList.add('is-error');
+      };
+
+      const setSubmitting = (isSubmitting) => {
+        if (!(submitButton instanceof HTMLButtonElement)) return;
+        submitButton.disabled = isSubmitting;
+        submitButton.textContent = isSubmitting ? 'Wysyłam...' : 'Wyślij wiadomość';
+      };
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = new FormData(form);
-        const name = data.get('name').trim();
-        const email = data.get('email').trim();
-        const message = data.get('message').trim();
+        const name = String(data.get('name') || '').trim();
+        const email = String(data.get('email') || '').trim();
+        const message = String(data.get('message') || '').trim();
+
         if (!name) {
-          status.textContent = 'Podaj imię albo podpis, żebym wiedział, do kogo odpisuję.';
-          status.style.color = 'red';
+          setStatus('Podaj imię albo podpis, żebym wiedział, do kogo odpisuję.', 'error');
           return;
         }
         if (!/^\S+@\S+\.\S+$/.test(email)) {
-          status.textContent = 'Podaj poprawny adres email.';
-          status.style.color = 'red';
+          setStatus('Podaj poprawny adres email.', 'error');
           return;
         }
         if (!message) {
-          status.textContent = 'Napisz chociaż kilka zdań, inaczej nie mam do czego się odnieść.';
-          status.style.color = 'red';
+          setStatus('Napisz chociaż kilka zdań, inaczej nie mam do czego się odnieść.', 'error');
           return;
         }
-        const res = await fetch('/api/contact', { method: 'POST', body: data });
-        if (res.ok) {
-          status.textContent = 'Wiadomość wysłana. Dzięki.';
-          status.style.color = 'green';
-          form.reset();
-        } else {
-          status.textContent = 'Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.';
-          status.style.color = 'red';
+
+        setSubmitting(true);
+        setStatus('Wysyłam wiadomość...', 'neutral');
+
+        try {
+          const res = await fetch('/api/contact', { method: 'POST', body: data });
+          if (res.ok) {
+            setStatus('Wiadomość wysłana. Dzięki, sygnał dotarł.', 'success');
+            if (card instanceof HTMLElement) {
+              card.classList.remove('is-sent');
+              window.requestAnimationFrame(() => card.classList.add('is-sent'));
+            }
+            form.reset();
+          } else {
+            setStatus('Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.', 'error');
+          }
+        } catch {
+          setStatus('Nie udało się połączyć z formularzem. Spróbuj ponownie za chwilę.', 'error');
+        } finally {
+          setSubmitting(false);
         }
       });
     </script>
