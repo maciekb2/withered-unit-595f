@@ -35,11 +35,16 @@ export interface GenerationAuditContext {
   [key: string]: unknown;
 }
 
+export interface GenerateAndPublishOptions {
+  initialTopic?: string;
+}
+
 export async function generateAndPublish(
   env: Env,
   controller?: { enqueue: (chunk: string) => void; close: () => void },
   promptPromise?: Promise<{ topic: string }>,
   auditContext: GenerationAuditContext = {},
+  options: GenerateAndPublishOptions = {},
 ): Promise<GenerateAndPublishResult> {
   let currentStage = 'start';
   const send = (log: string, data: Record<string, unknown> = {}) => {
@@ -66,7 +71,7 @@ export async function generateAndPublish(
   try {
     logEvent({
       type: 'generation-start',
-      mode: promptPromise ? 'manual' : 'auto',
+      mode: promptPromise || options.initialTopic ? 'manual' : 'auto',
       ...auditContext,
     });
 
@@ -78,7 +83,7 @@ export async function generateAndPublish(
     const sectionedText = shouldUseSectionedText(env, textProvider);
     send('generation-config', {
       generationConfig: {
-        runMode: promptPromise ? 'manual' : 'auto',
+        runMode: promptPromise || options.initialTopic ? 'manual' : 'auto',
         textProvider: textProvider.type,
         textProviderLabel: describeTextProvider(textProvider),
         textFallback: textProvider.type === 'jetson' ? (textProvider.fallback || 'openai') : undefined,
@@ -113,7 +118,16 @@ export async function generateAndPublish(
 
     let baseTopic = hotTopics[0]?.title || 'Aktualny temat';
 
-    if (promptPromise) {
+    if (options.initialTopic) {
+      baseTopic = options.initialTopic;
+      send('✏️ Wybrany temat', { selectedTopic: baseTopic });
+      logEvent({
+        type: 'generation-topic-selected',
+        ...auditContext,
+        topic: baseTopic,
+        source: 'stream-query',
+      });
+    } else if (promptPromise) {
       setStage('suggest-topic');
       send('suggest-topic-start');
       send(`🧠 Generuję propozycje tematów: ${describeTextProvider(textProvider)}...`);

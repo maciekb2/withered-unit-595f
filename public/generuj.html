@@ -638,11 +638,14 @@ function replaceList(el, title, items) {
   });
 }
 
-function startStream() {
-  appendLog('Łączenie z /api/generate-stream...');
+function startStream(topic) {
+  const endpoint = topic
+    ? `/api/generate-stream?topic=${encodeURIComponent(topic)}`
+    : '/api/generate-stream';
+  appendLog(`Łączenie z ${endpoint}...`);
   setStatus('Łączenie ze streamem');
-  sendLog('connect', { endpoint: '/api/generate-stream' });
-  const es = new EventSource('/api/generate-stream');
+  sendLog('connect', { endpoint, hasTopic: Boolean(topic) });
+  const es = new EventSource(endpoint);
   es.addEventListener('open', () => {
     appendLog('Połączono z serwerem', 'success');
     setStatus('Połączono');
@@ -662,28 +665,20 @@ function startStream() {
     es.close();
   };
 
-  continueBtn.addEventListener('click', async () => {
-    continueBtn.disabled = true;
-    try {
-      appendLog('Wysyłam wybrany temat do /api/update-prompt...');
-      sendLog('update-prompt-send', { endpoint: '/api/update-prompt' });
-      const res = await fetch('/api/update-prompt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: selectedTopic() }),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('status ' + res.status);
-      sendLog('update-prompt-response', { status: res.status });
-      appendLog('Temat wysłany. Kontynuuję tworzenie...', 'success');
-      continueBtn.style.display = 'none';
-      setStatus('Generuję artykuł');
-    } catch (err) {
-      appendLog(`Błąd podczas wysyłania tematu: ${err}`, 'error');
-      sendLog('update-prompt-error', { message: String(err) });
-      continueBtn.disabled = false;
+  continueBtn.onclick = () => {
+    const topic = selectedTopic();
+    if (!topic) {
+      appendLog('Wybierz albo wpisz temat przed kontynuacją.', 'warn');
+      return;
     }
-  });
+    continueBtn.disabled = true;
+    continueBtn.style.display = 'none';
+    sendLog('topic-selected', { topic });
+    appendLog('Uruchamiam generowanie z wybranym tematem...', 'success');
+    setStatus('Generuję artykuł');
+    es.close();
+    startStream(topic);
+  };
 }
 
 function handleMessage(msg, es) {

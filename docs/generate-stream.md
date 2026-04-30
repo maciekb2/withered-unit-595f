@@ -24,14 +24,16 @@ Po zakończeniu wysyłany jest obiekt `{ done: true, url: '<link do PR>' }`.
 
 Gdy OpenAI zwróci błąd wskazujący na brak środków, limit billingowy albo wyczerpany kredyt, strumień zwraca `errorCode: "OPENAI_BILLING_QUOTA_EXCEEDED"`. Ten przypadek wysyła też osobny alert na Slacka z etapem, kodem błędu i kontekstem Access użytkownika, bez ujawniania sekretów.
 
-Jeśli pojawi się pole `awaitingTopic`, proces czeka na wysłanie wybranego tematu pod
-endpoint `POST /api/update-prompt` w formacie `{ "topic": "wybrany temat" }`.
+Jeśli pojawi się pole `awaitingTopic`, dashboard powinien zamknąć bieżący stream propozycji i otworzyć
+nowy `GET /api/generate-stream?topic=<wybrany temat>`.
 
 ## Podstrona `generuj.html`
 
 W katalogu `public/` dodano dashboard, który łączy się z powyższym strumieniem, pokazuje konfigurację uruchomienia, oś etapów, log streamu, wybór tematu, konspekt/walidację oraz prompt/odpowiedź modelu. Użytkownik wybiera temat spośród propozycji lub wpisuje własny i potwierdza przyciskiem.
 
 Dashboard uruchamia `EventSource` bezpośrednio na `/api/generate-stream`. Cloudflare Access musi chronić panel i API w jednej aplikacji Access, z destynacjami `/generuj`, `/generuj.html` oraz `/api/*`; wtedy sesja z logowania do panelu działa też dla streamu SSE i pomocniczych endpointów.
+
+W trybie ręcznym pierwszy stream służy do pobrania propozycji tematów. Po wyborze dashboard otwiera nowy stream `GET /api/generate-stream?topic=...`. Dzięki temu wybór tematu nie zależy od współdzielonej pamięci między requestami Cloudflare Workers.
 
 ```
 const es = new EventSource('/api/generate-stream');

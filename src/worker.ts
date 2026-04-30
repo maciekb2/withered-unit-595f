@@ -299,7 +299,12 @@ export default {
         request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
       ) {
-        logEvent({ type: 'generate-stream-start', ...accessAuditContext });
+        const initialTopic = (url.searchParams.get('topic') || '').trim();
+        logEvent({
+          type: 'generate-stream-start',
+          ...accessAuditContext,
+          hasInitialTopic: Boolean(initialTopic),
+        });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
         let streamClosed = false;
@@ -310,12 +315,14 @@ export default {
             return writer.close();
           },
         };
-        const deferred = createDeferred<{ topic: string }>();
-        pendingPrompts.set(session.id, deferred.resolve);
+        const deferred = initialTopic ? undefined : createDeferred<{ topic: string }>();
+        if (deferred) pendingPrompts.set(session.id, deferred.resolve);
         ctx.waitUntil(
-          generateAndPublish(env, ctrl, deferred.promise, {
+          generateAndPublish(env, ctrl, deferred?.promise, {
             source: 'manual-sse',
             ...accessAuditContext,
+          }, {
+            initialTopic,
           })
             .catch(err => {
               console.error('Błąd w tle:', err);
