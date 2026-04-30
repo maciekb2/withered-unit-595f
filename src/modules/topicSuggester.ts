@@ -7,6 +7,7 @@ import { guardrails } from '../pipeline/guardrails';
 export interface SuggestedTopic {
   title: string;
   rationale: string;
+  sourceUrl?: string;
 }
 
 export interface SuggestedTopicResult {
@@ -34,7 +35,8 @@ export async function suggestArticleTopic(
     '',
     'Zaproponuj 3 tytuły artykułów satyrycznych, ironicznych, w tonie centro-prawicowym (PL-patriotycznym), unikając powtórzeń z listy.',
     'Dla każdego dodaj krótkie uzasadnienie wyboru tematu.',
-    'Odpowiedz TYLKO w formacie JSON array { title, rationale } bez dodatkowego tekstu.',
+    'Dla każdego przepisz sourceUrl jako dokładny URL jednego gorącego tematu, z którego wynika propozycja.',
+    'Odpowiedz TYLKO w formacie JSON array { title, rationale, sourceUrl } bez dodatkowego tekstu.',
   ].join('\n');
 
   if (!apiKey) {
@@ -82,7 +84,7 @@ export async function suggestArticleTopic(
     for (const s of arr) {
       const lowerTitle = s.title.toLowerCase();
       if (!lowerRecent.includes(lowerTitle) && !result.some(r => r.title.toLowerCase() === lowerTitle)) {
-        result.push(s);
+        result.push(withSourceUrl(s, hotTopics));
       }
     }
 
@@ -103,3 +105,54 @@ function isSuggestedTopic(value: unknown): value is SuggestedTopic {
   const topic = value as Partial<SuggestedTopic>;
   return typeof topic.title === 'string' && typeof topic.rationale === 'string';
 }
+
+function withSourceUrl(topic: SuggestedTopic, hotTopics: HotTopic[]): SuggestedTopic {
+  if (topic.sourceUrl && hotTopics.some(hot => hot.url === topic.sourceUrl)) return topic;
+  const inferred = inferSourceTopic(`${topic.title} ${topic.rationale}`, hotTopics);
+  return inferred ? { ...topic, sourceUrl: inferred.url } : topic;
+}
+
+function inferSourceTopic(value: string, hotTopics: HotTopic[]): HotTopic | undefined {
+  const queryTokens = topicTokens(value);
+  if (queryTokens.size === 0) return undefined;
+
+  let best: { topic: HotTopic; score: number } | undefined;
+  for (const topic of hotTopics) {
+    const haystack = topicTokens(`${topic.title} ${topic.description || ''} ${topic.source}`);
+    let score = 0;
+    for (const token of queryTokens) {
+      if (haystack.has(token)) score += 1;
+    }
+    if (!best || score > best.score) best = { topic, score };
+  }
+  return best && best.score >= 2 ? best.topic : undefined;
+}
+
+function topicTokens(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(/[^a-z0-9]+/i)
+      .filter(token => token.length >= 4 && !COMMON_TOPIC_TOKENS.has(token)),
+  );
+}
+
+const COMMON_TOPIC_TOKENS = new Set([
+  'przy',
+  'jako',
+  'oraz',
+  'ktory',
+  'ktora',
+  'temat',
+  'article',
+  'news',
+  'says',
+  'said',
+  'with',
+  'from',
+  'that',
+  'this',
+  'will',
+]);

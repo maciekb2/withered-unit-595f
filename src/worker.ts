@@ -300,10 +300,12 @@ export default {
         url.pathname === '/api/generate-stream'
       ) {
         const initialTopic = (url.searchParams.get('topic') || '').trim();
+        const initialSourceUrl = (url.searchParams.get('sourceUrl') || '').trim();
         logEvent({
           type: 'generate-stream-start',
           ...accessAuditContext,
           hasInitialTopic: Boolean(initialTopic),
+          hasInitialSourceUrl: Boolean(initialSourceUrl),
         });
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();
@@ -323,6 +325,7 @@ export default {
             ...accessAuditContext,
           }, {
             initialTopic,
+            initialSourceUrl,
           })
             .catch(err => {
               console.error('Błąd w tle:', err);

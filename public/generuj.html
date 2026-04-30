@@ -638,9 +638,12 @@ function replaceList(el, title, items) {
   });
 }
 
-function startStream(topic) {
-  const endpoint = topic
-    ? `/api/generate-stream?topic=${encodeURIComponent(topic)}`
+function startStream(topic, sourceUrl = '') {
+  const params = new URLSearchParams();
+  if (topic) params.set('topic', topic);
+  if (sourceUrl) params.set('sourceUrl', sourceUrl);
+  const endpoint = params.toString()
+    ? `/api/generate-stream?${params.toString()}`
     : '/api/generate-stream';
   appendLog(`Łączenie z ${endpoint}...`);
   setStatus('Łączenie ze streamem');
@@ -666,18 +669,18 @@ function startStream(topic) {
   };
 
   continueBtn.onclick = () => {
-    const topic = selectedTopic();
-    if (!topic) {
+    const selection = selectedTopic();
+    if (!selection.topic) {
       appendLog('Wybierz albo wpisz temat przed kontynuacją.', 'warn');
       return;
     }
     continueBtn.disabled = true;
     continueBtn.style.display = 'none';
-    sendLog('topic-selected', { topic });
+    sendLog('topic-selected', selection);
     appendLog('Uruchamiam generowanie z wybranym tematem...', 'success');
     setStatus('Generuję artykuł');
     es.close();
-    startStream(topic);
+    startStream(selection.topic, selection.sourceUrl);
   };
 }
 
@@ -740,6 +743,7 @@ function renderTopicForm(suggestions) {
     radio.type = 'radio';
     radio.name = 'topic';
     radio.value = s.title;
+    if (s.sourceUrl) radio.dataset.sourceUrl = s.sourceUrl;
     if (index === 0) radio.checked = true;
     const text = document.createElement('span');
     text.textContent = `${s.title} — ${s.rationale}`;
@@ -756,11 +760,11 @@ function renderTopicForm(suggestions) {
 }
 
 function selectedTopic() {
-  if (!topicForm) return '';
+  if (!topicForm) return { topic: '', sourceUrl: '' };
   const custom = document.getElementById('custom-topic');
-  if (custom?.value.trim()) return custom.value.trim();
+  if (custom?.value.trim()) return { topic: custom.value.trim(), sourceUrl: '' };
   const checked = topicForm.querySelector('input[name="topic"]:checked');
-  return checked ? checked.value : '';
+  return checked ? { topic: checked.value, sourceUrl: checked.dataset.sourceUrl || '' } : { topic: '', sourceUrl: '' };
 }
 
 function appendValidation(title, entries, stats) {

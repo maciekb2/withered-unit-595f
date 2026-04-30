@@ -37,6 +37,7 @@ export interface GenerationAuditContext {
 
 export interface GenerateAndPublishOptions {
   initialTopic?: string;
+  initialSourceUrl?: string;
 }
 
 export async function generateAndPublish(
@@ -194,8 +195,10 @@ export async function generateAndPublish(
       }
     }
 
-    const matchedTopic = hotTopics.find(t => t.title === baseTopic) || inferClosestTopic(baseTopic, hotTopics);
-    const leadSourceUrl = matchedTopic?.url || hotTopics[0]?.url || 'https://example.com';
+    const matchedTopic = options.initialSourceUrl
+      ? hotTopics.find(t => t.url === options.initialSourceUrl)
+      : hotTopics.find(t => t.title === baseTopic) || inferClosestTopic(baseTopic, hotTopics);
+    const leadSourceUrl = options.initialSourceUrl || matchedTopic?.url || hotTopics[0]?.url || 'https://example.com';
     const selectedTopic = matchedTopic
       ? {
           title: matchedTopic.title,
