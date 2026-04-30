@@ -27,8 +27,6 @@ export interface SectionedWriteResult {
 
 const DEFAULT_PARAGRAPHS_PER_SECTION = 3;
 const DEFAULT_TOKENS_PER_CALL = 1800;
-const MAX_PROMPT_BLOCK = 2600;
-
 export async function writeArticleSectioned({
   apiKey,
   outline,
@@ -52,27 +50,8 @@ export async function writeArticleSectioned({
   const messages: ChatMessage[] = [];
   const rawParts: string[] = [];
 
-  const leadPrompt = buildLeadPrompt({
-    outline,
-    writeTemplate,
-    styleGuide,
-    contextPack,
-    sourceUrl,
-  });
-  const leadMessages = [
-    { role: 'system', content: systemPrompt() },
-    { role: 'user', content: leadPrompt },
-  ];
-  messages.push(...leadMessages);
-  const leadRaw = await chat(apiKey, {
-    messages: leadMessages,
-    max_completion_tokens: Math.min(maxTokensPerCall, 1200),
-    model,
-    provider,
-    response_style: 'normal',
-  });
-  rawParts.push(leadRaw);
-  const lead = sanitizeBodyText(leadRaw, sourceUrl);
+  const lead = outline.description;
+  rawParts.push(lead);
 
   const writtenSections: { h2: string; raw: string; markdown: string }[] = [];
   for (let index = 0; index < outline.sections.length; index += 1) {
@@ -147,31 +126,6 @@ function systemPrompt(): string {
     'Pisz po polsku w stylu Pseudointelektu: satyryczny, publicystyczny, geopolityczny, z ironią, ale spójny i czytelny.',
     'Nie ujawniaj rozumowania. Zwracaj wyłącznie gotowy tekst artykułu, bez komentarzy technicznych.',
   ].join(' ');
-}
-
-function buildLeadPrompt({
-  outline,
-  styleGuide,
-  contextPack,
-  sourceUrl,
-}: {
-  outline: Outline;
-  writeTemplate: string;
-  styleGuide: string;
-  contextPack: string;
-  sourceUrl: string;
-}): string {
-  return [
-    'Napisz lead do artykułu.',
-    `Tytuł: ${outline.finalTitle}`,
-    `Opis: ${outline.description}`,
-    `Jedyne dozwolone źródło URL w całym artykule: ${sourceUrl}`,
-    'Lead ma mieć 1-2 zwarte akapity, bez nagłówka, bez list i bez dodatkowych URL.',
-    'Nie streszczaj całego planu; ustaw główną tezę i ton.',
-    'Zwróć wyłącznie gotowy lead po polsku. Bez JSON, bez komentarza, bez analizy i bez markdown fences.',
-    block('KONTEKST', contextPack),
-    block('STYLE GUIDE', styleGuide),
-  ].filter(Boolean).join('\n\n');
 }
 
 function buildSectionPrompt({
