@@ -51,3 +51,35 @@ test('suggestArticleTopic avoids recent titles and covers multiple themes', asyn
 
   globalThis.fetch = originalFetch;
 });
+
+test('suggestArticleTopic accepts a single topic object from small models', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        choices: [
+          {
+            message: {
+              parsed: {
+                title: 'Pojedynczy tytuł',
+                rationale: 'Model zwrócił jeden temat zamiast tablicy',
+              },
+            },
+          },
+        ],
+      }),
+      { status: 200 },
+    ) as any;
+
+  try {
+    const res = await suggestArticleTopic(mockHotTopics, recent, 'test-key');
+    assert.deepEqual(res.suggestions, [
+      {
+        title: 'Pojedynczy tytuł',
+        rationale: 'Model zwrócił jeden temat zamiast tablicy',
+      },
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

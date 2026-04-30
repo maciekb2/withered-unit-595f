@@ -64,14 +64,17 @@ export async function suggestArticleTopic(
       : typeof parsed === 'object' && parsed
         ? Object.keys(parsed).find(k => Array.isArray((parsed as any)[k])) || null
         : null;
+    const singleton = isSuggestedTopic(parsed) ? [parsed] : null;
     const arr: SuggestedTopic[] = Array.isArray(parsed)
       ? parsed
       : arrKey
         ? (parsed as any)[arrKey]
-        : (() => {
-            const keys = parsed && typeof parsed === 'object' ? Object.keys(parsed).join(', ') : String(parsed);
-            throw new Error(`Parsed response is not an array (keys: ${keys})`);
-          })();
+        : singleton
+          ? singleton
+          : (() => {
+              const keys = parsed && typeof parsed === 'object' ? Object.keys(parsed).join(', ') : String(parsed);
+              throw new Error(`Parsed response is not an array (keys: ${keys})`);
+            })();
     logEvent({ type: 'suggest-topic-parsed', parsed, arrayKey: arrKey });
 
     const lowerRecent = recentTitles.map(t => t.toLowerCase());
@@ -93,4 +96,10 @@ export async function suggestArticleTopic(
     logError(err, { type: 'suggest-topic-error' });
     throw err;
   }
+}
+
+function isSuggestedTopic(value: unknown): value is SuggestedTopic {
+  if (!value || typeof value !== 'object') return false;
+  const topic = value as Partial<SuggestedTopic>;
+  return typeof topic.title === 'string' && typeof topic.rationale === 'string';
 }
