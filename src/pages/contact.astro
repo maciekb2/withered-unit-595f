@@ -37,15 +37,15 @@ import { CONTACT_EMAIL } from '../consts';
       <form id="contact-form" action="/api/contact" method="post">
         <label>
           Imię
-          <input type="text" name="name" required />
+          <input type="text" name="name" maxlength="120" required />
         </label>
         <label>
           Email
-          <input type="email" name="email" required />
+          <input type="email" name="email" maxlength="254" required />
         </label>
         <label>
           Wiadomość
-          <textarea name="message" rows="5" required></textarea>
+          <textarea name="message" rows="5" maxlength="4000" required></textarea>
         </label>
         <button type="submit">Wyślij</button>
       </form>

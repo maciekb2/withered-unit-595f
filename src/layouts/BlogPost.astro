@@ -38,9 +38,9 @@ const jsonLd = {
 };
 ---
 
-<html lang="en">
+<html lang="pl">
         <head>
-                <BaseHead title={title} description={description} />
+                <BaseHead title={title} description={description} image={heroImage} type="article" />
                 <script type="application/ld+json">
                         {JSON.stringify(jsonLd)}
                 </script>
@@ -105,7 +105,7 @@ const jsonLd = {
                                                         {
                                                                 updatedDate && (
                                                                         <div class="last-updated-on">
-                                                                               Last updated on <FormattedDate date={updatedDate} />
+                                                                               Ostatnia aktualizacja: <FormattedDate date={updatedDate} />
                                                                         </div>
                                                                 )
                                                         }

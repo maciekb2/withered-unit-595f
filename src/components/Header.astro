@@ -3,7 +3,7 @@ import { SITE_TITLE } from '../consts';
 import Menu from './Menu.astro';
 ---
 
-<header>
+<header data-site-header>
         <nav>
                 <a href="/" class="logo">
                         <img src="/pseudointelekt_logo_tekstura.svg" alt={SITE_TITLE} />
@@ -12,75 +12,55 @@ import Menu from './Menu.astro';
         </nav>
 </header>
 <script>
-        const header = document.querySelector('header');
-        let lastScroll = window.scrollY;
+        const header = document.querySelector('header[data-site-header]');
 
-        function updateHeader() {
-                const current = window.scrollY;
-
-                if (current <= 0) {
-                        header.classList.add('expanded');
-                } else {
-                        header.classList.remove('expanded');
-                }
-
-                if (current > lastScroll && current > header.offsetHeight) {
-                        header.classList.add('hidden');
-                } else {
-                        header.classList.remove('hidden');
-                }
-                lastScroll = current;
+        function updateHeaderState() {
+                if (!header) return;
+                header.classList.toggle('is-scrolled', window.scrollY > 8);
         }
 
-        updateHeader();
-        window.addEventListener('scroll', updateHeader);
+        updateHeaderState();
+        window.addEventListener('scroll', updateHeaderState, { passive: true });
 </script>
 <style>
         header {
                 margin: 0;
                 padding: 0 1em;
-                background: white;
-                box-shadow: 0 2px 8px rgba(var(--black), 5%);
-                position: fixed;
+                background: rgba(var(--gray-light), 94%);
+                border-bottom: 1px solid transparent;
+                box-shadow: 0 2px 8px rgba(var(--gray-dark), 8%);
+                position: sticky;
                 top: 0;
-                left: 0;
-                right: 0;
-                z-index: 10;
-                transition: top 0.3s ease, height 0.3s ease;
-                height: 60px;
+                z-index: 100;
+                transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+                min-height: 72px;
                 display: flex;
                 align-items: center;
+                backdrop-filter: blur(8px);
         }
-        header.expanded {
-                height: 100px;
-        }
-        header.expanded .logo img {
-                animation: bump 0.3s ease;
-        }
-        header.hidden {
-                top: -100%;
+        header.is-scrolled {
+                background: rgba(var(--gray-light), 98%);
+                border-bottom-color: rgba(var(--gray-dark), 16%);
+                box-shadow: 0 10px 24px rgba(var(--gray-dark), 14%);
         }
         .logo {
                 display: flex;
                 align-items: center;
                 padding: 0;
-                height: 100%;
+                height: 56px;
         }
         .logo img {
                 display: block;
                 height: 100%;
                 width: auto;
         }
-        @keyframes bump {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-        }
         nav {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                height: 100%;
+                width: min(1100px, 100%);
+                min-height: 72px;
+                margin: 0 auto;
         }
         nav a {
                 position: relative;

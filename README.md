@@ -46,6 +46,19 @@ wrangler secret put GITHUB_REPO
 wrangler secret put SLACK_WEBHOOK_URL
 ```
 
+### Cloudflare Access dla panelu generowania
+Panel `/generuj.html` oraz endpointy sterujące generowaniem (`/api/generate-stream`, `/api/update-prompt`, `/api/get-prompt`, `/api/client-log`) zakładają, że hostname jest chroniony przez Cloudflare Access. Worker dodatkowo waliduje JWT z nagłówka `Cf-Access-Jwt-Assertion`, więc sama znajomość URL-a nie wystarczy do uruchomienia kosztownego pipeline'u OpenAI/GitHub.
+
+Ustaw jako Worker secrets:
+
+```bash
+wrangler secret put CF_ACCESS_TEAM_DOMAIN
+wrangler secret put CF_ACCESS_AUD
+wrangler secret put CF_ACCESS_ALLOWED_EMAILS
+```
+
+`CF_ACCESS_ALLOWED_EMAILS` jest opcjonalne. Jeśli pozostanie puste, wystarczy poprawna sesja danej aplikacji Access. Jeśli je ustawisz, Worker dopuści tylko wskazane adresy e-mail z tokenu Access. Lokalnie (`localhost`/`127.0.0.1`) ta blokada jest pomijana, żeby dało się testować `wrangler dev`.
+
 ### Konfiguracja bazy kontaktów
 Utwórz przestrzeń Cloudflare KV do przechowywania wysłanych formularzy:
 

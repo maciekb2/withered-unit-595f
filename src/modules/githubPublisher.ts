@@ -12,6 +12,10 @@ export interface PublishOptions {
   date?: string;
 }
 
+function createBranchSuffix(): string {
+  return crypto.randomUUID().replace(/-/g, '').slice(0, 8);
+}
+
 export async function publishArticleToGitHub({ env, article, heroImage, date }: PublishOptions): Promise<string> {
   logEvent({ type: 'github-publish-start', title: article.title });
   const validation = validateFinalJson(article);
@@ -59,7 +63,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   // Include a slugified title in the branch name to avoid collisions when
   // publishing multiple posts on the same day.
   const shortSlug = slug.slice(0, 20);
-  const branch = `auto-${postDate.replace(/-/g, '')}-${shortSlug}`;
+  const branch = `auto-${postDate.replace(/-/g, '')}-${shortSlug}-${createBranchSuffix()}`;
 
   const imageName = `${postDate}-${slug}.png`;
   const postName = `${postDate}-${slug}.md`;

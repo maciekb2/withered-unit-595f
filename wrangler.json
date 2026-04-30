@@ -5,7 +5,12 @@
   "main": "./dist/worker.js",
   "assets": {
     "directory": "./dist",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/generuj",
+      "/generuj.html",
+      "/api/*"
+    ]
   },
   "kv_namespaces": [
     {

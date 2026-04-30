@@ -18,5 +18,8 @@ interface Env {
         OPENAI_REPAIR_MODEL?: string;
         OPENAI_IMAGE_STYLE: string;
         OPENAI_IMAGE_QUALITY: string;
+        CF_ACCESS_TEAM_DOMAIN?: string;
+        CF_ACCESS_AUD?: string;
+        CF_ACCESS_ALLOWED_EMAILS?: string;
         pseudointelekt_logs_db: D1Database;
 }

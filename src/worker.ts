@@ -6,20 +6,118 @@ import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
 import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
+import { isGenerationPath, requireCloudflareAccess } from './utils/accessAuth';
 
 const pendingPrompts = new Map<
   string,
   (data: { topic: string }) => void
 >();
 
-async function handleContact(request: Request, env: Env) {
+const CONTACT_LIMITS = {
+  maxNameLength: 120,
+  maxEmailLength: 254,
+  maxMessageLength: 4000,
+  sessionWindowSeconds: 10 * 60,
+  sessionMax: 3,
+  ipWindowSeconds: 60 * 60,
+  ipMax: 10,
+} as const;
+
+function jsonResponse(data: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+async function shortHash(value: string): Promise<string> {
+  const bytes = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(hash))
+    .slice(0, 12)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get('CF-Connecting-IP') ||
+    request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+    'unknown'
+  );
+}
+
+async function incrementRateLimit(
+  env: Env,
+  key: string,
+  limit: number,
+  ttlSeconds: number,
+): Promise<boolean> {
+  const raw = await env.pseudointelekt_contact_form.get(key);
+  const current = raw ? Number.parseInt(raw, 10) || 0 : 0;
+  if (current >= limit) return false;
+  await env.pseudointelekt_contact_form.put(key, String(current + 1), {
+    expirationTtl: ttlSeconds,
+  });
+  return true;
+}
+
+async function checkContactRateLimit(
+  request: Request,
+  env: Env,
+  sessionId: string,
+): Promise<Response | null> {
+  const [sessionHash, ipHash] = await Promise.all([
+    shortHash(sessionId),
+    shortHash(getClientIp(request)),
+  ]);
+
+  const allowedBySession = await incrementRateLimit(
+    env,
+    `rate:contact:session:${sessionHash}`,
+    CONTACT_LIMITS.sessionMax,
+    CONTACT_LIMITS.sessionWindowSeconds,
+  );
+
+  if (!allowedBySession) {
+    logEvent({ type: 'contact-rate-limit-session', sessionHash });
+    return jsonResponse({ message: 'Too many messages. Try again later.' }, 429);
+  }
+
+  const allowedByIp = await incrementRateLimit(
+    env,
+    `rate:contact:ip:${ipHash}`,
+    CONTACT_LIMITS.ipMax,
+    CONTACT_LIMITS.ipWindowSeconds,
+  );
+
+  if (!allowedByIp) {
+    logEvent({ type: 'contact-rate-limit-ip', ipHash });
+    return jsonResponse({ message: 'Too many messages. Try again later.' }, 429);
+  }
+
+  return null;
+}
+
+async function handleContact(request: Request, env: Env, sessionId: string) {
   logEvent({ type: 'contact-start' });
+  const rateLimitResponse = await checkContactRateLimit(request, env, sessionId);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const data = await request.formData();
   const name = (data.get('name') || '').toString().trim();
   const email = (data.get('email') || '').toString().trim();
   const message = (data.get('message') || '').toString().trim();
 
-  if (!name || !email || !message || !/^\S+@\S+\.\S+$/.test(email)) {
+  if (
+    !name ||
+    !email ||
+    !message ||
+    name.length > CONTACT_LIMITS.maxNameLength ||
+    email.length > CONTACT_LIMITS.maxEmailLength ||
+    message.length > CONTACT_LIMITS.maxMessageLength ||
+    !/^\S+@\S+\.\S+$/.test(email)
+  ) {
     return new Response('Invalid input', { status: 400 });
   }
 
@@ -196,9 +294,14 @@ export default {
     }
     const url = new URL(request.url);
     try {
+      if (isGenerationPath(url.pathname)) {
+        const authResponse = await requireCloudflareAccess(request, env);
+        if (authResponse) return authResponse;
+      }
+
       let response: Response;
       if (request.method === 'POST' && url.pathname === '/api/contact') {
-        response = await handleContact(request, env);
+        response = await handleContact(request, env, session.id);
       } else if (
         request.method === 'GET' &&
         url.pathname === '/api/generate-stream'
@@ -290,11 +393,7 @@ export default {
       return response;
     } catch (err) {
       logError(err, { type: 'fetch-error', path: url.pathname });
-      const errorResponse = {
-        message: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : undefined,
-      };
-      return new Response(JSON.stringify(errorResponse, null, 2), {
+      return new Response(JSON.stringify({ message: 'Internal Server Error' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
