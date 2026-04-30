@@ -15,11 +15,11 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a local operator script for querying generation logs by session, Access identity, topic, URL, event type, or payload contents.
 - [x] Add an explicit D1 migration for the current logs table and a package script for applying future remote migrations.
 - [x] Move views and likes to D1-backed atomic counters while preserving existing KV counts as first-use baselines.
+- [x] Harden likes against trivial repeat voting with same-session idempotency plus hashed session/IP/IP+slug rate limits with KV expiry.
 
 ## Next
 
 - [x] Add lightweight anti-spam controls to the public contact form: size limits, per-session limits, and per-IP limits.
 - [x] Split deployment checks into a PR CI workflow and a main-branch deploy workflow.
-- [ ] Harden likes against trivial repeat voting with better rate limits and key expiry.
 - [ ] Replace regex-based RSS parsing with a proper XML/RSS parser or fixture-backed parser tests.
 - [ ] Add focused tests for Cloudflare Access auth decisions and contact-form throttling.

@@ -144,10 +144,10 @@ const jsonLd = {
                                 });
                         likeBtn?.addEventListener('click', () => {
                                 fetch(`/api/likes/${currentSlug}`, { method: 'POST' })
-                                        .then((r) => r.ok ? r.json() : { likes: 0 })
+                                        .then((r) => r.json().catch(() => ({})))
                                         .then((d) => {
                                                 const el = document.getElementById('like-count');
-                                                if (el) el.textContent = d.likes;
+                                                if (el && d.likes != null) el.textContent = d.likes;
                                                 if (likeBtn) {
                                                         likeBtn.disabled = true;
                                                         likeBtn.textContent = '❤️';

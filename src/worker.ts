@@ -15,6 +15,7 @@ import {
   ensureCounter,
   getCounter,
   getCounters,
+  hasLikeSession,
   incrementCounter,
   markLikeIfFirst,
 } from './utils/engagementCounters';
@@ -32,6 +33,15 @@ const CONTACT_LIMITS = {
   sessionMax: 3,
   ipWindowSeconds: 60 * 60,
   ipMax: 10,
+} as const;
+
+const LIKE_LIMITS = {
+  sessionWindowSeconds: 60 * 60,
+  sessionMax: 20,
+  ipWindowSeconds: 60 * 60,
+  ipMax: 40,
+  ipSlugWindowSeconds: 24 * 60 * 60,
+  ipSlugMax: 3,
 } as const;
 
 function jsonResponse(data: Record<string, unknown>, status = 200): Response {
@@ -59,15 +69,15 @@ function getClientIp(request: Request): string {
 }
 
 async function incrementRateLimit(
-  env: Env,
+  namespace: KVNamespace,
   key: string,
   limit: number,
   ttlSeconds: number,
 ): Promise<boolean> {
-  const raw = await env.pseudointelekt_contact_form.get(key);
+  const raw = await namespace.get(key);
   const current = raw ? Number.parseInt(raw, 10) || 0 : 0;
   if (current >= limit) return false;
-  await env.pseudointelekt_contact_form.put(key, String(current + 1), {
+  await namespace.put(key, String(current + 1), {
     expirationTtl: ttlSeconds,
   });
   return true;
@@ -84,7 +94,7 @@ async function checkContactRateLimit(
   ]);
 
   const allowedBySession = await incrementRateLimit(
-    env,
+    env.pseudointelekt_contact_form,
     `rate:contact:session:${sessionHash}`,
     CONTACT_LIMITS.sessionMax,
     CONTACT_LIMITS.sessionWindowSeconds,
@@ -96,7 +106,7 @@ async function checkContactRateLimit(
   }
 
   const allowedByIp = await incrementRateLimit(
-    env,
+    env.pseudointelekt_contact_form,
     `rate:contact:ip:${ipHash}`,
     CONTACT_LIMITS.ipMax,
     CONTACT_LIMITS.ipWindowSeconds,
@@ -105,6 +115,59 @@ async function checkContactRateLimit(
   if (!allowedByIp) {
     logEvent({ type: 'contact-rate-limit-ip', ipHash });
     return jsonResponse({ message: 'Too many messages. Try again later.' }, 429);
+  }
+
+  return null;
+}
+
+async function checkLikeRateLimit(
+  request: Request,
+  env: Env,
+  sessionId: string,
+  slug: string,
+  currentLikes: number,
+): Promise<Response | null> {
+  const ip = getClientIp(request);
+  const [sessionHash, ipHash, ipSlugHash] = await Promise.all([
+    shortHash(sessionId),
+    shortHash(ip),
+    shortHash(`${ip}:${slug}`),
+  ]);
+
+  const allowedBySession = await incrementRateLimit(
+    env.pseudointelekt_likes,
+    `rate:like:session:${sessionHash}`,
+    LIKE_LIMITS.sessionMax,
+    LIKE_LIMITS.sessionWindowSeconds,
+  );
+
+  if (!allowedBySession) {
+    logEvent({ type: 'like-rate-limit-session', sessionHash, slug });
+    return jsonResponse({ likes: currentLikes, rateLimited: true }, 429);
+  }
+
+  const allowedByIp = await incrementRateLimit(
+    env.pseudointelekt_likes,
+    `rate:like:ip:${ipHash}`,
+    LIKE_LIMITS.ipMax,
+    LIKE_LIMITS.ipWindowSeconds,
+  );
+
+  if (!allowedByIp) {
+    logEvent({ type: 'like-rate-limit-ip', ipHash });
+    return jsonResponse({ likes: currentLikes, rateLimited: true }, 429);
+  }
+
+  const allowedByIpSlug = await incrementRateLimit(
+    env.pseudointelekt_likes,
+    `rate:like:ip-slug:${ipSlugHash}`,
+    LIKE_LIMITS.ipSlugMax,
+    LIKE_LIMITS.ipSlugWindowSeconds,
+  );
+
+  if (!allowedByIpSlug) {
+    logEvent({ type: 'like-rate-limit-ip-slug', ipSlugHash, slug });
+    return jsonResponse({ likes: currentLikes, rateLimited: true }, 429);
   }
 
   return null;
@@ -202,6 +265,21 @@ async function handleLike(
       headers: { 'Content-Type': 'application/json' },
     });
   }
+
+  if (await hasLikeSession(env, slug, sessionId)) {
+    return new Response(JSON.stringify({ likes: current }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimitResponse = await checkLikeRateLimit(
+    request,
+    env,
+    sessionId,
+    slug,
+    current,
+  );
+  if (rateLimitResponse) return rateLimitResponse;
 
   const firstLike = await markLikeIfFirst(env, slug, sessionId);
   if (!firstLike) {

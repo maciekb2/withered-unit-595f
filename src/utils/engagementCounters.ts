@@ -156,3 +156,19 @@ export async function markLikeIfFirst(
 
   return Boolean(result.meta.changes);
 }
+
+export async function hasLikeSession(
+  env: Env,
+  slug: string,
+  sessionId: string,
+): Promise<boolean> {
+  const row = await env.pseudointelekt_logs_db
+    .prepare(
+      `SELECT 1 AS liked FROM engagement_like_sessions
+       WHERE slug = ?1 AND session_id = ?2`,
+    )
+    .bind(slug, sessionId)
+    .first<{ liked: number }>();
+
+  return Boolean(row?.liked);
+}

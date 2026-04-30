@@ -169,6 +169,7 @@ Publiczne endpointy liczników używają D1 zamiast read-modify-write w KV:
 
 - `engagement_counters` trzyma atomowe liczniki `view` i `like`,
 - `engagement_like_sessions` blokuje ponowne polubienie tego samego artykułu w tej samej sesji,
+- dodatkowe limity polubień używają wygasających kluczy KV dla hashy sesji, IP oraz pary IP+slug,
 - dotychczasowe wartości KV `view-<slug>` i `like-<slug>` są używane jako baseline przy pierwszym odczycie lub zapisie danego slug-a.
 
 KV pozostaje tylko źródłem kompatybilności/migracji dla starych liczników i starych znaczników sesji.
