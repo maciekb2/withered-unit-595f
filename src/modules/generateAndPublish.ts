@@ -32,6 +32,8 @@ export interface GenerationAuditContext {
   accessEmail?: string;
   accessSub?: string;
   accessAud?: string;
+  accessMethod?: string;
+  accessServiceTokenClientIdSuffix?: string;
   [key: string]: unknown;
 }
 
@@ -456,7 +458,11 @@ async function notifyOpenAIBillingFailure(
 
   if (classified.status) lines.push(`HTTP status: ${classified.status}`);
   if (classified.openAIErrorCode) lines.push(`OpenAI code: ${classified.openAIErrorCode}`);
-  if (auditContext.accessEmail) lines.push(`Użytkownik: ${auditContext.accessEmail}`);
+  if (auditContext.accessEmail && auditContext.accessEmail !== 'unknown') {
+    lines.push(`Użytkownik: ${auditContext.accessEmail}`);
+  } else if (auditContext.accessMethod) {
+    lines.push(`Autoryzacja: ${auditContext.accessMethod}`);
+  }
   if (auditContext.source) lines.push(`Źródło: ${auditContext.source}`);
   if (auditContext.sessionId) lines.push(`Session: ${auditContext.sessionId}`);
 

@@ -30,7 +30,7 @@
 - Kontekst: `src/utils/{hotTopics,recentTitlesGitHub,recentTitlesFs}.ts`, `src/utils/{logger,retryFetch,slack}.ts`.
 
 ## Audyt uruchomień
-Ręczna ścieżka generowania zapisuje w D1 eventy `generation-stream-event`, `generation-topic-selected`, `generation-complete` i błędy razem z `sessionId` oraz tożsamością Cloudflare Access (`accessEmail`, `accessSub`, `accessAud`). Payload jest celowo pełny: może zawierać prompty, odpowiedzi modeli, wybrany temat, dane klienta oraz URL-e publikacji.
+Ręczna ścieżka generowania zapisuje w D1 eventy `generation-stream-event`, `generation-topic-selected`, `generation-complete` i błędy razem z `sessionId` oraz tożsamością Cloudflare Access (`accessEmail`, `accessSub`, `accessAud`, `accessMethod`). Przy zwykłym logowaniu `accessMethod` ma wartość `user` i zachowuje email operatora, a przy automatycznych testach przez Access service token ma wartość `service-token` oraz bezpieczny suffix `accessServiceTokenClientIdSuffix`. Payload jest celowo pełny: może zawierać prompty, odpowiedzi modeli, wybrany temat, dane klienta oraz URL-e publikacji.
 
 Przykłady:
 

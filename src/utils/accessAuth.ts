@@ -12,6 +12,8 @@ export interface CloudflareAccessIdentity {
   email?: string;
   sub?: string;
   aud?: string;
+  method?: 'user' | 'service-token' | 'local-dev' | 'unknown';
+  serviceTokenClientIdSuffix?: string;
 }
 
 export interface CloudflareAccessResult {
@@ -87,7 +89,7 @@ export async function requireCloudflareAccess(
   env: Env,
 ): Promise<CloudflareAccessResult> {
   if (isLocalDevelopmentRequest(request)) {
-    return { identity: { email: 'local-dev', sub: 'local-dev' } };
+    return { identity: { email: 'local-dev', sub: 'local-dev', method: 'local-dev' } };
   }
 
   const issuer = normalizeIssuer(env.CF_ACCESS_TEAM_DOMAIN || '');
@@ -101,6 +103,7 @@ export async function requireCloudflareAccess(
   }
 
   const token = request.headers.get('cf-access-jwt-assertion');
+  const serviceTokenClientId = request.headers.get('cf-access-client-id') || '';
   if (!token) {
     logEvent({ type: 'access-auth-missing-token' });
     return { response: forbidden('Missing Cloudflare Access token') };
@@ -124,7 +127,11 @@ export async function requireCloudflareAccess(
       : accessPayload.aud;
     const allowedEmails = parseAllowedEmails(env.CF_ACCESS_ALLOWED_EMAILS);
 
-    if (allowedEmails.size > 0 && (!email || !allowedEmails.has(email))) {
+    if (
+      allowedEmails.size > 0 &&
+      !serviceTokenClientId &&
+      (!email || !allowedEmails.has(email))
+    ) {
       logEvent({
         type: 'access-auth-email-denied',
         email: email || 'unknown',
@@ -132,16 +139,27 @@ export async function requireCloudflareAccess(
       return { response: forbidden() };
     }
 
+    const method: CloudflareAccessIdentity['method'] = email
+      ? 'user'
+      : serviceTokenClientId
+        ? 'service-token'
+        : 'unknown';
     const identity = {
       email: email || 'unknown',
       sub: accessPayload.sub || 'unknown',
       aud: aud || 'unknown',
+      method,
+      serviceTokenClientIdSuffix: serviceTokenClientId
+        ? serviceTokenClientId.slice(-12)
+        : undefined,
     };
     logEvent({
       type: 'access-auth-ok',
       email: identity.email,
       sub: identity.sub,
       aud: identity.aud,
+      method: identity.method,
+      serviceTokenClientIdSuffix: identity.serviceTokenClientIdSuffix,
     });
     return { identity };
   } catch (err) {

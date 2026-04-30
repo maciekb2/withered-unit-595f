@@ -36,6 +36,7 @@ test('requireCloudflareAccess allows local development without Access config', a
   assert.deepEqual(result.identity, {
     email: 'local-dev',
     sub: 'local-dev',
+    method: 'local-dev',
   });
 });
 
@@ -89,6 +90,43 @@ test('requireCloudflareAccess accepts a valid Access JWT and normalizes identity
       email: 'operator@example.com',
       sub: 'user-123',
       aud: audience,
+      method: 'user',
+      serviceTokenClientIdSuffix: undefined,
+    });
+  });
+});
+
+test('requireCloudflareAccess marks service-token authentication in audit identity', async () => {
+  const issuer = 'https://access-service-token.example.test';
+  const audience = 'audience-service-token';
+  const { token, jwks } = await signedAccessToken({
+    issuer,
+    audience,
+    sub: 'service-token-subject',
+  });
+
+  await withLocalJwks(issuer, jwks, async () => {
+    const result = await requireCloudflareAccess(
+      new Request('https://pseudointelekt.pl/api/generate-stream', {
+        headers: {
+          'cf-access-jwt-assertion': token,
+          'cf-access-client-id': '1234567890abcdef.access',
+        },
+      }),
+      env({
+        CF_ACCESS_TEAM_DOMAIN: issuer,
+        CF_ACCESS_AUD: audience,
+        CF_ACCESS_ALLOWED_EMAILS: 'operator@example.com',
+      }),
+    );
+
+    assert.equal(result.response, undefined);
+    assert.deepEqual(result.identity, {
+      email: 'unknown',
+      sub: 'service-token-subject',
+      aud: audience,
+      method: 'service-token',
+      serviceTokenClientIdSuffix: 'bcdef.access',
     });
   });
 });
@@ -128,7 +166,7 @@ async function signedAccessToken({
 }: {
   issuer: string;
   audience: string;
-  email: string;
+  email?: string;
   sub: string;
 }) {
   const { publicKey, privateKey } = await generateKeyPair('RS256');
@@ -137,7 +175,7 @@ async function signedAccessToken({
   publicJwk.alg = 'RS256';
   publicJwk.use = 'sig';
 
-  const token = await new SignJWT({ email })
+  const token = await new SignJWT(email ? { email } : {})
     .setProtectedHeader({ alg: 'RS256', kid: 'test-key' })
     .setIssuer(issuer)
     .setAudience(audience)

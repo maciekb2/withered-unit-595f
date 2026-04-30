@@ -29,4 +29,4 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Document the target generation-provider contract: text through the token-authenticated home Jetson gateway, images through a newer configurable image model with a consistent house style.
 - [x] Add a safe text-generation provider abstraction so OpenAI remains the fallback while the Jetson gateway can be enabled with secrets and timeouts.
 - [x] Add a configurable image model setting and update the hero-image prompt/style defaults for consistent newer-model output.
-- [ ] Verify the full generation flow through Cloudflare Access with audit logs still preserving prompts, client payloads, and Access identity.
+- [x] Verify the full generation flow through Cloudflare Access with audit logs still preserving prompts, client payloads, and Access identity/method.

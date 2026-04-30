@@ -271,6 +271,8 @@ function buildAccessAuditContext(
     accessEmail: identity?.email || 'unknown',
     accessSub: identity?.sub || 'unknown',
     accessAud: identity?.aud || 'unknown',
+    accessMethod: identity?.method || 'unknown',
+    accessServiceTokenClientIdSuffix: identity?.serviceTokenClientIdSuffix,
   };
 }
 
