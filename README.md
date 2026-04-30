@@ -131,6 +131,12 @@ wrangler d1 create pseudointelekt_logs
 Otrzymany `database_id` wpisz w pliku `wrangler.json` w sekcji `d1_databases` (w tym repo to `c290edf1-394f-4c8b-940c-da62db2774b1`).
 W sekcji `vars` ustaw `WORKER_ID` na `pseudointelekt2137-blog`, który będzie wstawiany do kolumny `worker_id`.
 
+Schemat tabeli `logs` jest zapisany w `migrations/0001_create_logs.sql`. Po zmianach w schemacie aplikuj migracje przez:
+
+```bash
+npm run db:migrations:apply
+```
+
 Przykładowe zapytanie HTTP zostanie zapisane w kolumnie `data` jako JSON podobny do poniższego:
 
 ```json

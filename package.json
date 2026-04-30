@@ -31,6 +31,7 @@
     "astro": "astro",
     "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --conditions=worker,browser --external:./_worker.js --outfile=dist/worker.js",
     "check": "npm run build && tsc && wrangler deploy --dry-run",
+    "db:migrations:apply": "wrangler d1 migrations apply pseudointelekt_logs --remote",
     "deploy": "npm run build && wrangler deploy",
     "dev": "astro dev",
     "logs:audit": "node scripts/query-generation-logs.mjs",
