@@ -143,3 +143,16 @@ Przykładowe zapytanie HTTP zostanie zapisane w kolumnie `data` jako JSON podobn
   "referer": "https://google.com"
 }
 ```
+
+### Odczyt logów audytowych
+
+Do szukania uruchomień generatora używaj lokalnego skryptu operatorskiego, bez wystawiania logów przez publiczny endpoint:
+
+```bash
+npm run logs:audit -- --generation --limit 20
+npm run logs:audit -- --email osoba@example.com --generation --full
+npm run logs:audit -- --session <sessionId> --json
+npm run logs:audit -- --topic "wybrany temat" --full
+```
+
+Skrypt wymaga zmiennych `CLOUDFLARE_API_TOKEN`/`CF_API_TOKEN` oraz `CLOUDFLARE_ACCOUNT_ID`/`CF_ACCOUNT_ID` i czyta `database_id` z `wrangler.json`. Domyślny widok jest skrócony; `--full` oraz `--json` pokazują pełny payload, w tym prompty, odpowiedzi modeli, dane klienta i pola Cloudflare Access (`accessEmail`, `accessSub`, `accessAud`).

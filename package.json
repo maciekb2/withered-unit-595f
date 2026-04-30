@@ -33,6 +33,7 @@
     "check": "npm run build && tsc && wrangler deploy --dry-run",
     "deploy": "npm run build && wrangler deploy",
     "dev": "astro dev",
+    "logs:audit": "node scripts/query-generation-logs.mjs",
     "preview": "npm run build && wrangler dev",
     "types": "wrangler types"
   },

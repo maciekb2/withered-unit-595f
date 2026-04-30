@@ -12,12 +12,12 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a random suffix to automated GitHub publishing branches to avoid repeat-generation branch collisions.
 - [x] Improve generation logging correlation while intentionally preserving prompts, responses, selected topics, and client payloads for later audit.
 - [x] Cache D1 log table initialization per Worker isolate instead of running `CREATE TABLE IF NOT EXISTS` before every log insert.
+- [x] Add a local operator script for querying generation logs by session, Access identity, topic, URL, event type, or payload contents.
 
 ## Next
 
 - [x] Add lightweight anti-spam controls to the public contact form: size limits, per-session limits, and per-IP limits.
 - [x] Split deployment checks into a PR CI workflow and a main-branch deploy workflow.
-- [ ] Add a dedicated logs query/export endpoint or operator script for finding generation runs by session, Access identity, topic, or publication URL.
 - [ ] Move future D1 schema changes into explicit migrations before adding query indexes or new log columns.
 - [ ] Make views and likes atomic enough for production counts, likely through D1 or Durable Objects rather than read-modify-write KV.
 - [ ] Harden likes against trivial repeat voting with better rate limits and key expiry.

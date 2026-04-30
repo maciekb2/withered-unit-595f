@@ -22,10 +22,22 @@
 
 ## Kluczowe pliki
 - Orkiestracja: `src/modules/generateAndPublish.ts`, `src/worker.ts`, `src/cron-worker.ts`, `scripts/publish-article.ts`.
+- Odczyt logów audytowych: `scripts/query-generation-logs.mjs` (`npm run logs:audit -- --generation`).
 - Prompty: `src/prompt/article-write.txt`, `src/prompt/article-repair.txt`, `src/prompt/style-guide.txt`, `src/prompt/hero-image.txt`.
 - Pipeline treści: `src/pipeline/{outline,write,repair,format}.ts`, `src/pipeline/validators/content.ts`, `src/pipeline/contextPack.ts`, `src/pipeline/openai.ts`.
 - Publikacja/FS: `src/modules/{githubPublisher,articleAssembler}.ts`, `src/utils/{validators,slugify}.ts`.
 - Kontekst: `src/utils/{hotTopics,recentTitlesGitHub,recentTitlesFs}.ts`, `src/utils/{logger,retryFetch,slack}.ts`.
+
+## Audyt uruchomień
+Ręczna ścieżka generowania zapisuje w D1 eventy `generation-stream-event`, `generation-topic-selected`, `generation-complete` i błędy razem z `sessionId` oraz tożsamością Cloudflare Access (`accessEmail`, `accessSub`, `accessAud`). Payload jest celowo pełny: może zawierać prompty, odpowiedzi modeli, wybrany temat, dane klienta oraz URL-e publikacji.
+
+Przykłady:
+
+```bash
+npm run logs:audit -- --generation --limit 20
+npm run logs:audit -- --email osoba@example.com --generation --full
+npm run logs:audit -- --contains "fragment promptu" --json
+```
 
 ## Kontekst (bez zwiększania tokenów “style samples”)
 Kontekst jest podawany jako krótki JSON (tzw. context pack) i służy głównie do:
