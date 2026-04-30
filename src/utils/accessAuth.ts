@@ -1,4 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import type { JWTVerifyGetKey } from 'jose';
 import { logError, logEvent } from './logger';
 
 interface AccessPayload {
@@ -27,11 +28,19 @@ const GENERATION_PATHS = new Set([
   '/api/client-log',
 ]);
 
-let jwksCache: ReturnType<typeof createRemoteJWKSet> | undefined;
+let jwksCache: JWTVerifyGetKey | undefined;
 let jwksIssuer: string | undefined;
 
 export function isGenerationPath(pathname: string): boolean {
   return GENERATION_PATHS.has(pathname);
+}
+
+export function setCloudflareAccessJwksForTesting(
+  jwks: JWTVerifyGetKey | undefined,
+  issuer?: string,
+): void {
+  jwksCache = jwks;
+  jwksIssuer = issuer;
 }
 
 function normalizeIssuer(teamDomain: string): string {

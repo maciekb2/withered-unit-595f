@@ -22,4 +22,11 @@ This backlog captures the repository review findings from April 2026. Items are 
 
 - [x] Add lightweight anti-spam controls to the public contact form: size limits, per-session limits, and per-IP limits.
 - [x] Split deployment checks into a PR CI workflow and a main-branch deploy workflow.
-- [ ] Add focused tests for Cloudflare Access auth decisions and contact-form throttling.
+- [x] Add focused tests for Cloudflare Access auth decisions and contact-form throttling.
+
+## Generation provider migration
+
+- [ ] Document the target generation-provider contract: text through the token-authenticated home Jetson gateway, images through a newer configurable image model with a consistent house style.
+- [ ] Add a safe text-generation provider abstraction so OpenAI remains the fallback while the Jetson gateway can be enabled with secrets and timeouts.
+- [ ] Add a configurable image model setting and update the hero-image prompt/style defaults for consistent newer-model output.
+- [ ] Verify the full generation flow through Cloudflare Access with audit logs still preserving prompts, client payloads, and Access identity.
