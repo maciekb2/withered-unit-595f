@@ -5,7 +5,7 @@
 | Start | `GET /api/generate-stream` z `src/worker.ts` | `src/cron-worker.ts` (wywołuje `generateAndPublish` wg crona w `wrangler.json`) | `scripts/publish-article.ts` |
 | Pobranie ostatnich tytułów | `getRecentTitlesFromGitHub` | `getRecentTitlesFromGitHub` | `getRecentTitlesFS` |
 | Gorące tematy (RSS) | `getHotTopics` | `getHotTopics` | (nie używa) |
-| Sugestia tematu | `topicSuggester` (opcjonalnie; można wpisać własny) | `topicSuggester` (auto wybór) | (pomija; temat z `baseTopic` jeśli podany) |
+| Sugestia tematu | `topicSuggester` (opcjonalnie; można wpisać własny) | domyślnie pomijana dla Jetsona (`TEXT_TOPIC_SELECTION=auto` wybiera pierwszy RSS); można wymusić `llm` | (pomija; temat z `baseTopic` jeśli podany) |
 | Konspekt (outline) | `generateOutline` (+ context JSON) | `generateOutline` (+ context JSON) | `generateOutline` |
 | Generacja finalna (write) | `writeArticle` albo `writeArticleSectioned` | `writeArticle` albo `writeArticleSectioned` | `writeArticle` |
 | Walidacja | `validateAntiHallucination` | `validateAntiHallucination` | `validateAntiHallucination` |
@@ -48,7 +48,7 @@ Kontekst jest podawany jako krótki JSON (tzw. context pack) i służy głównie
 Context pack jest dołączany do:
 - outline (`generateOutline`) jako dodatkowy blok “Kontekst (JSON)”;
 - write/repair (`writeArticle` / `repairEdited`) jako “KONTEKST (JSON)”.
-- sectioned write (`writeArticleSectioned`) jako kontekst dla leadu i każdej sekcji.
+- sectioned write (`writeArticleSectioned`) jako kontekst dla każdej sekcji.
 
 ## Reguła linków i walidacja
 Walidator `validateAntiHallucination` wymusza teraz:

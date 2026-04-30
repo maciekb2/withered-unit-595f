@@ -8,7 +8,6 @@ import { extractJson } from '../utils/json';
 export interface SectionedWriteOptions {
   apiKey: string;
   outline: Outline;
-  writeTemplate: string;
   styleGuide?: string;
   contextPack?: string;
   model?: string;
@@ -30,7 +29,6 @@ const DEFAULT_TOKENS_PER_CALL = 1800;
 export async function writeArticleSectioned({
   apiKey,
   outline,
-  writeTemplate,
   styleGuide = '',
   contextPack = '',
   model = 'gpt-5',
@@ -63,7 +61,6 @@ export async function writeArticleSectioned({
     const sectionPrompt = buildSectionPrompt({
       outline,
       sectionIndex: index,
-      writeTemplate,
       styleGuide,
       contextPack,
       prior,
@@ -138,7 +135,6 @@ function buildSectionPrompt({
 }: {
   outline: Outline;
   sectionIndex: number;
-  writeTemplate: string;
   styleGuide: string;
   contextPack: string;
   prior: string;

@@ -19,7 +19,6 @@ test('writeArticleSectioned composes one sourced long article from smaller model
   const calls: any[] = [];
   const longParagraph = 'To jest spójny akapit publicystyczny z ironią i jednym tematem. '.repeat(18);
   const responses = [
-    `Lead otwiera temat i ustawia tezę. ${longParagraph}`,
     `${longParagraph}\n\n${longParagraph}`,
     `${longParagraph}\n\n${longParagraph}`,
     `${longParagraph}\n\n${longParagraph}`,
@@ -38,14 +37,13 @@ test('writeArticleSectioned composes one sourced long article from smaller model
     const res = await writeArticleSectioned({
       apiKey: 'k',
       outline,
-      writeTemplate: 'Pisz w stylu bloga.',
       styleGuide: 'Styl: satyra geopolityczna.',
       contextPack: JSON.stringify({ leadSourceUrl: 'https://example.com/source' }),
       model: 'gpt-5',
       paragraphsPerSection: 2,
     });
 
-    assert.equal(calls.length, 4);
+    assert.equal(calls.length, 3);
     assert.equal(res.edited.title, outline.finalTitle);
     assert.equal(res.edited.description, outline.description);
     assert(res.edited.markdown.includes('## Pierwsza sekcja'));

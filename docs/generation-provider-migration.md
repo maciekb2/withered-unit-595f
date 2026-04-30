@@ -77,8 +77,8 @@ Adapter tekstu jest spięty przez `textGenerationProviderFromEnv(env)` w `src/pi
 
 Jetson nie powinien dostawać zadania "napisz cały artykuł naraz". Docelowy tryb dla `TEXT_GENERATION_PROVIDER=jetson` to etapowy pipeline:
 
-1. `generateOutline` tworzy krótki plan, tytuł, opis i trzy sekcje.
-2. `writeArticleSectioned` pisze lead jako osobne wywołanie.
+1. `generateOutline` tworzy krótki plan, finalny tytuł, opis/lead i trzy sekcje.
+2. Kod używa opisu z outline jako leadu. To celowo pomija osobne wywołanie leadu, bo `qwen3:4b` potrafił wtedy wypisywać analizę promptu zamiast prozy.
 3. `writeArticleSectioned` pisze każdą sekcję osobno, przekazując:
    - cały outline,
    - aktualną sekcję i jej tezy,
@@ -91,6 +91,9 @@ Jetson nie powinien dostawać zadania "napisz cały artykuł naraz". Docelowy tr
 
 Przełączniki:
 
+- `TEXT_TOPIC_SELECTION=auto`: dla Jetsona pomija LLM-ową sugestię tematu w cron/auto i bierze pierwszy temat RSS; dla OpenAI zostawia dawną sugestię LLM.
+- `TEXT_TOPIC_SELECTION=rss-first`: zawsze pomija LLM-ową sugestię tematu w cron/auto.
+- `TEXT_TOPIC_SELECTION=llm`: wymusza dawny etap `topicSuggester` także w cron/auto.
 - `TEXT_ARTICLE_PIPELINE=auto`: używa trybu sekcyjnego automatycznie dla Jetsona, a one-shot dla OpenAI.
 - `TEXT_ARTICLE_PIPELINE=sectioned`: wymusza etapowy tryb także dla OpenAI/testów.
 - `TEXT_ARTICLE_PIPELINE=one-shot`: zostawia starą ścieżkę `writeArticle`.

@@ -81,6 +81,7 @@ export async function generateAndPublish(
     const writeModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const repairModel = env.OPENAI_REPAIR_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const textProvider = textGenerationProviderFromEnv(env);
+    const topicMode = topicSelectionMode(env, textProvider);
     const sectionedText = shouldUseSectionedText(env, textProvider);
     send('generation-config', {
       generationConfig: {
@@ -88,6 +89,7 @@ export async function generateAndPublish(
         textProvider: textProvider.type,
         textProviderLabel: describeTextProvider(textProvider),
         textFallback: textProvider.type === 'jetson' ? (textProvider.fallback || 'openai') : undefined,
+        topicMode,
         topicModel,
         outlineModel,
         writeModel,
@@ -166,7 +168,7 @@ export async function generateAndPublish(
         ...auditContext,
         topic: baseTopic,
       });
-    } else {
+    } else if (topicMode === 'llm') {
       try {
         setStage('auto-topic');
         logEvent({ type: 'auto-topic-suggest-start' });
@@ -192,6 +194,17 @@ export async function generateAndPublish(
         }
       } catch (err) {
         logError(err, { type: 'auto-topic-error' });
+      }
+    } else {
+      const first = hotTopics[0];
+      if (first?.title) {
+        baseTopic = first.title;
+        logEvent({
+          type: 'auto-topic-selected',
+          topic: baseTopic,
+          sourceUrl: first.url,
+          mode: topicMode,
+        });
       }
     }
 
@@ -245,7 +258,6 @@ export async function generateAndPublish(
         ? await writeArticleSectioned({
             apiKey: env.OPENAI_API_KEY,
             outline,
-            writeTemplate: writePrompt,
             styleGuide,
             contextPack,
             model: writeModel,
@@ -456,6 +468,13 @@ function shouldUseSectionedText(env: Env, provider: ReturnType<typeof textGenera
   if (mode === 'sectioned') return true;
   if (mode === 'one-shot') return false;
   return provider.type === 'jetson';
+}
+
+function topicSelectionMode(env: Env, provider: ReturnType<typeof textGenerationProviderFromEnv>): 'rss-first' | 'llm' {
+  const mode = env.TEXT_TOPIC_SELECTION || 'auto';
+  if (mode === 'llm') return 'llm';
+  if (mode === 'rss-first') return 'rss-first';
+  return provider.type === 'jetson' ? 'rss-first' : 'llm';
 }
 
 function describeTextProvider(provider: ReturnType<typeof textGenerationProviderFromEnv>): string {
