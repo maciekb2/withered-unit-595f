@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200" style="background: none">
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="115" viewBox="90 35 620 115" style="background: none">
 	<defs>
 		<filter id="stone-texture" x="0%" y="0%" width="100%" height="100%">
 			<feTurbulence type="turbulence" baseFrequency="0.8" numOctaves="4" result="turbulence"/>

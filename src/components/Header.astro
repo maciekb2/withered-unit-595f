@@ -25,7 +25,7 @@ import Menu from './Menu.astro';
 <style>
         header {
                 margin: 0;
-                padding: 0 1rem;
+                padding: 0 0.75rem;
                 background: rgba(248, 246, 241, 0.92);
                 border-bottom: 1px solid transparent;
                 box-shadow: 0 2px 8px rgba(var(--gray-dark), 8%);
@@ -33,7 +33,7 @@ import Menu from './Menu.astro';
                 top: 0;
                 z-index: 100;
                 transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-                min-height: 72px;
+                min-height: 78px;
                 display: flex;
                 align-items: center;
                 backdrop-filter: blur(8px);
@@ -48,23 +48,23 @@ import Menu from './Menu.astro';
                 display: flex;
                 align-items: center;
                 padding: 0;
-                height: 52px;
+                height: 64px;
                 min-width: 0;
         }
         .logo img {
                 display: block;
                 height: 100%;
                 width: auto;
-                max-width: min(260px, 46vw);
+                max-width: min(340px, 48vw);
         }
         nav {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                width: min(1100px, 100%);
-                min-height: 72px;
+                width: min(1180px, 100%);
+                min-height: 78px;
                 margin: 0 auto;
-                gap: 1rem;
+                gap: clamp(1rem, 2.8vw, 2.25rem);
                 min-width: 0;
         }
         nav a {
@@ -95,26 +95,26 @@ import Menu from './Menu.astro';
         @media (max-width: 760px) {
                 header {
                         padding: 0 0.55rem;
-                        min-height: 112px;
+                        min-height: 124px;
                         align-items: stretch;
                 }
 
                 nav {
-                        min-height: 112px;
+                        min-height: 124px;
                         flex-direction: column;
                         align-items: stretch;
                         justify-content: center;
                         gap: 0.5rem;
-                        padding: 0.55rem 0;
+                        padding: 0.45rem 0 0.55rem;
                 }
 
                 .logo {
-                        height: 44px;
+                        height: 58px;
                         justify-content: center;
                 }
 
                 .logo img {
-                        max-width: min(280px, 78vw);
+                        max-width: min(340px, 88vw);
                 }
 
                 nav a {
@@ -126,15 +126,15 @@ import Menu from './Menu.astro';
 
         @media (max-width: 420px) {
                 header {
-                        min-height: 106px;
+                        min-height: 118px;
                 }
 
                 nav {
-                        min-height: 106px;
+                        min-height: 118px;
                 }
 
                 .logo {
-                        height: 40px;
+                        height: 52px;
                 }
 
                 nav a {
