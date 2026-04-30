@@ -1,7 +1,7 @@
 import { logEvent, logError } from '../utils/logger';
 import { buildDraftPrompt } from './prompts';
 import type { Outline, Draft } from './types';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 
 export interface GenerateDraftOptions {
@@ -11,6 +11,7 @@ export interface GenerateDraftOptions {
   contextPack?: string;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface GenerateDraftResult {
@@ -19,7 +20,7 @@ export interface GenerateDraftResult {
   raw: string;
 }
 
-export async function generateDraft({ apiKey, outline, articlePrompt, contextPack, model = 'gpt-5', maxTokens }: GenerateDraftOptions): Promise<GenerateDraftResult> {
+export async function generateDraft({ apiKey, outline, articlePrompt, contextPack, model = 'gpt-5', maxTokens, provider }: GenerateDraftOptions): Promise<GenerateDraftResult> {
   const userPrompt = buildDraftPrompt(outline, articlePrompt, contextPack);
 
   logEvent({ type: 'draft-start' });
@@ -33,6 +34,7 @@ export async function generateDraft({ apiKey, outline, articlePrompt, contextPac
       messages,
       max_completion_tokens: maxTokens ?? 1200,
       model,
+      provider,
       response_style: 'full',
     });
     logEvent({ type: 'draft-complete' });

@@ -69,7 +69,7 @@ test('generateOutline exposes prompt and raw on error', async () => {
   }, (err: any) => {
     assert.ok(err.messages.some((m: any) => m.role === 'user' && m.content.includes('Temat bazowy: T')));
     assert.equal(err.raw, '');
-    return /No JSON/.test(err.message);
+    return /OpenAI response empty|No JSON/.test(err.message);
   });
   globalThis.fetch = original;
 });

@@ -1,7 +1,7 @@
 import type { HotTopic } from '../utils/hotTopics';
 import { logEvent, logError } from '../utils/logger';
 import { extractJson } from '../utils/json';
-import { chat, type ChatMessage } from '../pipeline/openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from '../pipeline/openai';
 import { guardrails } from '../pipeline/guardrails';
 
 export interface SuggestedTopic {
@@ -20,6 +20,7 @@ export async function suggestArticleTopic(
   recentTitles: string[],
   apiKey: string,
   model?: string,
+  provider?: TextGenerationProvider,
 ): Promise<SuggestedTopicResult> {
   const userPrompt = [
     'Mam listę gorących tematów:',
@@ -52,6 +53,7 @@ export async function suggestArticleTopic(
       messages,
       max_completion_tokens: 2000,
       model,
+      provider,
       response_format: { type: 'json_object' },
       response_style: 'brief',
     });

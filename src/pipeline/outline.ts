@@ -1,6 +1,6 @@
 import { logEvent, logError } from '../utils/logger';
 import type { Outline } from './types';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { outlineJsonSchema } from './schemas';
@@ -11,6 +11,7 @@ export interface GenerateOutlineOptions {
   topicContext?: string;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface GenerateOutlineResult {
@@ -25,7 +26,7 @@ const REQUIRED_GUARDRAILS = [
   'Trzymaj sie jednego glownego tematu bez zmiany osi narracji.',
 ];
 
-export async function generateOutline({ apiKey, baseTopic, topicContext, model = 'gpt-5', maxTokens = 2000 }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
+export async function generateOutline({ apiKey, baseTopic, topicContext, model = 'gpt-5', maxTokens = 2000, provider }: GenerateOutlineOptions): Promise<GenerateOutlineResult> {
   const ctxBlock = topicContext ? `Kontekst (JSON):\n${topicContext}\n\n` : '';
   const userPrompt =
     ctxBlock +
@@ -49,6 +50,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
       messages,
       max_completion_tokens: maxTokens,
       model,
+      provider,
       response_style: 'normal',
       response_format: { type: 'json_schema', json_schema: { name: 'outline', schema: outlineJsonSchema } },
     });

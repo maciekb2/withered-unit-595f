@@ -12,10 +12,43 @@ export interface ChatOptions {
   model?: string;
   response_format?: Record<string, unknown>;
   response_style?: 'brief' | 'normal' | 'full';
+  provider?: TextGenerationProvider;
 }
 
 const MAX_LENGTH_RETRIES = 3;
 const MAX_TOKEN_CAP = 12000;
+
+export type TextGenerationProvider =
+  | { type: 'openai' }
+  | {
+      type: 'jetson';
+      gatewayUrl: string;
+      token: string;
+      model?: string;
+      timeoutMs?: number;
+      disableThinking?: boolean;
+      fallback?: 'openai' | 'none';
+      accessClientId?: string;
+      accessClientSecret?: string;
+    };
+
+export function textGenerationProviderFromEnv(env: Env): TextGenerationProvider {
+  if ((env.TEXT_GENERATION_PROVIDER || 'openai') !== 'jetson') {
+    return { type: 'openai' };
+  }
+
+  return {
+    type: 'jetson',
+    gatewayUrl: env.JETSON_GATEWAY_URL || '',
+    token: env.JETSON_GATEWAY_TOKEN || '',
+    model: env.JETSON_GATEWAY_MODEL || env.OPENAI_TEXT_MODEL || 'qwen3:4b',
+    timeoutMs: Number.parseInt(env.JETSON_GATEWAY_TIMEOUT_MS || '', 10) || 120000,
+    disableThinking: env.JETSON_GATEWAY_DISABLE_THINKING !== 'false',
+    fallback: env.TEXT_GENERATION_FALLBACK === 'none' ? 'none' : 'openai',
+    accessClientId: env.JETSON_ACCESS_CLIENT_ID,
+    accessClientSecret: env.JETSON_ACCESS_CLIENT_SECRET,
+  };
+}
 
 export async function chat(
   apiKey: string,
@@ -25,6 +58,7 @@ export async function chat(
     model = 'gpt-5',
     response_format,
     response_style,
+    provider = { type: 'openai' },
   }: ChatOptions,
 ): Promise<string> {
   let finalMessages = messages;
@@ -34,6 +68,25 @@ export async function chat(
       finalMessages = [messages[0], styleMsg, ...messages.slice(1)];
     } else {
       finalMessages = [styleMsg, ...messages];
+    }
+  }
+
+  if (provider.type === 'jetson') {
+    try {
+      return await chatJetson(provider, {
+        messages: finalMessages,
+        max_completion_tokens,
+        model: provider.model || model,
+        response_format,
+        response_style,
+      });
+    } catch (err) {
+      logError(err, { type: 'jetson-error', fallback: provider.fallback || 'openai' });
+      if (provider.fallback !== 'none') {
+        logEvent({ type: 'text-provider-fallback', from: 'jetson', to: 'openai' });
+      } else {
+        throw err;
+      }
     }
   }
 
@@ -179,4 +232,100 @@ export async function chat(
     }
   }
   throw new Error('OpenAI response empty after retries');
+}
+
+async function chatJetson(
+  provider: Extract<TextGenerationProvider, { type: 'jetson' }>,
+  {
+    messages,
+    max_completion_tokens,
+    model,
+    response_format,
+    response_style,
+  }: Omit<ChatOptions, 'provider'>,
+): Promise<string> {
+  if (!provider.gatewayUrl || !provider.token) {
+    throw new Error('Jetson gateway is not configured');
+  }
+
+  const url = new URL('/api/generate', provider.gatewayUrl.replace(/\/+$/, ''));
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${provider.token}`,
+  };
+  if (provider.disableThinking) {
+    headers['X-Disable-Thinking'] = 'true';
+  }
+  if (provider.accessClientId && provider.accessClientSecret) {
+    headers['CF-Access-Client-Id'] = provider.accessClientId;
+    headers['CF-Access-Client-Secret'] = provider.accessClientSecret;
+  }
+
+  const timeoutMs = provider.timeoutMs || 120000;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  logEvent({
+    type: 'jetson-request',
+    model,
+    response_style,
+    max_tokens: max_completion_tokens,
+    gatewayHost: url.host,
+  });
+
+  try {
+    const res = await retryFetch(url.toString(), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        model,
+        messages,
+        max_completion_tokens,
+        response_format,
+        response_style,
+        stream: false,
+      }),
+      signal: controller.signal,
+      retries: 1,
+      retryDelayMs: 1000,
+    });
+    logEvent({ type: 'jetson-response-status', status: res.status });
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(`Jetson gateway request failed: ${res.status} ${msg}`);
+    }
+
+    const contentType = res.headers.get('Content-Type') || '';
+    const raw = contentType.includes('application/json')
+      ? extractJetsonText(await res.json())
+      : (await res.text()).trim();
+
+    if (!raw) {
+      throw new Error('Jetson gateway response empty');
+    }
+    logEvent({ type: 'jetson-response-received' });
+    return raw;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function extractJetsonText(data: any): string {
+  if (typeof data === 'string') return data.trim();
+  if (!data || typeof data !== 'object') return '';
+
+  if (typeof data.response === 'string') return data.response.trim();
+  if (typeof data.text === 'string') return data.text.trim();
+  if (typeof data.content === 'string') return data.content.trim();
+  if (typeof data.output === 'string') return data.output.trim();
+  if (typeof data.message?.content === 'string') return data.message.content.trim();
+  if (Array.isArray(data.choices) && data.choices[0]) {
+    const choice = data.choices[0];
+    if (typeof choice.text === 'string') return choice.text.trim();
+    if (typeof choice.message?.content === 'string') {
+      return choice.message.content.trim();
+    }
+  }
+
+  return '';
 }

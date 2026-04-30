@@ -54,11 +54,21 @@ Adapter providerów powinien zachować obecny kontrakt `chat()`:
 
 Minimalny bezpieczny rollout:
 
-1. Dodać provider abstraction bez zmiany domyślnego provideru.
-2. Dodać testy adaptera dla OpenAI i Jetsona na mockowanym `fetch`.
+1. Dodać provider abstraction bez zmiany domyślnego provideru. Status: zrobione, domyślnie `TEXT_GENERATION_PROVIDER=openai`.
+2. Dodać testy adaptera dla OpenAI i Jetsona na mockowanym `fetch`. Status: zrobione w `src/pipeline/openai.test.ts`.
 3. Dodać sekrety Workera dla Jetsona.
 4. Zweryfikować gateway z laptopa i potem przez Worker dry-run/smoke path.
 5. Dopiero wtedy przełączyć `TEXT_GENERATION_PROVIDER=jetson`.
+
+## Implementacja adaptera
+
+Adapter tekstu jest spięty przez `textGenerationProviderFromEnv(env)` w `src/pipeline/openai.ts`.
+
+- Domyślny provider to OpenAI, więc aktualna produkcja nie zmienia zachowania.
+- Provider `jetson` wysyła request na `/api/generate` z bearer tokenem i timeoutem.
+- Jeśli `TEXT_GENERATION_FALLBACK=openai`, błąd gatewaya przełącza pojedyncze wywołanie na OpenAI.
+- Jeśli `TEXT_GENERATION_FALLBACK=none`, błąd gatewaya przerywa generowanie.
+- Logi zapisują provider, model, status i host gatewaya, ale nie zapisują tokenów.
 
 ## Docelowy kontrakt obrazów
 

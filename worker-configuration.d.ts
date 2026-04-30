@@ -18,6 +18,15 @@ interface Env {
         OPENAI_REPAIR_MODEL?: string;
         OPENAI_IMAGE_STYLE: string;
         OPENAI_IMAGE_QUALITY: string;
+        TEXT_GENERATION_PROVIDER?: string;
+        TEXT_GENERATION_FALLBACK?: string;
+        JETSON_GATEWAY_URL?: string;
+        JETSON_GATEWAY_TOKEN?: string;
+        JETSON_GATEWAY_MODEL?: string;
+        JETSON_GATEWAY_TIMEOUT_MS?: string;
+        JETSON_GATEWAY_DISABLE_THINKING?: string;
+        JETSON_ACCESS_CLIENT_ID?: string;
+        JETSON_ACCESS_CLIENT_SECRET?: string;
         CF_ACCESS_TEAM_DOMAIN?: string;
         CF_ACCESS_AUD?: string;
         CF_ACCESS_ALLOWED_EMAILS?: string;

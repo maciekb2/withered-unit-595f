@@ -15,15 +15,16 @@ const outline: Outline = {
   guardrails: [],
 };
 
-test('fails report without source', () => {
+test('fails missing source URL and warns for report without same-sentence source', () => {
   const md = `## Sec1\nWedług najnowszego raportu Instytut XYZ donosi o problemie.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\ntekst`;
   const res = validateAntiHallucination(md, outline);
   assert.equal(res.ok, false);
-  assert(res.errors.some(e => e.includes('Raport bez źródła')));
+  assert(res.errors.some(e => e.includes('Brak linku do zrodla')));
+  assert(res.errors.some(e => e.includes('raport bez zrodla')));
 });
 
 test('warns for numbers without context', () => {
-  const md = `## Sec1\nObecnie 10 osób czeka, w magazynie 20 produktów, a rok temu było 30.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\ntekst`;
+  const md = `## Sec1\nWedług statystyk obecnie 10 osób czeka, w magazynie 20 produktów, a rok temu było 30.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\nŹródło tematu: https://example.com`;
   const res = validateAntiHallucination(md, outline);
   assert.equal(res.ok, true);
   assert(res.errors.some(e => e.startsWith('WARN')));

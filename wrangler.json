@@ -45,7 +45,12 @@
     "OPENAI_EDIT_MODEL": "",
     "OPENAI_REPAIR_MODEL": "",
     "OPENAI_IMAGE_STYLE": "vivid",
-    "OPENAI_IMAGE_QUALITY": "hd"
+    "OPENAI_IMAGE_QUALITY": "hd",
+    "TEXT_GENERATION_PROVIDER": "openai",
+    "TEXT_GENERATION_FALLBACK": "openai",
+    "JETSON_GATEWAY_MODEL": "qwen3:4b",
+    "JETSON_GATEWAY_TIMEOUT_MS": "120000",
+    "JETSON_GATEWAY_DISABLE_THINKING": "true"
   },
   "observability": {
     "enabled": true

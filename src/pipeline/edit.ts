@@ -2,7 +2,7 @@ import { logEvent, logError } from '../utils/logger';
 import { buildEditPrompt } from './prompts';
 import { scrubTodoClaims } from './scrubTodoClaims';
 import type { Outline, Draft, Edited } from './types';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { editedJsonSchema } from './schemas';
@@ -14,6 +14,7 @@ export interface EditDraftOptions {
   editTemplate?: string;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface EditDraftResult {
@@ -22,7 +23,7 @@ export interface EditDraftResult {
   raw: string;
 }
 
-export async function editDraft({ apiKey, draft, outline, editTemplate, model = 'gpt-5', maxTokens }: EditDraftOptions): Promise<EditDraftResult> {
+export async function editDraft({ apiKey, draft, outline, editTemplate, model = 'gpt-5', maxTokens, provider }: EditDraftOptions): Promise<EditDraftResult> {
   const userPrompt = buildEditPrompt(draft, outline, editTemplate);
   logEvent({ type: 'edit-start' });
   const messages: ChatMessage[] = [
@@ -35,6 +36,7 @@ export async function editDraft({ apiKey, draft, outline, editTemplate, model = 
       messages,
       max_completion_tokens: maxTokens ?? 1000,
       model,
+      provider,
       response_style: 'full',
       response_format: { type: 'json_schema', json_schema: { name: 'edited', schema: editedJsonSchema } },
     });

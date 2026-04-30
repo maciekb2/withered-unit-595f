@@ -1,5 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import type { Outline, Edited } from './types';
 import { extractJson } from '../utils/json';
@@ -14,6 +14,7 @@ export interface WriteArticleOptions {
   contextPack?: string;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface WriteArticleResult {
@@ -48,6 +49,7 @@ export async function writeArticle({
   contextPack,
   model = 'gpt-5',
   maxTokens,
+  provider,
 }: WriteArticleOptions): Promise<WriteArticleResult> {
   const userPrompt = buildWritePrompt(outline, writeTemplate, styleGuide, contextPack);
   logEvent({ type: 'write-start' });
@@ -63,6 +65,7 @@ export async function writeArticle({
       messages,
       max_completion_tokens: maxTokens ?? 7200,
       model,
+      provider,
       response_style: 'full',
       response_format: { type: 'json_schema', json_schema: { name: 'edited', schema: editedJsonSchema } },
     });
@@ -90,4 +93,3 @@ export async function writeArticle({
     throw err;
   }
 }
-

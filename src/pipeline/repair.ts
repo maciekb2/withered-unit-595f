@@ -1,5 +1,5 @@
 import { logEvent, logError } from '../utils/logger';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import type { Outline, Edited } from './types';
 import { extractJson } from '../utils/json';
@@ -16,6 +16,7 @@ export interface RepairEditedOptions {
   contextPack?: string;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface RepairEditedResult {
@@ -66,6 +67,7 @@ export async function repairEdited({
   contextPack,
   model = 'gpt-5',
   maxTokens,
+  provider,
 }: RepairEditedOptions): Promise<RepairEditedResult> {
   const userPrompt = buildRepairPrompt(edited, outline, errors, repairTemplate, styleGuide, contextPack);
   logEvent({ type: 'repair-start', errorCount: errors.length });
@@ -81,6 +83,7 @@ export async function repairEdited({
       messages,
       max_completion_tokens: maxTokens ?? 1200,
       model,
+      provider,
       response_style: 'full',
       response_format: { type: 'json_schema', json_schema: { name: 'edited', schema: editedJsonSchema } },
     });

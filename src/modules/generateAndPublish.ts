@@ -15,6 +15,7 @@ import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
+import { textGenerationProviderFromEnv } from '../pipeline/openai';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 
@@ -65,6 +66,7 @@ export async function generateAndPublish(
     const outlineModel = env.OPENAI_OUTLINE_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const writeModel = env.OPENAI_DRAFT_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
     const repairModel = env.OPENAI_REPAIR_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5';
+    const textProvider = textGenerationProviderFromEnv(env);
 
     send('🚀 Startujemy! Pobieram listę ostatnich tytułów z GitHuba...');
     const recent = await getRecentTitlesFromGitHub(env.GITHUB_REPO, env.GITHUB_TOKEN);
@@ -92,6 +94,7 @@ export async function generateAndPublish(
           recent,
           env.OPENAI_API_KEY,
           topicModel,
+          textProvider,
         );
         send('suggest-topic-prompt', { prompt: sugRes.messages });
         send('suggest-topic-response', { response: sugRes.raw });
@@ -126,6 +129,7 @@ export async function generateAndPublish(
           recent,
           env.OPENAI_API_KEY,
           topicModel,
+          textProvider,
         );
         const suggestions = sugRes.suggestions || [];
         logEvent({
@@ -165,6 +169,7 @@ export async function generateAndPublish(
         apiKey: env.OPENAI_API_KEY,
         baseTopic,
         model: outlineModel,
+        provider: textProvider,
         maxTokens: 2000,
         topicContext: contextPack,
       });
@@ -192,6 +197,7 @@ export async function generateAndPublish(
         styleGuide,
         contextPack,
         model: writeModel,
+        provider: textProvider,
         maxTokens: 7200,
       });
       send('write-prompt', { prompt: writeRes.messages });
@@ -233,6 +239,7 @@ export async function generateAndPublish(
             styleGuide,
             contextPack,
             model: repairModel,
+            provider: textProvider,
             maxTokens: 2500,
           });
           send('repair-prompt', { attempt, prompt: repairRes.messages });
