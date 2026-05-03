@@ -14,7 +14,7 @@ import { writeArticle } from '../pipeline/write';
 import { writeArticleSectioned } from '../pipeline/sectionedWrite';
 import { formatFinal } from '../pipeline/format';
 import { validateAntiHallucination } from '../pipeline/validators/content';
-import { validateArticleQuality } from '../pipeline/validators/quality';
+import { TARGET_ARTICLE_WORDS, validateArticleQuality } from '../pipeline/validators/quality';
 import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
 import { textGenerationProviderFromEnv } from '../pipeline/openai';
@@ -365,18 +365,28 @@ export async function generateAndPublish(
       warnings: quality.warnings,
       stats: quality.stats,
     });
-    if (!quality.ok) {
+    if (!quality.ok || quality.stats.words < TARGET_ARTICLE_WORDS) {
       const qualityRepairProvider =
         textProvider.type === 'jetson' && textProvider.fallback !== 'none'
           ? { type: 'openai' as const }
           : textProvider;
 
-      for (let attempt = 1; attempt <= 2 && !quality.ok; attempt++) {
+      for (
+        let attempt = 1;
+        attempt <= 2 && (!quality.ok || quality.stats.words < TARGET_ARTICLE_WORDS);
+        attempt++
+      ) {
+        const repairErrors = quality.ok
+          ? [
+              `ERROR: Artykul jest za krotki redakcyjnie (${quality.stats.words} slow); rozbuduj go do ${TARGET_ARTICLE_WORDS}-1200 slow bez zmiany faktow`,
+            ]
+          : quality.errors;
         setStage(`quality-repair-${attempt}`);
         send('quality-repair-start', {
           attempt,
-          errors: quality.errors,
+          errors: repairErrors,
           stats: quality.stats,
+          targetWords: TARGET_ARTICLE_WORDS,
         });
 
         let repairRes;
@@ -385,7 +395,7 @@ export async function generateAndPublish(
             apiKey: env.OPENAI_API_KEY,
             edited,
             outline,
-            errors: quality.errors,
+            errors: repairErrors,
             repairTemplate,
             styleGuide,
             contextPack,
@@ -415,12 +425,19 @@ export async function generateAndPublish(
           errors: quality.errors,
           warnings: quality.warnings,
           stats: quality.stats,
+          targetWords: TARGET_ARTICLE_WORDS,
         });
       }
 
       setStage('quality-check');
       if (!quality.ok) {
         throw new Error(`Quality validation failed: ${quality.errors.join('; ')}`);
+      }
+      if (quality.stats.words < TARGET_ARTICLE_WORDS) {
+        send('⚠️ Artykuł przeszedł minimalne filtry, ale pozostał krótszy od celu redakcyjnego', {
+          stats: quality.stats,
+          targetWords: TARGET_ARTICLE_WORDS,
+        });
       }
     }
     if (quality.warnings.length > 0) {

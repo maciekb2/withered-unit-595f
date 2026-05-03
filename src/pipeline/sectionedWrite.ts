@@ -26,6 +26,7 @@ export interface SectionedWriteResult {
 
 const DEFAULT_PARAGRAPHS_PER_SECTION = 3;
 const DEFAULT_TOKENS_PER_CALL = 1800;
+const TARGET_WORDS_PER_SECTION = 320;
 export async function writeArticleSectioned({
   apiKey,
   outline,
@@ -65,6 +66,7 @@ export async function writeArticleSectioned({
       contextPack,
       prior,
       paragraphsPerSection,
+      targetWordsPerSection: TARGET_WORDS_PER_SECTION,
     });
     const sectionMessages = [
       { role: 'system', content: systemPrompt() },
@@ -132,6 +134,7 @@ function buildSectionPrompt({
   contextPack,
   prior,
   paragraphsPerSection,
+  targetWordsPerSection,
 }: {
   outline: Outline;
   sectionIndex: number;
@@ -139,6 +142,7 @@ function buildSectionPrompt({
   contextPack: string;
   prior: string;
   paragraphsPerSection: number;
+  targetWordsPerSection: number;
 }): string {
   const section = outline.sections[sectionIndex];
   return [
@@ -146,7 +150,8 @@ function buildSectionPrompt({
     `Tytuł artykułu: ${outline.finalTitle}`,
     `Sekcja ${sectionIndex + 1}/${outline.sections.length}: ${section.h2}`,
     `Tezy do rozwinięcia:\n${section.bullets.map(b => `- ${b}`).join('\n')}`,
-    `Napisz ${paragraphsPerSection} akapity po 4-6 zdań każdy.`,
+    `Napisz ${paragraphsPerSection} akapity po 5-7 zdań każdy; cała sekcja ma mieć około ${targetWordsPerSection}-${targetWordsPerSection + 80} słów.`,
+    'Jeśli model musi wybierać między zwięzłością a kompletnością, wybierz kompletność: rozwiń oba bullet-pointy konkretnie, ale bez nowych faktów.',
     'Nie dodawaj nagłówka sekcji; nagłówek zostanie dodany przez system.',
     'Nie dodawaj żadnych URL, przypisów ani list wypunktowanych.',
     'Trzymaj jeden wątek i nawiązuj do poprzednich sekcji bez powtarzania tych samych zdań.',

@@ -12,6 +12,9 @@ export interface QualityValidationResult {
   };
 }
 
+export const MIN_ARTICLE_WORDS = 850;
+export const TARGET_ARTICLE_WORDS = 1050;
+
 const GENERIC_PHRASES = [
   'wielkie narracje',
   'zdrowy dystans',
@@ -35,8 +38,14 @@ export function validateArticleQuality(
     .filter(part => part && !/^#{1,6}\s+/.test(part));
   const words = (content.match(/\p{L}[\p{L}\p{M}-]*/gu) || []).length;
 
-  if (words < 850) {
-    errors.push(`ERROR: Artykul jest za krotki (${words} slow); minimum to 850 slow`);
+  if (words < MIN_ARTICLE_WORDS) {
+    errors.push(
+      `ERROR: Artykul jest za krotki (${words} slow); minimum to ${MIN_ARTICLE_WORDS} slow`,
+    );
+  } else if (words < TARGET_ARTICLE_WORDS) {
+    warnings.push(
+      `WARN: Artykul jest krotszy niz cel redakcyjny (${words} slow); cel to ${TARGET_ARTICLE_WORDS}+ slow`,
+    );
   }
 
   if (h2Headings.length < outline.sections.length) {
