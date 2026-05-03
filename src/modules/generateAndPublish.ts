@@ -356,9 +356,9 @@ export async function generateAndPublish(
       send('✅ Walidacja treści OK', { stats: validation.stats });
     }
 
-    const article = formatFinal(edited);
+    let article = formatFinal(edited);
     setStage('quality-check');
-    const quality = validateArticleQuality(article, outline);
+    let quality = validateArticleQuality(article, outline);
     send('quality-check', {
       ok: quality.ok,
       errors: quality.errors,
@@ -366,7 +366,62 @@ export async function generateAndPublish(
       stats: quality.stats,
     });
     if (!quality.ok) {
-      throw new Error(`Quality validation failed: ${quality.errors.join('; ')}`);
+      const qualityRepairProvider =
+        textProvider.type === 'jetson' && textProvider.fallback !== 'none'
+          ? { type: 'openai' as const }
+          : textProvider;
+
+      for (let attempt = 1; attempt <= 2 && !quality.ok; attempt++) {
+        setStage(`quality-repair-${attempt}`);
+        send('quality-repair-start', {
+          attempt,
+          errors: quality.errors,
+          stats: quality.stats,
+        });
+
+        let repairRes;
+        try {
+          repairRes = await repairEdited({
+            apiKey: env.OPENAI_API_KEY,
+            edited,
+            outline,
+            errors: quality.errors,
+            repairTemplate,
+            styleGuide,
+            contextPack,
+            model: repairModel,
+            provider: qualityRepairProvider,
+            maxTokens: 5000,
+          });
+          send('quality-repair-prompt', { attempt, prompt: repairRes.messages });
+          send('quality-repair-response', { attempt, response: repairRes.raw });
+        } catch (err) {
+          send('quality-repair-error', {
+            attempt,
+            error: (err as Error).message,
+            ...errorTelemetry(err, currentStage),
+            prompt: (err as any).messages,
+            response: (err as any).raw,
+          });
+          break;
+        }
+
+        edited = repairRes.edited;
+        article = formatFinal(edited);
+        quality = validateArticleQuality(article, outline);
+        send('quality-repair-end', {
+          attempt,
+          ok: quality.ok,
+          errors: quality.errors,
+          warnings: quality.warnings,
+          stats: quality.stats,
+        });
+      }
+
+      setStage('quality-check');
+      if (!quality.ok) {
+        throw new Error(`Quality validation failed: ${quality.errors.join('; ')}`);
+      }
     }
     if (quality.warnings.length > 0) {
       send('⚠️ Ostrzeżenia jakości', {
@@ -434,9 +489,7 @@ export async function generateAndPublish(
       stage: currentStage,
       ...errorTelemetry(err, currentStage, classified),
     });
-    if (classified.code === 'OPENAI_BILLING_QUOTA_EXCEEDED') {
-      await notifyOpenAIBillingFailure(env, classified, currentStage, auditContext);
-    }
+    await notifyGenerationFailure(env, classified, currentStage, auditContext);
     throw err;
   } finally {
     clearInterval(keepAlive);
@@ -462,14 +515,17 @@ function errorTelemetry(
   };
 }
 
-async function notifyOpenAIBillingFailure(
+async function notifyGenerationFailure(
   env: Env,
   classified: ClassifiedGenerationError,
   stage: string,
   auditContext: GenerationAuditContext,
 ): Promise<void> {
+  const isBilling = classified.code === 'OPENAI_BILLING_QUOTA_EXCEEDED';
   const lines = [
-    '🚨 Pseudointelekt: generowanie zatrzymane przez billing OpenAI',
+    isBilling
+      ? '🚨 Pseudointelekt: generowanie zatrzymane przez billing OpenAI'
+      : '⚠️ Pseudointelekt: generowanie artykułu nie doszło do PR',
     `Kod: ${classified.code}`,
     `Etap: ${stage}`,
     `Opis: ${classified.message}`,

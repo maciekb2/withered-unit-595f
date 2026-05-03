@@ -40,7 +40,7 @@ function buildRepairPrompt(
 
   return (
     `Napraw ponizszy artykul zgodnie z bledami walidacji. ` +
-    `Nie dodawaj nowych faktow ani zrodel; mozesz tylko usuwac, uogolniac i przeredagowywac zdania, aby spelnic reguly. ` +
+    `Nie dodawaj nowych faktow ani zrodel; mozesz usuwac, uogolniac, przeredagowywac oraz rozbudowywac interpretacje i przejscia miedzy akapitami na podstawie juz podanych informacji. ` +
     `Zachowaj tytul i opis DOKLADNIE jak podano.\n\n` +
     `Bledy walidacji:\n${errors.map(e => `- ${e}`).join('\n')}\n\n` +
     `Wymagane naglowki sekcji (musza wystapic w tekscie dokladnie jako linie zaczynajace sie od "## "):\n${h2List}\n\n` +
@@ -48,6 +48,7 @@ function buildRepairPrompt(
     `- W finalnym tekscie nie moze pozostac [[TODO-CLAIM]].\n` +
     `- W calym tekscie ma byc dokladnie 1 URL: leadSourceUrl z kontekstu (i zadnych innych).\n` +
     `- Jesli pojawia sie niepewna liczba/data/raport — uogolnij; nie dopisuj nowych danych.\n` +
+    `- Jesli blad dotyczy dlugosci, rozbuduj istniejace sekcje o konkretne akapity publicystyczne, bez lania wody i bez nowych zrodel.\n` +
     templateBlock +
     ctx +
     style +
