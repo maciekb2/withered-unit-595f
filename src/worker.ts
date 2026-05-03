@@ -27,6 +27,7 @@ import {
   incrementCounter,
   markLikeIfFirst,
 } from './utils/engagementCounters';
+import { reportWorkerError } from './utils/glitchtip';
 
 const pendingPrompts = new Map<
   string,
@@ -276,7 +277,7 @@ function buildAccessAuditContext(
   };
 }
 
-export default {
+const handler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
     const session = getSessionInfo(request);
@@ -329,8 +330,17 @@ export default {
             initialTopic,
             initialSourceUrl,
           })
-            .catch(err => {
+            .catch(async err => {
               console.error('Błąd w tle:', err);
+              await reportWorkerError(env, err, {
+                request,
+                transaction: 'manual article generation',
+                tags: { trigger: 'manual-sse' },
+                extra: {
+                  type: 'manual-generation-error',
+                  ...accessAuditContext,
+                },
+              });
               if (!streamClosed) {
                 const classified = classifyGenerationError(err);
                 const msg = JSON.stringify({
@@ -363,6 +373,40 @@ export default {
         url.pathname === '/api/client-log'
       ) {
         response = await handleClientLog(request, session.id, accessAuditContext);
+      } else if (
+        url.pathname === '/api/sentry-test' &&
+        (request.method === 'GET' || request.method === 'POST')
+      ) {
+        if ((env.GLITCHTIP_SENTRY_TEST_ENDPOINT || env.SENTRY_TEST_ENDPOINT) !== 'enabled') {
+          response = new Response('Not Found', { status: 404 });
+        } else {
+          const expectedToken = env.GLITCHTIP_SENTRY_TEST_TOKEN || env.SENTRY_TEST_TOKEN;
+          if (!expectedToken) {
+            response = new Response('Test endpoint token is not configured', { status: 503 });
+          } else if (url.searchParams.get('token') !== expectedToken) {
+            response = new Response('Forbidden', { status: 403 });
+          } else {
+            const mode = url.searchParams.get('mode') || 'capture';
+            const testError = new Error(`[pseudointelekt] Controlled Worker GlitchTip test (${mode})`);
+            testError.name = 'PseudointelektWorkerGlitchTipTestError';
+            const report = await reportWorkerError(env, testError, {
+              request,
+              extra: {
+                type: 'manual_glitchtip_probe',
+                mode,
+                triggeredAt: new Date().toISOString(),
+              },
+            });
+            if (mode === 'throw') throw testError;
+            response = jsonResponse({
+              ok: true,
+              captured: true,
+              mode,
+              event: 'PseudointelektWorkerGlitchTipTestError',
+              report,
+            });
+          }
+        }
       } else if (
         request.method === 'POST' &&
         url.pathname === '/api/update-prompt'
@@ -419,6 +463,10 @@ export default {
       return response;
     } catch (err) {
       logError(err, { type: 'fetch-error', path: url.pathname });
+      ctx.waitUntil(reportWorkerError(env, err, {
+        request,
+        extra: { type: 'fetch-error' },
+      }));
       return new Response(JSON.stringify({ message: 'Internal Server Error' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -427,3 +475,5 @@ export default {
   },
   scheduled: cron.scheduled,
 };
+
+export default handler;

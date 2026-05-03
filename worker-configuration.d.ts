@@ -32,6 +32,15 @@ interface Env {
         JETSON_GATEWAY_MODEL?: string;
         JETSON_GATEWAY_TIMEOUT_MS?: string;
         JETSON_GATEWAY_DISABLE_THINKING?: string;
+        SENTRY_DSN?: string;
+        GLITCHTIP_SENTRY_DSN?: string;
+        SENTRY_ENVIRONMENT?: string;
+        SENTRY_RELEASE?: string;
+        SENTRY_TRACES_SAMPLE_RATE?: string;
+        SENTRY_TEST_ENDPOINT?: string;
+        SENTRY_TEST_TOKEN?: string;
+        GLITCHTIP_SENTRY_TEST_ENDPOINT?: string;
+        GLITCHTIP_SENTRY_TEST_TOKEN?: string;
         JETSON_ACCESS_CLIENT_ID?: string;
         JETSON_ACCESS_CLIENT_SECRET?: string;
         CF_ACCESS_TEAM_DOMAIN?: string;

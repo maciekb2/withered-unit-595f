@@ -1,5 +1,6 @@
 import { initLogger, logEvent, logError } from './utils/logger';
 import { generateAndPublish } from './modules/generateAndPublish';
+import { reportWorkerError } from './utils/glitchtip';
 
 export default {
   async scheduled(event: ScheduledController, env: Env, ctx: ExecutionContext) {
@@ -13,6 +14,14 @@ export default {
       logEvent({ type: 'cron-complete', title: article.title, slug });
     } catch (err) {
       logError(err, { type: 'cron-error' });
+      ctx.waitUntil(reportWorkerError(env, err, {
+        transaction: 'scheduled article generation',
+        tags: { trigger: 'cron' },
+        extra: {
+          type: 'cron-error',
+          scheduledTime: event.scheduledTime,
+        },
+      }));
       throw err;
     }
   },
