@@ -35,4 +35,5 @@ This backlog captures the repository review findings from April 2026. Items are 
 
 - [x] Rebuild the blog index into a richer editorial archive with a featured article, descriptions, responsive cards, and local search.
 - [x] Improve the article page reading chrome: metadata bar, like/view controls, spacing, and article JSON-LD/BreadcrumbList details.
+- [x] Add local Google site-ops tooling for GA4 Admin/Data API and Search Console API without putting Google credentials into Worker runtime.
 - [ ] Upgrade the generation dashboard quality panel so it visualizes `quality-check` warnings and errors as a checklist.
