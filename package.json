@@ -35,7 +35,6 @@
     "db:migrations:apply": "wrangler d1 migrations apply pseudointelekt_logs --remote",
     "deploy": "npm run build && wrangler deploy",
     "dev": "astro dev",
-    "google:site-ops": "node scripts/google-site-ops.mjs",
     "logs:audit": "node scripts/query-generation-logs.mjs",
     "preview": "npm run build && wrangler dev",
     "types": "wrangler types"
