@@ -1,6 +1,6 @@
 ---
 title: "Polska flaga na kablu: cyberpożar po awariach"
-description: "Satyryczny tekst o tym, jak po cyfrowych awariach państwo ma przestać modlić się do routera i zacząć ćwiczyć odporność."
+description: "Po cyfrowych awariach państwo powinno przestać modlić się do routera i zacząć ćwiczyć odporność usług."
 pubDate: "2026-05-04"
 heroImage: "/blog-images/2026-05-04-polska-flaga-na-kablu-cyberpoar-po-awariach.png"
 views: 0
@@ -9,7 +9,7 @@ likes: 0
 
 # Polska flaga na kablu: cyberpożar po awariach
 
-Satyryczny tekst o tym, jak po cyfrowych awariach państwo ma przestać modlić się do routera i zacząć ćwiczyć odporność.
+Po cyfrowych awariach państwo powinno przestać modlić się do routera i zacząć ćwiczyć odporność usług.
 
 Źródło tematu: https://www.bbc.com/news/articles/cy0294829ndo?at_medium=RSS&at_campaign=rss
 
