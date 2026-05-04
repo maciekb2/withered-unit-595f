@@ -57,7 +57,7 @@
     "TEXT_SECTION_MAX_TOKENS": "1800",
     "JETSON_GATEWAY_URL": "https://jetson.senara-system.xyz",
     "JETSON_GATEWAY_MODEL": "qwen3:4b",
-    "JETSON_GATEWAY_TIMEOUT_MS": "120000",
+    "JETSON_GATEWAY_TIMEOUT_MS": "300000",
     "JETSON_GATEWAY_DISABLE_THINKING": "true",
     "SENTRY_ENVIRONMENT": "production",
     "SENTRY_RELEASE": "pseudointelekt2137-blog@manual",
