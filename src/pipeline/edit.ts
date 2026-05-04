@@ -6,6 +6,7 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { editedJsonSchema } from './schemas';
+import { assertArticleDescription, cleanArticleDescription } from './description';
 
 export interface EditDraftOptions {
   apiKey: string;
@@ -41,12 +42,9 @@ export async function editDraft({ apiKey, draft, outline, editTemplate, model = 
       response_format: { type: 'json_schema', json_schema: { name: 'edited', schema: editedJsonSchema } },
     });
     const json: Edited = extractJson<Edited>(text);
-    if (json.title.length > 100 || json.description.length > 200) {
-      throw new Error('Title or description too long');
-    }
-    if (/[#*_`]/.test(json.description)) {
-      throw new Error('Description contains markdown');
-    }
+    json.description = cleanArticleDescription(json.description);
+    if (json.title.length > 100) throw new Error('Title too long');
+    assertArticleDescription(json.description);
     const { cleaned, removedCount } = scrubTodoClaims(json.markdown);
     if (removedCount > 0) {
       logEvent({ type: 'todo-claim-warning', removedCount });

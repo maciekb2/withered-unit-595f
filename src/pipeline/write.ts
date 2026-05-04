@@ -5,6 +5,7 @@ import type { Outline, Edited } from './types';
 import { extractJson } from '../utils/json';
 import { scrubTodoClaims } from './scrubTodoClaims';
 import { editedJsonSchema } from './schemas';
+import { assertArticleDescription, cleanArticleDescription } from './description';
 
 export interface WriteArticleOptions {
   apiKey: string;
@@ -71,12 +72,9 @@ export async function writeArticle({
     });
 
     const json: Edited = extractJson<Edited>(text);
-    if (json.title.length > 100 || json.description.length > 200) {
-      throw new Error('Title or description too long');
-    }
-    if (/[#*_`]/.test(json.description)) {
-      throw new Error('Description contains markdown');
-    }
+    json.description = cleanArticleDescription(json.description);
+    if (json.title.length > 100) throw new Error('Title too long');
+    assertArticleDescription(json.description);
 
     const { cleaned, removedCount } = scrubTodoClaims(json.markdown);
     if (removedCount > 0) {

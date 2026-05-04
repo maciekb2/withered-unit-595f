@@ -4,6 +4,7 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { scrubTodoClaims } from './scrubTodoClaims';
 import { extractJson } from '../utils/json';
+import { cleanArticleDescription } from './description';
 
 export interface SectionedWriteOptions {
   apiKey: string;
@@ -49,7 +50,7 @@ export async function writeArticleSectioned({
   const messages: ChatMessage[] = [];
   const rawParts: string[] = [];
 
-  const lead = outline.description;
+  const lead = cleanArticleDescription(outline.description);
   rawParts.push(lead);
 
   const writtenSections: { h2: string; raw: string; markdown: string }[] = [];
@@ -86,7 +87,7 @@ export async function writeArticleSectioned({
       writtenSections.push({
         h2: section.h2,
         raw: sectionRaw,
-        markdown: sanitizeBodyText(sectionRaw, sourceUrl),
+        markdown: sanitizeBodyText(sectionRaw, sourceUrl, section.h2),
       });
       logEvent({ type: 'sectioned-write-section-complete', h2: section.h2, index });
     } catch (err) {
@@ -108,7 +109,7 @@ export async function writeArticleSectioned({
 
   const edited = {
     title: outline.finalTitle,
-    description: outline.description,
+    description: lead,
     markdown: cleaned,
   };
   logEvent({
@@ -123,6 +124,7 @@ function systemPrompt(): string {
   return [
     guardrails(),
     'Pisz po polsku w stylu Pseudointelektu: satyryczny, publicystyczny, geopolityczny, z ironią, ale spójny i czytelny.',
+    'Nie nazywaj gotowego tekstu satyrą ani artykułem; nie używaj w treści słów satyra, satyryczny, satyryczna, satyrycznie.',
     'Nie ujawniaj rozumowania. Zwracaj wyłącznie gotowy tekst artykułu, bez komentarzy technicznych.',
   ].join(' ');
 }
@@ -186,8 +188,8 @@ function assembleMarkdown({
     .join('\n\n');
 }
 
-function sanitizeBodyText(text: string, allowedUrl: string): string {
-  const cleaned = stripMetaPreamble(jsonMarkdownOrText(text))
+function sanitizeBodyText(text: string, allowedUrl: string, h2: string): string {
+  const cleaned = extractRelevantSection(stripMetaPreamble(jsonMarkdownOrText(text)), h2)
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/```[\s\S]*?```/g, block => block.replace(/```[a-z]*|```/gi, ''))
     .split('\n')
@@ -199,6 +201,29 @@ function sanitizeBodyText(text: string, allowedUrl: string): string {
     .replace(/\n{3,}/g, '\n\n')
     .trim();
   return removeMetaParagraphs(cleaned);
+}
+
+function extractRelevantSection(text: string, h2: string): string {
+  const lines = text.trim().split('\n');
+  const h2Index = lines.findIndex(line => normalizeHeadingLine(line) === normalizeHeadingLine(h2));
+  if (h2Index === -1) return text;
+
+  const nextH2Index = lines.findIndex((line, index) =>
+    index > h2Index && /^##\s+/.test(line.trim())
+  );
+  return lines
+    .slice(h2Index + 1, nextH2Index === -1 ? undefined : nextH2Index)
+    .join('\n')
+    .trim();
+}
+
+function normalizeHeadingLine(value: string): string {
+  return value
+    .replace(/^#{1,6}\s+/, '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
 function jsonMarkdownOrText(text: string): string {

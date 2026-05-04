@@ -4,6 +4,7 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { outlineJsonSchema } from './schemas';
+import { assertArticleDescription, cleanArticleDescription } from './description';
 
 export interface GenerateOutlineOptions {
   apiKey: string;
@@ -31,7 +32,8 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
   const userPrompt =
     ctxBlock +
     `Temat bazowy: ${baseTopic}\n` +
-    'Przygotuj konspekt satyrycznego artykulu (PL-patriotyczny).\n' +
+    'Przygotuj konspekt artykulu w stylu Pseudointelektu (PL-patriotyczny, ironiczny, publicystyczny).\n' +
+    'Opis ma brzmiec jak naturalny lead tematyczny; nie uzywaj slow: satyra, satyryczny, satyryczna, satyrycznie, tekst, artykul.\n' +
     '3 sekcje; kazda dokladnie 2 krotkie bullet-pointy.\n' +
     'Naglowki sekcji h2 maja byc krotkimi etykietami watku, nie moga powtarzac finalTitle ani jego duzych fragmentow.\n' +
     'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
@@ -60,7 +62,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
 
     const outline: Outline = {
       finalTitle: json.finalTitle,
-      description: cleanDescription(json.description),
+      description: cleanArticleDescription(json.description),
       sections: cleanSectionHeadings(json.finalTitle, json.sections),
       guardrails: json.guardrails || [],
     };
@@ -69,12 +71,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
       if (!outline.guardrails.includes(gr)) outline.guardrails.push(gr);
     }
 
-    if (outline.description.length > 200) {
-      throw new Error('Description too long');
-    }
-    if (/[#*_`]/.test(outline.description)) {
-      throw new Error('Description contains markdown');
-    }
+    assertArticleDescription(outline.description);
     if (outline.sections.length !== 3) {
       throw new Error('Outline must have 3 sections');
     }
@@ -95,14 +92,6 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     if (debug) (err as any).debug = debug;
     throw err;
   }
-}
-
-function cleanDescription(description: string): string {
-  return description
-    .replace(/^konspekt satyry o\b/i, 'Satyra o')
-    .replace(/^satyryczny konspekt o\b/i, 'Satyryczny tekst o')
-    .replace(/^konspekt artykułu o\b/i, 'Artykuł o')
-    .trim();
 }
 
 function cleanSectionHeadings(
