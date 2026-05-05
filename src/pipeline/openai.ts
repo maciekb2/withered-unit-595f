@@ -115,12 +115,24 @@ export async function chat(
         response_style,
       });
     } catch (err) {
-      logError(err, { type: 'cloudflare-ai-error', fallback: provider.fallback || 'openai' });
+      const classified = classifyCloudflareAiError(err);
+      logError(err, {
+        type: 'cloudflare-ai-error',
+        code: classified.code,
+        fallback: provider.fallback || 'openai',
+      });
+      logEvent({
+        type: classified.eventType,
+        code: classified.code,
+        retryable: classified.retryable,
+        message: classified.message.slice(0, 180),
+      });
       if (provider.fallback !== 'none') {
         provider.disabled = true;
-        provider.disabledReason = err instanceof Error ? err.message : String(err);
+        provider.disabledReason = `${classified.code}: ${classified.message}`;
         logEvent({
           type: 'cloudflare-ai-disabled-for-run',
+          code: classified.code,
           reason: provider.disabledReason.slice(0, 180),
         });
         if (provider.fallbackModel) {
@@ -398,6 +410,55 @@ async function chatCloudflareAi(
   }
 
   return text;
+}
+
+function classifyCloudflareAiError(error: unknown): {
+  code: string;
+  eventType: string;
+  message: string;
+  retryable: boolean;
+} {
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('daily free allocation') ||
+    normalized.includes('10,000 neurons') ||
+    normalized.includes('10000 neurons') ||
+    normalized.includes('4006')
+  ) {
+    return {
+      code: 'CLOUDFLARE_AI_FREE_QUOTA_EXHAUSTED',
+      eventType: 'cloudflare-ai-free-quota-exhausted',
+      message,
+      retryable: false,
+    };
+  }
+
+  if (normalized.includes('estimated daily budget exceeded')) {
+    return {
+      code: 'CLOUDFLARE_AI_LOCAL_BUDGET_EXCEEDED',
+      eventType: 'cloudflare-ai-local-budget-exceeded',
+      message,
+      retryable: false,
+    };
+  }
+
+  if (normalized.includes('rate') || normalized.includes('429')) {
+    return {
+      code: 'CLOUDFLARE_AI_RATE_LIMIT',
+      eventType: 'cloudflare-ai-rate-limit',
+      message,
+      retryable: true,
+    };
+  }
+
+  return {
+    code: 'CLOUDFLARE_AI_ERROR',
+    eventType: 'cloudflare-ai-error-classified',
+    message,
+    retryable: true,
+  };
 }
 
 function extractCloudflareAiText(data: unknown): string {

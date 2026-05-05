@@ -134,6 +134,16 @@ function buildQuery(args) {
   if (args.generation) {
     filters.push(`(
       json_extract(data, '$.type') LIKE 'generation-%'
+      OR json_extract(data, '$.type') LIKE 'cloudflare-ai-%'
+      OR json_extract(data, '$.type') LIKE 'github-%'
+      OR json_extract(data, '$.type') LIKE 'image-%'
+      OR json_extract(data, '$.type') LIKE 'jetson-%'
+      OR json_extract(data, '$.type') LIKE 'openai-%'
+      OR json_extract(data, '$.type') LIKE 'outline-%'
+      OR json_extract(data, '$.type') LIKE 'quality-%'
+      OR json_extract(data, '$.type') LIKE 'sectioned-%'
+      OR json_extract(data, '$.type') LIKE 'slack-%'
+      OR json_extract(data, '$.type') LIKE 'text-provider-%'
       OR json_extract(data, '$.type') IN (
         'access-auth-email-denied',
         'access-auth-invalid-token',
@@ -141,8 +151,13 @@ function buildQuery(args) {
         'access-auth-missing-token',
         'access-auth-ok',
         'client-log',
+        'content-validation',
         'generate-stream-start',
         'get-prompt',
+        'rss-topic-selected',
+        'topic-candidate-selected',
+        'topic-dedupe-accepted',
+        'topic-dedupe-rejected',
         'update-prompt'
       )
     )`);
