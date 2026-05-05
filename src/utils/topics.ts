@@ -121,7 +121,14 @@ export function sortPostsByDate(posts: BlogPostEntry[]): BlogPostEntry[] {
 }
 
 export function inferPostTopics(post: BlogPostEntry): TopicDefinition[] {
+  const frontmatterTopics = topicsFromTags(post.data.tags || []);
+  if (frontmatterTopics.length > 0) return frontmatterTopics;
   return inferTopicsForText(post.data.title, post.data.description);
+}
+
+export function topicsFromTags(tags: string[] = []): TopicDefinition[] {
+  const tagSet = new Set(tags.map((tag) => tag.toLocaleLowerCase('pl-PL')));
+  return TOPICS.filter((topic) => tagSet.has(topic.slug));
 }
 
 export function inferTopicsForText(title: string, description = ''): TopicDefinition[] {
@@ -131,6 +138,10 @@ export function inferTopicsForText(title: string, description = ''): TopicDefini
   );
 
   return matched.length ? matched.slice(0, 3) : [TOPICS[0]];
+}
+
+export function tagsForArticle(title: string, description = ''): string[] {
+  return inferTopicsForText(title, description).map((topic) => topic.slug);
 }
 
 export function buildTopicIndex(posts: BlogPostEntry[]): TopicSummary[] {

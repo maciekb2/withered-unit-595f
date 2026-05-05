@@ -3,7 +3,8 @@ import path from 'node:path';
 import { slugify } from '../utils/slugify';
 import { logEvent, logError } from '../utils/logger';
 import type { FinalJson } from '../pipeline/types';
-import { validateFinalJson, yamlEscape } from '../utils/validators';
+import { validateFinalJson, yamlEscape, yamlStringArray } from '../utils/validators';
+import { tagsForArticle } from '../utils/topics';
 
 export interface AssembleOptions {
   article: FinalJson;
@@ -40,6 +41,7 @@ export async function assembleArticle({
   const imageName = `${postDate}-${slug}.png`;
   const imagePath = path.join(publicDir, imageName);
   await fs.writeFile(imagePath, heroImage);
+  const tags = article.tags?.length ? article.tags : tagsForArticle(article.title, article.description);
 
   const fm = [
     '---',
@@ -47,6 +49,7 @@ export async function assembleArticle({
     `description: "${yamlEscape(article.description)}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
+    `tags: ${yamlStringArray(tags)}`,
     'views: 0',
     'likes: 0',
     '---',

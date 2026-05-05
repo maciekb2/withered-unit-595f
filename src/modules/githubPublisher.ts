@@ -3,7 +3,8 @@ import { logEvent, logError } from '../utils/logger';
 import { retryFetch } from '../utils/retryFetch';
 import { normalizeRepo } from '../utils/github';
 import type { FinalJson } from '../pipeline/types';
-import { validateFinalJson, yamlEscape } from '../utils/validators';
+import { validateFinalJson, yamlEscape, yamlStringArray } from '../utils/validators';
+import { tagsForArticle } from '../utils/topics';
 
 export interface PublishOptions {
   env: Env;
@@ -67,12 +68,14 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
 
   const imageName = `${postDate}-${slug}.png`;
   const postName = `${postDate}-${slug}.md`;
+  const tags = article.tags?.length ? article.tags : tagsForArticle(article.title, article.description);
   const markdown = [
     '---',
     `title: "${yamlEscape(article.title)}"`,
     `description: "${yamlEscape(article.description)}"`,
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
+    `tags: ${yamlStringArray(tags)}`,
     'views: 0',
     'likes: 0',
     '---',

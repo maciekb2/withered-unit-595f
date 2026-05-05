@@ -1,5 +1,6 @@
 import type { Edited, FinalJson } from './types';
 import { assertArticleDescription, cleanArticleDescription } from './description';
+import { tagsForArticle } from '../utils/topics';
 
 export function formatFinal(edited: Edited): FinalJson {
   const description = cleanArticleDescription(edited.description);
@@ -10,5 +11,10 @@ export function formatFinal(edited: Edited): FinalJson {
   if (edited.markdown.length < 800) {
     throw new Error('content too short');
   }
-  return { title: edited.title, description, content: edited.markdown };
+  return {
+    title: edited.title,
+    description,
+    content: edited.markdown,
+    tags: tagsForArticle(edited.title, description),
+  };
 }

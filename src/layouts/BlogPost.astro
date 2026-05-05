@@ -6,7 +6,7 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import PostNavigation from '../components/PostNavigation.astro';
 import { SITE_TITLE } from '../consts';
-import { inferTopicsForText } from '../utils/topics';
+import { inferTopicsForText, topicsFromTags } from '../utils/topics';
 
 type Props = CollectionEntry<'blog'>['data'] & {
     slug: string;
@@ -22,11 +22,17 @@ const {
     pubDate,
     updatedDate,
     heroImage,
+    tags = [],
     likes,
     prev,
     next,
     related = [],
 } = Astro.props as Props;
+
+const frontmatterTopics = topicsFromTags(tags);
+const articleTopics = frontmatterTopics.length
+        ? frontmatterTopics
+        : inferTopicsForText(title, description);
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -35,6 +41,7 @@ const jsonLd = {
       "@type": "BlogPosting",
       headline: title,
       description,
+      keywords: articleTopics.map((topic) => topic.name),
       image: heroImage ? new URL(heroImage, Astro.site).toString() : undefined,
       url: new URL(`/blog/${slug}/`, Astro.site).toString(),
       datePublished: pubDate.toISOString(),
@@ -69,7 +76,6 @@ const jsonLd = {
   ],
 };
 
-const articleTopics = inferTopicsForText(title, description);
 ---
 
 <html lang="pl">
