@@ -7,5 +7,5 @@ export const SITE_DESCRIPTION = "Geopolityka, komentarz i satyra bez zadęcia";
 export const CONTACT_EMAIL = "info@pseudointelekt.pl";
 export const SITE_KEYWORDS =
   "geopolityka, blog, komentarz, humor, polityka";
-export const GA4_MEASUREMENT_ID = "";
+export const GA4_MEASUREMENT_ID = "G-WTSC0BFN20";
 export const GOOGLE_SITE_VERIFICATION = "";
