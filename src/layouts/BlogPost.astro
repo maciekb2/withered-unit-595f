@@ -282,7 +282,7 @@ const articleTopics = inferTopicsForText(title, description);
                                 gap: 0.45rem;
                                 padding: 0.85rem;
                         }
-                        .related-card time {
+                        .related-card__date {
                                 color: var(--diplomatic-blue);
                                 font-size: 0.7rem;
                                 font-weight: 700;
@@ -377,7 +377,7 @@ const articleTopics = inferTopicsForText(title, description);
                                                                                         <img src={post.data.heroImage} alt="" loading="lazy" />
                                                                                 )}
                                                                                 <div class="related-card__body">
-                                                                                        <time><FormattedDate date={post.data.pubDate} /></time>
+                                                                                        <span class="related-card__date"><FormattedDate date={post.data.pubDate} /></span>
                                                                                         <h3>{post.data.title}</h3>
                                                                                         <p>{post.data.description}</p>
                                                                                 </div>
