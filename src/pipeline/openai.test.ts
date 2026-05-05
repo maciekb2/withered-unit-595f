@@ -92,6 +92,56 @@ test('chat falls back from Jetson to OpenAI when fallback is enabled', async () 
   }
 });
 
+test('chat disables Jetson for the current run after the first fallback', async () => {
+  const original = globalThis.fetch;
+  const urls: string[] = [];
+  const provider = {
+    type: 'jetson' as const,
+    gatewayUrl: 'https://jetson.example.test',
+    token: 'jetson-token',
+    fallback: 'openai' as const,
+    fallbackModel: 'gpt-5.5',
+  };
+
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    const url = String(input);
+    urls.push(url);
+    if (url.includes('jetson.example.test')) {
+      return new Response('gateway timeout', { status: 524 });
+    }
+    return new Response(
+      JSON.stringify({ choices: [{ message: { content: 'tekst z openai' } }] }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    await chat('openai-key', {
+      messages: [{ role: 'user', content: 'Napisz lead' }],
+      max_completion_tokens: 100,
+      model: 'gpt-5',
+      provider,
+    });
+    await chat('openai-key', {
+      messages: [{ role: 'user', content: 'Napisz kolejną sekcję' }],
+      max_completion_tokens: 100,
+      model: 'gpt-5',
+      provider,
+    });
+
+    assert.deepEqual(urls, [
+      'https://jetson.example.test/api/generate',
+      'https://api.openai.com/v1/chat/completions',
+      'https://api.openai.com/v1/chat/completions',
+    ]);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config without secrets in vars', () => {
   assert.deepEqual(textGenerationProviderFromEnv({} as Env), { type: 'openai' });
 

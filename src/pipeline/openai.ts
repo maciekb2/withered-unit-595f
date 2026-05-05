@@ -18,6 +18,7 @@ export interface ChatOptions {
 
 const MAX_LENGTH_RETRIES = 3;
 const MAX_TOKEN_CAP = 12000;
+const JETSON_REQUEST_TIMEOUT_CAP_MS = 90000;
 
 export type TextGenerationProvider =
   | { type: 'openai' }
@@ -32,6 +33,8 @@ export type TextGenerationProvider =
       fallbackModel?: string;
       accessClientId?: string;
       accessClientSecret?: string;
+      disabled?: boolean;
+      disabledReason?: string;
     };
 
 export function textGenerationProviderFromEnv(env: Env): TextGenerationProvider {
@@ -74,7 +77,7 @@ export async function chat(
     }
   }
 
-  if (provider.type === 'jetson') {
+  if (provider.type === 'jetson' && !provider.disabled) {
     try {
       return await chatJetson(provider, {
         messages: finalMessages,
@@ -86,6 +89,12 @@ export async function chat(
     } catch (err) {
       logError(err, { type: 'jetson-error', fallback: provider.fallback || 'openai' });
       if (provider.fallback !== 'none') {
+        provider.disabled = true;
+        provider.disabledReason = err instanceof Error ? err.message : String(err);
+        logEvent({
+          type: 'jetson-disabled-for-run',
+          reason: provider.disabledReason.slice(0, 180),
+        });
         if (provider.fallbackModel) {
           model = provider.fallbackModel;
         }
@@ -94,6 +103,16 @@ export async function chat(
         throw err;
       }
     }
+  } else if (provider.type === 'jetson' && provider.disabled) {
+    if (provider.fallbackModel) {
+      model = provider.fallbackModel;
+    }
+    logEvent({
+      type: 'text-provider-skip-disabled-jetson',
+      to: 'openai',
+      model,
+      reason: provider.disabledReason?.slice(0, 180) || 'disabled',
+    });
   }
 
   let tokens = Math.min(max_completion_tokens, MAX_TOKEN_CAP);
@@ -268,7 +287,7 @@ async function chatJetson(
     headers['CF-Access-Client-Secret'] = provider.accessClientSecret;
   }
 
-  const timeoutMs = provider.timeoutMs || 120000;
+  const timeoutMs = Math.min(provider.timeoutMs || 120000, JETSON_REQUEST_TIMEOUT_CAP_MS);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -278,6 +297,7 @@ async function chatJetson(
     response_style,
     max_tokens: max_completion_tokens,
     gatewayHost: url.host,
+    timeoutMs,
   });
 
   try {
@@ -296,7 +316,7 @@ async function chatJetson(
         stream: false,
       }),
       signal: controller.signal,
-      retries: 1,
+      retries: 0,
       retryDelayMs: 1000,
     });
     logEvent({ type: 'jetson-response-status', status: res.status });
