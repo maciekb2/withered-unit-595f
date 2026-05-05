@@ -386,11 +386,14 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
                 </main>
                <Footer />
                <script type="module">
+			document.body.dataset.pageSection = 'blog_archive';
 			const search = document.querySelector('#blog-search');
 			const cards = Array.from(document.querySelectorAll('[data-search-card]'));
 			const count = document.querySelector('[data-blog-count]');
 			const empty = document.querySelector('[data-empty-results]');
 			const total = cards.length;
+			let searchTrackTimer = 0;
+			let lastTrackedSearch = '';
 
 			function updateFilter() {
 				const query = search instanceof HTMLInputElement
@@ -407,6 +410,16 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 					count.textContent = `${visibleTotal} ${visibleTotal === 1 ? 'wpis' : 'wpisów'}${query ? ' pasuje do filtra' : ''}`;
 				}
 				if (empty) empty.classList.toggle('is-visible', query.length > 0 && visible === 0);
+				window.clearTimeout(searchTrackTimer);
+				if (query.length >= 2 && query !== lastTrackedSearch) {
+					searchTrackTimer = window.setTimeout(() => {
+						lastTrackedSearch = query;
+						window.pseudointelektTrack?.('blog_search', {
+							query_length: query.length,
+							result_count: visible,
+						});
+					}, 650);
+				}
 			}
 
 			search?.addEventListener('input', updateFilter);

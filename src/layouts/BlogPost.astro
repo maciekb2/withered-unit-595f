@@ -203,7 +203,12 @@ const jsonLd = {
 	<body>
 		<Header />
 		<main>
-			<article>
+			<article
+                                data-article-page
+                                data-article-slug={slug}
+                                data-article-year={pubDate.getFullYear()}
+                                data-article-age-days={Math.max(0, Math.floor((Date.now() - pubDate.getTime()) / 86400000))}
+                        >
 				<div class="hero-image">
 					{heroImage && <img width={1020} height={510} src={heroImage} alt={title} />}
 				</div>
@@ -237,6 +242,40 @@ const jsonLd = {
                 <Footer />
                 <script type="module" define:vars={{ slug }}>
                         const currentSlug = slug;
+                        const article = document.querySelector('[data-article-page]');
+                        const articleParams = {
+                                article_slug: currentSlug,
+                                article_year: Number(article?.dataset.articleYear || 0),
+                                article_age_days: Number(article?.dataset.articleAgeDays || 0),
+                        };
+                        document.body.dataset.pageSection = 'article';
+                        window.pseudointelektTrack?.('article_read_start', articleParams);
+
+                        const scrollThresholds = [25, 50, 75, 90];
+                        const seenThresholds = new Set();
+                        let readCompleteSent = false;
+                        function trackScrollDepth() {
+                                const doc = document.documentElement;
+                                const scrollable = doc.scrollHeight - window.innerHeight;
+                                if (scrollable <= 0) return;
+                                const percent = Math.min(100, Math.round((window.scrollY / scrollable) * 100));
+                                scrollThresholds.forEach((threshold) => {
+                                        if (percent >= threshold && !seenThresholds.has(threshold)) {
+                                                seenThresholds.add(threshold);
+                                                window.pseudointelektTrack?.('article_scroll_depth', {
+                                                        ...articleParams,
+                                                        scroll_percent: threshold,
+                                                });
+                                        }
+                                });
+                                if (percent >= 90 && !readCompleteSent) {
+                                        readCompleteSent = true;
+                                        window.pseudointelektTrack?.('article_read_complete', articleParams);
+                                }
+                        }
+                        window.addEventListener('scroll', trackScrollDepth, { passive: true });
+                        window.addEventListener('load', trackScrollDepth);
+
                         fetch(`/api/views/${currentSlug}`, { method: 'POST' })
                                 .then((r) => r.ok ? r.json() : { views: 0 })
                                 .then((d) => {
@@ -273,7 +312,16 @@ const jsonLd = {
                                                         }, { once: true });
                                                 }
                                                 sessionStorage.setItem(likeStorageKey, '1');
+                                                window.pseudointelektTrack?.('article_like', articleParams);
                                         });
+                        });
+                        document.querySelectorAll('.post-nav a').forEach((link) => {
+                                link.addEventListener('click', () => {
+                                        window.pseudointelektTrack?.('article_adjacent_click', {
+                                                ...articleParams,
+                                                direction: link.classList.contains('next') ? 'next' : 'prev',
+                                        });
+                                });
                         });
                 </script>
         </body>

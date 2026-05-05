@@ -58,9 +58,18 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
   const consentKey = 'pseudointelekt_cookie_consent_v2';
   const consentVersion = 2;
   const hasGa4 = typeof ga4Id === 'string' && /^G-[A-Z0-9]+$/i.test(ga4Id);
+  let analyticsGranted = false;
 
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
+  window.pseudointelektTrack = function pseudointelektTrack(eventName, params = {}) {
+    if (!analyticsGranted || !hasGa4 || typeof window.gtag !== 'function') return;
+    if (!/^[a-z][a-z0-9_]{1,39}$/.test(eventName)) return;
+    window.gtag('event', eventName, {
+      site_section: document.body?.dataset?.pageSection || 'unknown',
+      ...params,
+    });
+  };
   window.gtag('consent', 'default', {
     analytics_storage: 'denied',
     ad_storage: 'denied',
@@ -80,6 +89,7 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
   }
 
   function saveConsent(analytics) {
+    const wasGranted = analyticsGranted;
     const value = {
       version: consentVersion,
       analytics: Boolean(analytics),
@@ -87,10 +97,16 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
     };
     localStorage.setItem(consentKey, JSON.stringify(value));
     applyConsent(value);
+    if (!wasGranted && value.analytics) {
+      window.pseudointelektTrack('analytics_consent_granted', {
+        consent_version: consentVersion,
+      });
+    }
   }
 
   function applyConsent(consent) {
     const granted = Boolean(consent && consent.analytics);
+    analyticsGranted = granted;
     window.gtag('consent', 'update', {
       analytics_storage: granted ? 'granted' : 'denied',
       ad_storage: 'denied',
@@ -266,6 +282,16 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
 
   document.addEventListener('DOMContentLoaded', () => {
     addStyles();
+    document.addEventListener('click', (event) => {
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!(link instanceof HTMLAnchorElement)) return;
+      const url = new URL(link.href, window.location.href);
+      if (url.hostname === window.location.hostname) return;
+      window.pseudointelektTrack('outbound_click', {
+        link_domain: url.hostname.replace(/^www\./, ''),
+      });
+    }, { capture: true });
+
     const consent = readConsent();
     if (consent) {
       applyConsent(consent);
