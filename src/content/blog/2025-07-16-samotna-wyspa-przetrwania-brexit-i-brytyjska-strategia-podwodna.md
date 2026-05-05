@@ -1,6 +1,7 @@
 ---
 title: "Samotna Wyspa Przetrwania: Brexit i Brytyjska Strategia Podwodna"
 description: "Jak Wielka Brytania staje się liderem w wyścigu o najbardziej bezcelową niezależność pod wodą!"
+tags: ["europa-i-unia"]
 pubDate: "2025-07-16"
 heroImage: "/blog-images/2025-07-16-samotna-wyspa-przetrwania-brexit-i-brytyjska-strategia-podwodna.png"
 views: 0

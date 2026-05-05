@@ -1,6 +1,7 @@
 ---
 title: "Gumka demokracji: skreślmy Trumpa z Kennedy Center, będzie spokój"
 description: "Patriotyczna satyra: skreślmy Trumpa z Kennedy Center, a spór cudownie zniknie. Jeden gest, jeden wątek, zero problemów — przynajmniej na afiszu."
+tags: ["polityka-i-media"]
 pubDate: "2025-12-25"
 heroImage: "/blog-images/2025-12-25-gumka-demokracji-skrelmy-trumpa-z-kennedy-center-bdzie-spokj.png"
 views: 0

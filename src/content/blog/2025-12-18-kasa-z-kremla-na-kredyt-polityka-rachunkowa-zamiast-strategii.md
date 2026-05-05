@@ -1,6 +1,7 @@
 ---
 title: "Kasa z Kremla na kredyt: polityka rachunkowa zamiast strategii"
 description: "Unijne pomysły na finansowanie Ukrainy z zamrożonych aktywów Kremla kuszą Excela, ale zdradzają brak kompasu: księgowość zastępuje strategię, a ryzyka lądują poza bilansem."
+tags: ["geopolityka", "technologia-i-cyber", "gospodarka-i-energia"]
 pubDate: "2025-12-18"
 heroImage: "/blog-images/2025-12-18-kasa-z-kremla-na-kredyt-polityka-rachunkowa-zamiast-strategii.png"
 views: 0

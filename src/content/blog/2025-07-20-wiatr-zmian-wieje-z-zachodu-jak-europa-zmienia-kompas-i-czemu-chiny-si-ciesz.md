@@ -1,6 +1,7 @@
 ---
 title: "Wiatr Zmian wieje z Zachodu: Jak Europa Zmienia Kompas i Czemu Chiny się Cieszą?"
 description: "Gdy Europa buduje zielone imperium, Chiny czają się tuż za rogiem z szampanem w ręku, patrząc jak Zachód pływa po własnym Nebukadnezarze regulacji."
+tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 pubDate: "2025-07-20"
 heroImage: "/blog-images/2025-07-20-wiatr-zmian-wieje-z-zachodu-jak-europa-zmienia-kompas-i-czemu-chiny-si-ciesz.png"
 views: 0

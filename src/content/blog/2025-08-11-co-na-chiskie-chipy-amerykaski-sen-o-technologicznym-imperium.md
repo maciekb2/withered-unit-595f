@@ -1,6 +1,7 @@
 ---
 title: "Cło na Chińskie Chipy: Amerykański Sen o Technologicznym Imperium"
 description: "USA wprowadza \"podatek od chipów\". Polska neutralnie obserwuje, jak giganci walczą o dominację."
+tags: ["geopolityka", "technologia-i-cyber", "gospodarka-i-energia"]
 pubDate: "2025-08-11"
 heroImage: "/blog-images/2025-08-11-co-na-chiskie-chipy-amerykaski-sen-o-technologicznym-imperium.png"
 views: 0

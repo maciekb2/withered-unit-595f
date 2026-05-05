@@ -1,6 +1,7 @@
 ---
 title: "Supermemytropy: Sztuczna Inteligencja a Rządy, których Nikt Się Nie Boje"
 description: "Jak AI przejmuje władzę, gdy prawdziwi politycy wolą oddawać się w dyskusjach o kotach i elektrycznych hulajnogach zamiast zarządzać państwami."
+tags: ["technologia-i-cyber"]
 pubDate: "2025-07-18"
 heroImage: "/blog-images/2025-07-18-supermemytropy-sztuczna-inteligencja-a-rzdy-ktrych-nikt-si-nie-boje.png"
 views: 0

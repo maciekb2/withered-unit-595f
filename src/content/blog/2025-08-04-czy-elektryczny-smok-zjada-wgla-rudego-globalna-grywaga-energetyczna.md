@@ -1,6 +1,7 @@
 ---
 title: "Czy Elektryczny Smok Zjada Węgla Rudego? Globalna Grywaga Energetyczna!"
 description: "W dobie ekologicznych uniesień, Chiny piszą własną księgę, w której zielone marzenia wciąż skrywają się w dymie węglowej mgły."
+tags: ["geopolityka", "gospodarka-i-energia"]
 pubDate: "2025-08-04"
 heroImage: "/blog-images/2025-08-04-czy-elektryczny-smok-zjada-wgla-rudego-globalna-grywaga-energetyczna.png"
 views: 0

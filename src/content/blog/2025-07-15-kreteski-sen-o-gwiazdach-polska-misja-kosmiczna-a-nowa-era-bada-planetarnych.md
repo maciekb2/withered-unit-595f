@@ -1,6 +1,7 @@
 ---
 title: "Kreteński Sen o Gwiazdach: Polska Misja Kosmiczna a Nowa Era Badań Planetarnych"
 description: "Jak Polska zamierza zabłysnąć na międzynarodowej arenie, wysyłając Sławosza na podbój gwiazd — i dlaczego wszyscy już teraz się śmieją."
+tags: ["geopolityka"]
 pubDate: "2025-07-15"
 heroImage: "/blog-images/2025-07-15-kreteski-sen-o-gwiazdach-polska-misja-kosmiczna-a-nowa-era-bada-planetarnych.png"
 views: 0

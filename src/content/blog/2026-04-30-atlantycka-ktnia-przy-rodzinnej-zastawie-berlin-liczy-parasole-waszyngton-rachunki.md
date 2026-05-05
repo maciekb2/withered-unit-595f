@@ -1,6 +1,7 @@
 ---
 title: "Atlantycka kłótnia przy rodzinnej zastawie: Berlin liczy parasole, Waszyngton rachunki"
 description: "Transatlantycki rachunek za bezpieczeństwo: Berlin liczy parasole, Waszyngton faktury, a Polska pilnuje wschodniej flanki."
+tags: ["geopolityka", "europa-i-unia"]
 pubDate: "2026-04-30"
 heroImage: "/blog-images/2026-04-30-atlantycka-ktnia-przy-rodzinnej-zastawie-berlin-liczy-parasole-waszyngton-rachunki.png"
 views: 0

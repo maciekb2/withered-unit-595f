@@ -1,6 +1,7 @@
 ---
 title: "Giganci Ropni i Małe Skinięcie: Jak Energetyczny Cover Band Zapisuje Nowe Nuty w Geopolityce"
 description: "Zamiast ładu i składu, światowy rynek energii przypomina niezgrabną kapelę rockową, gdzie kilka potknięć zmienia koncert w festiwal chaosu."
+tags: ["gospodarka-i-energia"]
 pubDate: "2025-07-25"
 heroImage: "/blog-images/2025-07-25-giganci-ropni-i-mae-skinicie-jak-energetyczny-cover-band-zapisuje-nowe-nuty-w-geopolityce.png"
 views: 0

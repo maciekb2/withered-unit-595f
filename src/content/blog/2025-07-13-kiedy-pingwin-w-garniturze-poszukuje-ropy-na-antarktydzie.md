@@ -1,6 +1,7 @@
 ---
 title: "Kiedy pingwin w garniturze poszukuje ropy na Antarktydzie"
 description: "Gdyby pingwiny rządziły światem, czy korporacyjne rekiny walczyłyby o ich głosy? Irlandzki ton w światowej polityce w czasach smogu i kryptowalut."
+tags: ["geopolityka"]
 pubDate: "2025-07-13"
 heroImage: "/blog-images/2025-07-13-kiedy-pingwin-w-garniturze-poszukuje-ropy-na-antarktydzie.png"
 views: 0

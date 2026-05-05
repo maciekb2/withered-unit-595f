@@ -1,6 +1,7 @@
 ---
 title: "Cztery Końce Świata: Geopolityczne Migreny w Końcu Korytarza"
 description: "W świecie, gdzie wszyscy są ekspertami, a mapa polityczna przypomina coraz bardziej instruktarz do gry strategicznej – co czai się w kątach, gdy historia zmienia biegi z prędkością pędzącego dyplomaty?"
+tags: ["technologia-i-cyber"]
 pubDate: "2025-08-08"
 heroImage: "/blog-images/2025-08-08-cztery-koce-wiata-geopolityczne-migreny-w-kocu-korytarza.png"
 views: 0

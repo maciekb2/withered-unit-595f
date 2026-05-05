@@ -1,6 +1,7 @@
 ---
 title: "Idol z Krzemowej Doliny: Jak BYOD Zamienia się w Wielkiego Brata?"
 description: "Nie tak dawno temu, smartfony narzędziami pracy nazwano. Teraz patrzymy, jak nas śledzą przez palce mądrzejsze od nas samych."
+tags: ["geopolityka"]
 pubDate: "2025-08-06"
 heroImage: "/blog-images/2025-08-06-idol-z-krzemowej-doliny-jak-byod-zamienia-si-w-wielkiego-brata.png"
 views: 0

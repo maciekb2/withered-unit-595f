@@ -1,6 +1,7 @@
 ---
 title: "Car-bomba Kremla: gdy imperium nie chroni własnych generałów"
 description: "Sarmacka kpina z imperium, które pozwala car-bombie mówić głośniej niż ochrona własnych generałów."
+tags: ["geopolityka"]
 pubDate: "2025-12-22"
 heroImage: "/blog-images/2025-12-22-car-bomba-kremla-gdy-imperium-nie-chroni-wasnych-generaw.png"
 views: 0

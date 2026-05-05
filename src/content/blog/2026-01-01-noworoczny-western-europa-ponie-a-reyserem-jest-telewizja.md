@@ -1,6 +1,7 @@
 ---
 title: "Noworoczny western na ekranie: fajerwerki, polityka i kamera z palcem na spuście"
 description: "Satyryczny komentarz o medialnym westernie, w którym polityka miesza się z widowiskiem, a obraz często wyprzedza sens."
+tags: ["polityka-i-media"]
 pubDate: "2026-01-01"
 heroImage: "/blog-images/2026-01-01-noworoczny-western-europa-ponie-a-reyserem-jest-telewizja.png"
 views: 0

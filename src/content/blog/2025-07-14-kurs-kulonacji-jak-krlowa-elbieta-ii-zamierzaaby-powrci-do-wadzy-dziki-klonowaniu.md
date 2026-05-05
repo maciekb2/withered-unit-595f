@@ -1,6 +1,7 @@
 ---
 title: "Kurs Kopiowania: Jak Królowa Elżbieta II Zamierzałaby Powrócić do Władzy dzięki Klonowaniu"
 description: "Czy technologia klonowania jest nową monarchią? W świecie, gdzie nauka spotyka się z polityką, nawet królowe mogą powrócić w jeszcze lepszej wersji."
+tags: ["technologia-i-cyber"]
 pubDate: "2025-07-14"
 heroImage: "/blog-images/2025-07-14-kurs-kulonacji-jak-krlowa-elbieta-ii-zamierzaaby-powrci-do-wadzy-dziki-klonowaniu.png"
 views: 0

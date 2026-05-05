@@ -1,6 +1,7 @@
 ---
 title: "Polska flaga na kablu: cyberpożar po awariach"
 description: "Po cyfrowych awariach państwo powinno przestać modlić się do routera i zacząć ćwiczyć odporność usług."
+tags: ["technologia-i-cyber"]
 pubDate: "2026-05-04"
 heroImage: "/blog-images/2026-05-04-polska-flaga-na-kablu-cyberpoar-po-awariach.png"
 views: 0

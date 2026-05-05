@@ -1,6 +1,7 @@
 ---
 title: "Wielki Mur Środkowoeuropejski: Jak Polska Stawia Opór Globalnym Absurdalnościom"
 description: "Rzut oka na polsko-białoruską granicę i jej niesławne kąty absurdu, podczas gdy granice z Niemcami i Ukrainą trwają w błogiej harmonii."
+tags: ["technologia-i-cyber", "europa-i-unia"]
 pubDate: "2025-07-13"
 heroImage: "/blog-images/2025-07-13-wielki-mur-rodkowoeuropejski-jak-polska-stawia-opr-globalnym-absurdalnociom.png"
 views: 0

@@ -1,6 +1,7 @@
 ---
 title: "Technologiczna Husaria: Czy Smartfon Zastąpi Różaniec?"
 description: "Z przymrużeniem oka o tym, jak Polacy gonią za innowacjami, mimo że tradycja i zdrowy rozsądek czasem mówią 'stop'."
+tags: ["geopolityka"]
 pubDate: "2025-08-09"
 heroImage: "/blog-images/2025-08-09-technologiczna-husaria-czy-smartfon-zastpi-raniec.png"
 views: 0

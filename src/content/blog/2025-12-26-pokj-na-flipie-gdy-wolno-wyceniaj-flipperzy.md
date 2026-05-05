@@ -1,6 +1,7 @@
 ---
 title: "Pokój na flipie: gdy wolność wyceniają flipperzy"
 description: "Satyryczny szkic o „pokoju na flipie” i patriotycznej odmowie wyceny wolności przez spekulantów od m2. Jeden wątek, trzy akty, zero dygresji."
+tags: ["geopolityka"]
 pubDate: "2025-12-26"
 heroImage: "/blog-images/2025-12-26-pokj-na-flipie-gdy-wolno-wyceniaj-flipperzy.png"
 views: 0

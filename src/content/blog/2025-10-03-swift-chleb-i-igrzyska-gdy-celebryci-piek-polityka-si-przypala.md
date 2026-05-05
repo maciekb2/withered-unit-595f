@@ -1,6 +1,7 @@
 ---
 title: "Swift, chleb i igrzyska: gdy celebryci pieką, polityka się przypala"
 description: "Patriotyczna satyra: celebryci lukrują, stadiony błyszczą, a Polska piecze swój chleb codzienną robotą i liczbami, nie lajkami."
+tags: ["polityka-i-media"]
 pubDate: "2025-10-03"
 heroImage: "/blog-images/2025-10-03-swift-chleb-i-igrzyska-gdy-celebryci-piek-polityka-si-przypala.png"
 views: 0

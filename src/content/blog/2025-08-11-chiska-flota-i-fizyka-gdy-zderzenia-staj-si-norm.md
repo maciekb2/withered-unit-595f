@@ -1,6 +1,7 @@
 ---
 title: "Chińska Flota i Fizyka: Gdy Zderzenia Stają się Normą"
 description: "Satyryczne spojrzenie na chińską flotę i jej zmagania z fizyką, w kontekście polskiego patriotyzmu."
+tags: ["geopolityka"]
 pubDate: "2025-08-11"
 heroImage: "/blog-images/2025-08-11-chiska-flota-i-fizyka-gdy-zderzenia-staj-si-norm.png"
 views: 0

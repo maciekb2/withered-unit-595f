@@ -1,6 +1,7 @@
 ---
 title: "Banki Szlachetnie Demokratyczne: Gdy Kredyt Zastąpi Wybory"
 description: "W świecie, gdzie pożyczki stają się narzędziem geopolityki, czy nowoczesna demokracja to tylko urokliwy gust pisany przez bankowość?"
+tags: ["gospodarka-i-energia", "polityka-i-media"]
 pubDate: "2025-08-09"
 heroImage: "/blog-images/2025-08-09-banki-szlachetnie-demokratyczne-gdy-kredyt-zastpi-wybory.png"
 views: 0

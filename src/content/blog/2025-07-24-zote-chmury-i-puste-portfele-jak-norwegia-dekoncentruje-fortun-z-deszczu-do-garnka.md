@@ -1,6 +1,7 @@
 ---
 title: "Złote Chmury i Puste Portfele: Jak Norwegia dekoncentruje fortunę z deszczu do garnka"
 description: "W erze, gdy ropa płynie potokiem, Norwegowie wolą łapać deszcz w chmurach — w stylu IKEA. Zabrzmiało przekomicznie? Tylko dla zatwardziałych realistów."
+tags: ["gospodarka-i-energia"]
 pubDate: "2025-07-24"
 heroImage: "/blog-images/2025-07-24-zote-chmury-i-puste-portfele-jak-norwegia-dekoncentruje-fortun-z-deszczu-do-garnka.png"
 views: 0

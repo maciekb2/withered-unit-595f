@@ -1,6 +1,7 @@
 ---
 title: "Bazyliszek Wzrostów i Spadków: Jak Polityka Czarnej Skrzynki Igłą w Globalny Balon Dźga"
 description: "Nic tak nie łechce geopolitycznego podbrzusza, jak subtelny wdech inflacji przed wielkim wydechem gospodarczej zadyszki. Przedstawiamy najnowsze ingrediencje w zupie ze świata giełdy, finansów i wiecznego chaosu dyplomacji."
+tags: ["gospodarka-i-energia", "polityka-i-media"]
 pubDate: "2025-07-29"
 heroImage: "/blog-images/2025-07-29-bazyliszek-wzrostw-i-spadkw-jak-polityka-czarnej-skrzynki-ig-w-globalny-balon-dga.png"
 views: 0

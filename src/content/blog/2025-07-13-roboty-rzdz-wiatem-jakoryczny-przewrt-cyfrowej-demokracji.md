@@ -1,6 +1,7 @@
 ---
 title: "Roboty Rządzą Światem: Jakoryczny Przewrót Cyfrowej Demokracji"
 description: "Analiza najnowszej tendencji, która każdemu pozwala marzyć o elektronicznej utopii, pełnej żartów na temat pseudopolitycznych robotów."
+tags: ["technologia-i-cyber", "polityka-i-media"]
 pubDate: "2025-07-13"
 heroImage: "/blog-images/2025-07-13-roboty-rzdz-wiatem-jakoryczny-przewrt-cyfrowej-demokracji.png"
 views: 0

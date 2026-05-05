@@ -1,6 +1,7 @@
 ---
 title: "Hamburger kontra Baguette: Jak Globalne Zmiany Klimatyczne Stają się Sałatką Na Talerzu Dyplomatycznym"
 description: "Polityczna sałatka - USA i Francja przepychają się nad stołem klimatycznej strategii, a w tle słychać szelest dolarów i euro. Czy to czas, by ziemniak stał się nowym symbolem neutralności węglowej?"
+tags: ["geopolityka", "europa-i-unia"]
 pubDate: "2025-07-17"
 heroImage: "/blog-images/2025-07-17-hamburger-kontra-baguette-jak-globalne-zmiany-klimatyczne-staj-si-saatk-na-talerzu-dyplomatycznym.png"
 views: 0
