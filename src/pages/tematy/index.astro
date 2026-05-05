@@ -28,10 +28,8 @@ const latestPost = posts[0];
       }
       .topics-hero {
         border-bottom: 1px solid rgba(var(--gray-dark), 0.12);
-        background:
-          linear-gradient(135deg, rgba(28, 61, 90, 0.96), rgba(28, 61, 90, 0.82)),
-          var(--diplomatic-blue);
-        color: var(--ivory);
+        background: var(--ivory);
+        color: var(--charcoal);
       }
       .topics-hero__inner,
       .topics-grid,
@@ -44,7 +42,7 @@ const latestPost = posts[0];
         grid-template-columns: minmax(0, 1fr) minmax(240px, 0.36fr);
         gap: clamp(1.5rem, 5vw, 4rem);
         align-items: end;
-        padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 4.5rem);
+        padding: clamp(3rem, 7vw, 5.25rem) 0 clamp(2.1rem, 5vw, 3.4rem);
       }
       .kicker {
         margin: 0 0 0.75rem;
@@ -64,17 +62,18 @@ const latestPost = posts[0];
       .topics-hero p {
         max-width: 62ch;
         margin: 1rem 0 0;
-        color: rgba(255, 250, 240, 0.86);
+        color: rgba(var(--gray-dark), 0.84);
         font-size: clamp(1rem, 1.7vw, 1.16rem);
         line-height: 1.6;
       }
       .topics-stats {
         display: grid;
         gap: 0.75rem;
-        padding: 1rem;
-        border: 1px solid rgba(255, 250, 240, 0.2);
+        padding: 1.1rem;
+        border: 1px solid rgba(28, 61, 90, 0.14);
         border-radius: 8px;
-        background: rgba(255, 250, 240, 0.08);
+        background: rgba(255, 255, 255, 0.68);
+        box-shadow: 0 10px 24px rgba(28, 61, 90, 0.08);
       }
       .topics-stats strong {
         display: block;
@@ -82,25 +81,26 @@ const latestPost = posts[0];
         line-height: 1;
       }
       .topics-stats span {
-        color: rgba(255, 250, 240, 0.78);
+        color: rgba(var(--gray-dark), 0.72);
       }
       .topics-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
+        gap: clamp(0.9rem, 2vw, 1.25rem);
         padding: clamp(2.5rem, 5vw, 4rem) 0;
       }
       .topic-card {
         display: grid;
-        gap: 1rem;
+        grid-template-rows: auto 1fr auto;
+        gap: 0.9rem;
         min-height: 100%;
         padding: clamp(1rem, 2vw, 1.35rem);
         color: inherit;
         text-decoration: none;
         border: 1px solid rgba(var(--gray-dark), 0.14);
         border-radius: 8px;
-        background: #fff;
-        box-shadow: 0 10px 26px rgba(var(--gray-dark), 0.08);
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 8px 22px rgba(var(--gray-dark), 0.07);
         transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
       }
       .topic-card:hover,
@@ -115,6 +115,8 @@ const latestPost = posts[0];
         justify-content: space-between;
         gap: 1rem;
         align-items: start;
+        padding-bottom: 0.85rem;
+        border-bottom: 1px solid rgba(var(--gray-dark), 0.1);
       }
       .topic-card h2 {
         margin: 0;
@@ -136,12 +138,15 @@ const latestPost = posts[0];
       .topic-card p {
         margin: 0;
         color: rgba(var(--gray-dark), 0.9);
+        line-height: 1.55;
       }
       .topic-card__latest {
         display: grid;
         gap: 0.35rem;
-        padding-top: 0.9rem;
-        border-top: 1px solid rgba(var(--gray-dark), 0.12);
+        padding: 0.85rem;
+        border: 1px solid rgba(var(--gray-dark), 0.1);
+        border-radius: 8px;
+        background: rgba(244, 239, 226, 0.58);
       }
       .topic-card__latest span {
         color: var(--diplomatic-blue);
@@ -156,13 +161,16 @@ const latestPost = posts[0];
       }
       .latest-strip {
         padding: 0 0 clamp(2.5rem, 5vw, 4rem);
+        color: rgba(var(--gray-dark), 0.78);
       }
       .latest-strip a {
         display: inline-flex;
         align-items: center;
         min-height: 44px;
+        margin-left: 0.25rem;
         color: var(--diplomatic-blue);
         font-weight: 700;
+        text-wrap: balance;
       }
       @media (max-width: 760px) {
         .topics-hero__inner,

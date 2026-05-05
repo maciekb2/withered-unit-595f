@@ -35,10 +35,8 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
       }
       .topic-hero {
         border-bottom: 1px solid rgba(var(--gray-dark), 0.12);
-        background:
-          linear-gradient(135deg, rgba(28, 61, 90, 0.96), rgba(28, 61, 90, 0.78)),
-          var(--diplomatic-blue);
-        color: var(--ivory);
+        background: var(--ivory);
+        color: var(--charcoal);
       }
       .topic-hero__inner,
       .topic-content {
@@ -50,19 +48,19 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
         grid-template-columns: minmax(0, 1fr) minmax(220px, 0.34fr);
         gap: clamp(1.5rem, 5vw, 4rem);
         align-items: end;
-        padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 4.5rem);
+        padding: clamp(3rem, 7vw, 5.25rem) 0 clamp(2.1rem, 5vw, 3.4rem);
       }
       .back-link {
         display: inline-flex;
         align-items: center;
         min-height: 36px;
         margin-bottom: 1rem;
-        color: rgba(255, 250, 240, 0.84);
+        color: var(--diplomatic-blue);
         font-weight: 700;
         text-decoration: none;
       }
       .back-link:hover {
-        color: var(--gold-accent);
+        color: var(--accent-dark);
       }
       .kicker {
         margin: 0 0 0.75rem;
@@ -82,15 +80,16 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
       .topic-hero p {
         max-width: 64ch;
         margin: 1rem 0 0;
-        color: rgba(255, 250, 240, 0.86);
+        color: rgba(var(--gray-dark), 0.84);
         font-size: clamp(1rem, 1.7vw, 1.16rem);
         line-height: 1.6;
       }
       .topic-stat {
-        padding: 1rem;
-        border: 1px solid rgba(255, 250, 240, 0.2);
+        padding: 1.1rem;
+        border: 1px solid rgba(28, 61, 90, 0.14);
         border-radius: 8px;
-        background: rgba(255, 250, 240, 0.08);
+        background: rgba(255, 255, 255, 0.68);
+        box-shadow: 0 10px 24px rgba(28, 61, 90, 0.08);
       }
       .topic-stat strong {
         display: block;
@@ -98,7 +97,7 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
         line-height: 1;
       }
       .topic-stat span {
-        color: rgba(255, 250, 240, 0.78);
+        color: rgba(var(--gray-dark), 0.72);
       }
       .topic-content {
         display: grid;
@@ -109,7 +108,7 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
       }
       .post-list {
         display: grid;
-        gap: 1rem;
+        gap: clamp(0.9rem, 2vw, 1.2rem);
         margin: 0;
         padding: 0;
         list-style: none;
@@ -124,8 +123,8 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
         text-decoration: none;
         border: 1px solid rgba(var(--gray-dark), 0.14);
         border-radius: 8px;
-        background: #fff;
-        box-shadow: 0 10px 26px rgba(var(--gray-dark), 0.08);
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 8px 22px rgba(var(--gray-dark), 0.07);
         transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
       }
       .post-card a:hover,
@@ -164,6 +163,7 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
       .post-card p {
         margin: 0;
         color: rgba(var(--gray-dark), 0.9);
+        line-height: 1.55;
       }
       .topic-aside {
         position: sticky;
@@ -173,7 +173,8 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
         padding: 1rem;
         border: 1px solid rgba(var(--gray-dark), 0.14);
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 8px 22px rgba(var(--gray-dark), 0.06);
       }
       .topic-aside h2 {
         margin: 0;

@@ -91,7 +91,8 @@ const jsonLd = {
 			}
 			.hero-image {
 				width: 100%;
-                                background: var(--diplomatic-blue);
+                                padding: clamp(0.75rem, 2vw, 1.25rem) 0 0;
+                                background: var(--ivory);
 			}
 			.hero-image img {
 				display: block;
@@ -308,6 +309,10 @@ const jsonLd = {
                                 line-height: 1.45;
                         }
                         @media (max-width: 680px) {
+                                .hero-image {
+                                        padding-top: 0;
+                                }
+
                                 .hero-image img {
                                         border-radius: 0;
                                         max-height: 42vh;
