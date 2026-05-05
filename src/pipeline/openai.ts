@@ -289,7 +289,13 @@ async function chatJetson(
 
   const timeoutMs = Math.min(provider.timeoutMs || 120000, JETSON_REQUEST_TIMEOUT_CAP_MS);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<Response>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`Jetson gateway request timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
 
   logEvent({
     type: 'jetson-request',
@@ -301,7 +307,7 @@ async function chatJetson(
   });
 
   try {
-    const res = await retryFetch(url.toString(), {
+    const fetchPromise = retryFetch(url.toString(), {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -319,6 +325,8 @@ async function chatJetson(
       retries: 0,
       retryDelayMs: 1000,
     });
+    fetchPromise.catch(() => undefined);
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
     logEvent({ type: 'jetson-response-status', status: res.status });
     if (!res.ok) {
       const msg = await res.text();
@@ -336,7 +344,7 @@ async function chatJetson(
     logEvent({ type: 'jetson-response-received' });
     return raw;
   } finally {
-    clearTimeout(timeout);
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
