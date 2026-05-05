@@ -1,0 +1,238 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_TITLE } from '../../consts';
+import { buildTopicIndex, sortPostsByDate } from '../../utils/topics';
+
+const posts = sortPostsByDate(await getCollection('blog'));
+const topics = buildTopicIndex(posts);
+const latestPost = posts[0];
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <BaseHead
+      title={`Tematy | ${SITE_TITLE}`}
+      description="Stałe ścieżki przez teksty pseudointelekt.pl: geopolityka, technologia, Europa, gospodarka i polityczne widowiska."
+    />
+    <style>
+      main {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+      .topics-hero {
+        border-bottom: 1px solid rgba(var(--gray-dark), 0.12);
+        background:
+          linear-gradient(135deg, rgba(28, 61, 90, 0.96), rgba(28, 61, 90, 0.82)),
+          var(--diplomatic-blue);
+        color: var(--ivory);
+      }
+      .topics-hero__inner,
+      .topics-grid,
+      .latest-strip {
+        width: min(1120px, calc(100% - 2rem));
+        margin: 0 auto;
+      }
+      .topics-hero__inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(240px, 0.36fr);
+        gap: clamp(1.5rem, 5vw, 4rem);
+        align-items: end;
+        padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 4.5rem);
+      }
+      .kicker {
+        margin: 0 0 0.75rem;
+        color: var(--gold-accent);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      h1 {
+        max-width: 12ch;
+        margin: 0;
+        font-size: clamp(2.4rem, 7vw, 5rem);
+        line-height: 0.95;
+        text-wrap: balance;
+      }
+      .topics-hero p {
+        max-width: 62ch;
+        margin: 1rem 0 0;
+        color: rgba(255, 250, 240, 0.86);
+        font-size: clamp(1rem, 1.7vw, 1.16rem);
+        line-height: 1.6;
+      }
+      .topics-stats {
+        display: grid;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid rgba(255, 250, 240, 0.2);
+        border-radius: 8px;
+        background: rgba(255, 250, 240, 0.08);
+      }
+      .topics-stats strong {
+        display: block;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1;
+      }
+      .topics-stats span {
+        color: rgba(255, 250, 240, 0.78);
+      }
+      .topics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        padding: clamp(2.5rem, 5vw, 4rem) 0;
+      }
+      .topic-card {
+        display: grid;
+        gap: 1rem;
+        min-height: 100%;
+        padding: clamp(1rem, 2vw, 1.35rem);
+        color: inherit;
+        text-decoration: none;
+        border: 1px solid rgba(var(--gray-dark), 0.14);
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 10px 26px rgba(var(--gray-dark), 0.08);
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      }
+      .topic-card:hover,
+      .topic-card:focus-visible {
+        transform: translateY(-3px);
+        border-color: rgba(203, 161, 53, 0.62);
+        box-shadow: 0 16px 34px rgba(var(--gray-dark), 0.14);
+        outline: none;
+      }
+      .topic-card__head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: start;
+      }
+      .topic-card h2 {
+        margin: 0;
+        color: var(--charcoal);
+        font-size: clamp(1.45rem, 2.7vw, 2rem);
+        line-height: 1.1;
+      }
+      .topic-card__count {
+        flex: 0 0 auto;
+        min-width: 4.6rem;
+        padding: 0.38rem 0.62rem;
+        border-radius: 999px;
+        background: rgba(203, 161, 53, 0.18);
+        color: var(--accent-dark);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-align: center;
+      }
+      .topic-card p {
+        margin: 0;
+        color: rgba(var(--gray-dark), 0.9);
+      }
+      .topic-card__latest {
+        display: grid;
+        gap: 0.35rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(var(--gray-dark), 0.12);
+      }
+      .topic-card__latest span {
+        color: var(--diplomatic-blue);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .topic-card__latest strong {
+        color: var(--charcoal);
+        line-height: 1.25;
+      }
+      .latest-strip {
+        padding: 0 0 clamp(2.5rem, 5vw, 4rem);
+      }
+      .latest-strip a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        color: var(--diplomatic-blue);
+        font-weight: 700;
+      }
+      @media (max-width: 760px) {
+        .topics-hero__inner,
+        .topics-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 520px) {
+        .topics-hero__inner,
+        .topics-grid,
+        .latest-strip {
+          width: min(100%, calc(100% - 1.2rem));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="topics-hero" aria-labelledby="topics-title">
+        <div class="topics-hero__inner">
+          <div>
+            <p class="kicker">Mapa tekstów</p>
+            <h1 id="topics-title">Czytaj według tematu</h1>
+            <p>
+              Chronologia jest dobra na depesze. Tutaj ważniejsze są powracające napięcia:
+              interesy państw, technologia, europejskie rachunki, energia i polityczne widowiska.
+            </p>
+          </div>
+          <div class="topics-stats" aria-label="Statystyki tematów">
+            <div>
+              <strong>{posts.length}</strong>
+              <span>wpisów w archiwum</span>
+            </div>
+            <div>
+              <strong>{topics.length}</strong>
+              <span>aktywnych ścieżek</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topics-grid" aria-label="Lista tematów">
+        {topics.map((topic) => {
+          const latest = topic.posts[0];
+          return (
+            <a class="topic-card" href={`/tematy/${topic.slug}/`}>
+              <div class="topic-card__head">
+                <h2>{topic.name}</h2>
+                <span class="topic-card__count">{topic.posts.length} wpisów</span>
+              </div>
+              <p>{topic.description}</p>
+              {latest && (
+                <span class="topic-card__latest">
+                  <span>Ostatnio</span>
+                  <strong>{latest.data.title}</strong>
+                  <small><FormattedDate date={latest.data.pubDate} /></small>
+                </span>
+              )}
+            </a>
+          );
+        })}
+      </section>
+
+      {latestPost && (
+        <p class="latest-strip">
+          Najnowszy tekst: <a href={`/blog/${latestPost.id}/`}>{latestPost.data.title}</a>
+        </p>
+      )}
+    </main>
+    <Footer />
+  </body>
+</html>
