@@ -146,3 +146,30 @@ export function buildTopicIndex(posts: BlogPostEntry[]): TopicSummary[] {
 export function getTopicBySlug(slug: string): TopicDefinition | undefined {
   return TOPICS.find((topic) => topic.slug === slug);
 }
+
+export function getRelatedPosts(
+  currentPost: BlogPostEntry,
+  posts: BlogPostEntry[],
+  limit = 3,
+): BlogPostEntry[] {
+  const currentTopics = new Set(inferPostTopics(currentPost).map((topic) => topic.slug));
+
+  return sortPostsByDate(posts)
+    .filter((post) => post.id !== currentPost.id)
+    .map((post) => {
+      const sharedTopicCount = inferPostTopics(post)
+        .filter((topic) => currentTopics.has(topic.slug)).length;
+      const daysApart = Math.abs(
+        post.data.pubDate.valueOf() - currentPost.data.pubDate.valueOf(),
+      ) / 86400000;
+
+      return {
+        post,
+        score: sharedTopicCount * 1000 - Math.min(daysApart, 365),
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.post);
+}
