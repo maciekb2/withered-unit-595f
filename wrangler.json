@@ -36,6 +36,9 @@
       "database_id": "c290edf1-394f-4c8b-940c-da62db2774b1"
     }
   ],
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
     "WORKER_ID": "pseudointelekt2137-blog",
     "OPENAI_TEXT_MODEL": "gpt-5.5",
@@ -48,9 +51,11 @@
     "OPENAI_IMAGE_SIZE": "1024x1024",
     "OPENAI_IMAGE_STYLE": "vivid",
     "OPENAI_IMAGE_QUALITY": "low",
-    "TEXT_GENERATION_PROVIDER": "jetson",
+    "TEXT_GENERATION_PROVIDER": "cloudflare-ai",
     "TEXT_GENERATION_FALLBACK": "openai",
     "TEXT_GENERATION_FALLBACK_MODEL": "gpt-5.5",
+    "CLOUDFLARE_AI_TEXT_MODEL": "@cf/qwen/qwen3-30b-a3b-fp8",
+    "CLOUDFLARE_AI_DAILY_NEURON_LIMIT": "8000",
     "TEXT_TOPIC_SELECTION": "auto",
     "TEXT_ARTICLE_PIPELINE": "auto",
     "TEXT_SECTION_PARAGRAPHS": "3",

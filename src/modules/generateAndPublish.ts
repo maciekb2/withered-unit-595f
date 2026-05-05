@@ -565,19 +565,22 @@ function shouldUseSectionedText(env: Env, provider: ReturnType<typeof textGenera
   const mode = env.TEXT_ARTICLE_PIPELINE || 'auto';
   if (mode === 'sectioned') return true;
   if (mode === 'one-shot') return false;
-  return provider.type === 'jetson';
+  return provider.type === 'jetson' || provider.type === 'cloudflare-ai';
 }
 
 function topicSelectionMode(env: Env, provider: ReturnType<typeof textGenerationProviderFromEnv>): 'rss-first' | 'llm' {
   const mode = env.TEXT_TOPIC_SELECTION || 'auto';
   if (mode === 'llm') return 'llm';
   if (mode === 'rss-first') return 'rss-first';
-  return provider.type === 'jetson' ? 'rss-first' : 'llm';
+  return provider.type === 'jetson' || provider.type === 'cloudflare-ai' ? 'rss-first' : 'llm';
 }
 
 function describeTextProvider(provider: ReturnType<typeof textGenerationProviderFromEnv>): string {
   if (provider.type === 'jetson') {
     return `Jetson (${provider.model || 'model domyślny'})`;
+  }
+  if (provider.type === 'cloudflare-ai') {
+    return `Cloudflare Workers AI (${provider.model || 'model domyślny'})`;
   }
   return 'OpenAI';
 }

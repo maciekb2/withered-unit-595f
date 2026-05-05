@@ -142,6 +142,78 @@ test('chat disables Jetson for the current run after the first fallback', async 
   }
 });
 
+test('chat uses Cloudflare Workers AI binding when configured', async () => {
+  const calls: Array<{ model: string; body: any }> = [];
+  const result = await chat('openai-key', {
+    messages: [{ role: 'user', content: 'Napisz lead' }],
+    max_completion_tokens: 100,
+    model: 'gpt-5',
+    provider: {
+      type: 'cloudflare-ai',
+      model: '@cf/qwen/qwen3-30b-a3b-fp8',
+      dailyNeuronLimit: 8000,
+      binding: {
+        run: async (model: string, body: any) => {
+          calls.push({ model, body });
+          return { response: 'tekst z workers ai' };
+        },
+      } as unknown as Ai,
+    },
+  });
+
+  assert.equal(result, 'tekst z workers ai');
+  assert.equal(calls[0].model, '@cf/qwen/qwen3-30b-a3b-fp8');
+  assert.equal(calls[0].body.max_tokens, 100);
+  assert.deepEqual(calls[0].body.messages, [{ role: 'user', content: 'Napisz lead' }]);
+});
+
+test('chat falls back from Cloudflare Workers AI to OpenAI when budget is exhausted', async () => {
+  const original = globalThis.fetch;
+  let openAiBody: any;
+  const db = {
+    prepare: () => ({
+      bind: () => ({
+        first: async () => ({ used: 7999 }),
+      }),
+    }),
+  } as unknown as D1Database;
+
+  globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    openAiBody = JSON.parse(String(init?.body));
+    return new Response(
+      JSON.stringify({ choices: [{ message: { content: 'tekst z openai' } }] }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }) as typeof fetch;
+
+  try {
+    const result = await chat('openai-key', {
+      messages: [{ role: 'user', content: 'Napisz dłuższy lead' }],
+      max_completion_tokens: 2000,
+      model: 'gpt-5',
+      provider: {
+        type: 'cloudflare-ai',
+        model: '@cf/qwen/qwen3-30b-a3b-fp8',
+        dailyNeuronLimit: 8000,
+        logsDb: db,
+        fallback: 'openai',
+        fallbackModel: 'gpt-5.5',
+        binding: {
+          run: async () => ({ response: 'nie powinno sie wykonac' }),
+        } as unknown as Ai,
+      },
+    });
+
+    assert.equal(result, 'tekst z openai');
+    assert.equal(openAiBody.model, 'gpt-5.5');
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config without secrets in vars', () => {
   assert.deepEqual(textGenerationProviderFromEnv({} as Env), { type: 'openai' });
 
@@ -167,5 +239,31 @@ test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config w
     fallbackModel: 'gpt-5.5',
     accessClientId: undefined,
     accessClientSecret: undefined,
+  });
+});
+
+test('textGenerationProviderFromEnv reads Cloudflare Workers AI config', () => {
+  const ai = { run: async () => ({ response: 'ok' }) } as unknown as Ai;
+  const db = {} as D1Database;
+
+  const provider = textGenerationProviderFromEnv({
+    TEXT_GENERATION_PROVIDER: 'cloudflare-ai',
+    TEXT_GENERATION_FALLBACK: 'none',
+    CLOUDFLARE_AI_TEXT_MODEL: '@cf/openai/gpt-oss-120b',
+    CLOUDFLARE_AI_DAILY_NEURON_LIMIT: '6000',
+    TEXT_GENERATION_FALLBACK_MODEL: 'gpt-5.5',
+    OPENAI_TEXT_MODEL: 'gpt-5.5',
+    AI: ai,
+    pseudointelekt_logs_db: db,
+  } as Env);
+
+  assert.deepEqual(provider, {
+    type: 'cloudflare-ai',
+    binding: ai,
+    logsDb: db,
+    model: '@cf/openai/gpt-oss-120b',
+    fallback: 'none',
+    fallbackModel: 'gpt-5.5',
+    dailyNeuronLimit: 6000,
   });
 });

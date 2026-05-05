@@ -19,9 +19,22 @@ export interface ChatOptions {
 const MAX_LENGTH_RETRIES = 3;
 const MAX_TOKEN_CAP = 12000;
 const JETSON_REQUEST_TIMEOUT_CAP_MS = 90000;
+const DEFAULT_CLOUDFLARE_AI_MODEL = '@cf/qwen/qwen3-30b-a3b-fp8';
+const DEFAULT_CLOUDFLARE_AI_DAILY_NEURON_LIMIT = 8000;
 
 export type TextGenerationProvider =
   | { type: 'openai' }
+  | {
+      type: 'cloudflare-ai';
+      binding?: Ai;
+      logsDb?: D1Database;
+      model?: string;
+      fallback?: 'openai' | 'none';
+      fallbackModel?: string;
+      dailyNeuronLimit?: number;
+      disabled?: boolean;
+      disabledReason?: string;
+    }
   | {
       type: 'jetson';
       gatewayUrl: string;
@@ -38,7 +51,22 @@ export type TextGenerationProvider =
     };
 
 export function textGenerationProviderFromEnv(env: Env): TextGenerationProvider {
-  if ((env.TEXT_GENERATION_PROVIDER || 'openai') !== 'jetson') {
+  const provider = env.TEXT_GENERATION_PROVIDER || 'openai';
+  if (provider === 'cloudflare-ai') {
+    return {
+      type: 'cloudflare-ai',
+      binding: env.AI,
+      logsDb: env.pseudointelekt_logs_db,
+      model: env.CLOUDFLARE_AI_TEXT_MODEL || DEFAULT_CLOUDFLARE_AI_MODEL,
+      fallback: env.TEXT_GENERATION_FALLBACK === 'none' ? 'none' : 'openai',
+      fallbackModel: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+      dailyNeuronLimit:
+        Number.parseInt(env.CLOUDFLARE_AI_DAILY_NEURON_LIMIT || '', 10) ||
+        DEFAULT_CLOUDFLARE_AI_DAILY_NEURON_LIMIT,
+    };
+  }
+
+  if (provider !== 'jetson') {
     return { type: 'openai' };
   }
 
@@ -75,6 +103,44 @@ export async function chat(
     } else {
       finalMessages = [styleMsg, ...messages];
     }
+  }
+
+  if (provider.type === 'cloudflare-ai' && !provider.disabled) {
+    try {
+      return await chatCloudflareAi(provider, {
+        messages: finalMessages,
+        max_completion_tokens,
+        model: provider.model || model,
+        response_format,
+        response_style,
+      });
+    } catch (err) {
+      logError(err, { type: 'cloudflare-ai-error', fallback: provider.fallback || 'openai' });
+      if (provider.fallback !== 'none') {
+        provider.disabled = true;
+        provider.disabledReason = err instanceof Error ? err.message : String(err);
+        logEvent({
+          type: 'cloudflare-ai-disabled-for-run',
+          reason: provider.disabledReason.slice(0, 180),
+        });
+        if (provider.fallbackModel) {
+          model = provider.fallbackModel;
+        }
+        logEvent({ type: 'text-provider-fallback', from: 'cloudflare-ai', to: 'openai', model });
+      } else {
+        throw err;
+      }
+    }
+  } else if (provider.type === 'cloudflare-ai' && provider.disabled) {
+    if (provider.fallbackModel) {
+      model = provider.fallbackModel;
+    }
+    logEvent({
+      type: 'text-provider-skip-disabled-cloudflare-ai',
+      to: 'openai',
+      model,
+      reason: provider.disabledReason?.slice(0, 180) || 'disabled',
+    });
   }
 
   if (provider.type === 'jetson' && !provider.disabled) {
@@ -258,6 +324,143 @@ export async function chat(
     }
   }
   throw new Error('OpenAI response empty after retries');
+}
+
+async function chatCloudflareAi(
+  provider: Extract<TextGenerationProvider, { type: 'cloudflare-ai' }>,
+  {
+    messages,
+    max_completion_tokens,
+    model,
+    response_format,
+    response_style,
+  }: Omit<ChatOptions, 'provider'>,
+): Promise<string> {
+  if (!provider.binding) {
+    throw new Error('Cloudflare Workers AI binding is not configured');
+  }
+
+  const estimatedNeurons = estimateCloudflareAiNeurons(
+    model || DEFAULT_CLOUDFLARE_AI_MODEL,
+    messages,
+    max_completion_tokens,
+  );
+  const dailyUsed = await getCloudflareAiDailyEstimatedNeurons(provider.logsDb);
+  const dailyLimit = provider.dailyNeuronLimit || DEFAULT_CLOUDFLARE_AI_DAILY_NEURON_LIMIT;
+  logEvent({
+    type: 'cloudflare-ai-budget-check',
+    model,
+    dailyUsed,
+    estimatedNeurons,
+    dailyLimit,
+  });
+  if (dailyUsed + estimatedNeurons > dailyLimit) {
+    throw new Error(
+      `Cloudflare AI estimated daily budget exceeded: ${Math.ceil(dailyUsed + estimatedNeurons)} > ${dailyLimit} neurons`,
+    );
+  }
+
+  const body: Record<string, unknown> = {
+    messages,
+    max_tokens: max_completion_tokens,
+  };
+  if (response_format) body.response_format = response_format;
+  if (response_style) body.response_style = response_style;
+
+  logEvent({
+    type: 'cloudflare-ai-request',
+    model,
+    response_style,
+    max_tokens: max_completion_tokens,
+    estimatedNeurons,
+  });
+  const started = Date.now();
+  const data = await provider.binding.run((model || DEFAULT_CLOUDFLARE_AI_MODEL) as keyof AiModels, body as any);
+  logEvent({
+    type: 'cloudflare-ai-response-received',
+    model,
+    durationMs: Date.now() - started,
+  });
+
+  const text = extractCloudflareAiText(data);
+  logEvent({
+    type: 'cloudflare-ai-usage',
+    model,
+    estimatedNeurons,
+    estimatedInputTokens: estimateTokens(messages.map(message => message.content).join('\n')),
+    estimatedOutputTokens: max_completion_tokens,
+    dailyLimit,
+  });
+  logEvent({ type: 'cloudflare-ai-response-text', text });
+  if (!text) {
+    logEvent({ type: 'cloudflare-ai-response-debug', data });
+    throw new Error('Cloudflare AI response empty');
+  }
+
+  return text;
+}
+
+function extractCloudflareAiText(data: unknown): string {
+  if (typeof data === 'string') return data.trim();
+  if (!data || typeof data !== 'object') return '';
+  const value = data as any;
+  if (typeof value.response === 'string') return value.response.trim();
+  if (typeof value.result === 'string') return value.result.trim();
+  if (typeof value.text === 'string') return value.text.trim();
+  if (typeof value.output === 'string') return value.output.trim();
+  if (typeof value.content === 'string') return value.content.trim();
+  if (typeof value.message?.content === 'string') return value.message.content.trim();
+  if (Array.isArray(value.choices) && value.choices[0]) {
+    const choice = value.choices[0];
+    if (typeof choice.text === 'string') return choice.text.trim();
+    if (typeof choice.message?.content === 'string') return choice.message.content.trim();
+  }
+  return '';
+}
+
+async function getCloudflareAiDailyEstimatedNeurons(db?: D1Database): Promise<number> {
+  if (!db) return 0;
+  try {
+    const dayStart = new Date();
+    dayStart.setUTCHours(0, 0, 0, 0);
+    const result = await db
+      .prepare(`
+        SELECT COALESCE(SUM(CAST(json_extract(data, '$.estimatedNeurons') AS REAL)), 0) AS used
+        FROM logs
+        WHERE time >= ?1
+          AND json_extract(data, '$.type') = 'cloudflare-ai-usage'
+      `)
+      .bind(dayStart.toISOString())
+      .first<{ used: number }>();
+    return Number(result?.used || 0);
+  } catch (err) {
+    logError(err, { type: 'cloudflare-ai-budget-query-error' });
+    return 0;
+  }
+}
+
+function estimateCloudflareAiNeurons(
+  model: string,
+  messages: ChatMessage[],
+  maxCompletionTokens: number,
+): number {
+  const inputTokens = estimateTokens(messages.map(message => message.content).join('\n'));
+  const pricing = cloudflareAiNeuronPricing(model);
+  return (inputTokens / 1_000_000) * pricing.input + (maxCompletionTokens / 1_000_000) * pricing.output;
+}
+
+function estimateTokens(text: string): number {
+  return Math.max(1, Math.ceil(text.length / 4));
+}
+
+function cloudflareAiNeuronPricing(model: string): { input: number; output: number } {
+  if (model.includes('qwen3-30b-a3b-fp8')) return { input: 4625, output: 30475 };
+  if (model.includes('gpt-oss-120b')) return { input: 31818, output: 68182 };
+  if (model.includes('gpt-oss-20b')) return { input: 18182, output: 27273 };
+  if (model.includes('llama-3.3-70b-instruct-fp8-fast')) return { input: 26668, output: 204805 };
+  if (model.includes('gemma-4-26b-a4b-it')) return { input: 9091, output: 27273 };
+  if (model.includes('llama-3.2-3b-instruct')) return { input: 4625, output: 30475 };
+  return { input: 31876, output: 50488 };
 }
 
 async function chatJetson(

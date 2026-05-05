@@ -2,6 +2,7 @@
 
 interface Env {
         ASSETS: Fetcher;
+        AI: Ai;
         OPENAI_API_KEY: string;
         GITHUB_TOKEN: string;
         GITHUB_REPO: string;
@@ -23,6 +24,8 @@ interface Env {
         TEXT_GENERATION_PROVIDER?: string;
         TEXT_GENERATION_FALLBACK?: string;
         TEXT_GENERATION_FALLBACK_MODEL?: string;
+        CLOUDFLARE_AI_TEXT_MODEL?: string;
+        CLOUDFLARE_AI_DAILY_NEURON_LIMIT?: string;
         TEXT_TOPIC_SELECTION?: string;
         TEXT_ARTICLE_PIPELINE?: string;
         TEXT_SECTION_PARAGRAPHS?: string;
