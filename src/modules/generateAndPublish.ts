@@ -17,7 +17,7 @@ import { validateAntiHallucination } from '../pipeline/validators/content';
 import { TARGET_ARTICLE_WORDS, validateArticleQuality } from '../pipeline/validators/quality';
 import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
-import { textGenerationProviderFromEnv } from '../pipeline/openai';
+import { textGenerationProviderFromEnv, type TextGenerationProvider } from '../pipeline/openai';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
@@ -91,7 +91,9 @@ export async function generateAndPublish(
         runMode: promptPromise || options.initialTopic ? 'manual' : 'auto',
         textProvider: textProvider.type,
         textProviderLabel: describeTextProvider(textProvider),
-        textFallback: textProvider.type === 'jetson' ? (textProvider.fallback || 'openai') : undefined,
+        textFallback: textProvider.type === 'jetson' || textProvider.type === 'cloudflare-ai'
+          ? (textProvider.fallback || 'openai')
+          : undefined,
         topicMode,
         topicModel,
         outlineModel,
@@ -241,6 +243,44 @@ export async function generateAndPublish(
       send('outline-prompt', { prompt: outlineRes.messages });
       send('outline-response', { response: outlineRes.raw });
     } catch (err) {
+      const fallbackProvider = fallbackTextProvider(textProvider);
+      if (fallbackProvider) {
+        send('outline-fallback-start', {
+          from: textProvider.type,
+          to: fallbackProvider.type,
+          error: (err as Error).message,
+        });
+        logEvent({
+          type: 'text-provider-fallback',
+          from: textProvider.type,
+          to: fallbackProvider.type,
+          stage: 'outline',
+          reason: (err as Error).message,
+        });
+        try {
+          outlineRes = await generateOutline({
+            apiKey: env.OPENAI_API_KEY,
+            baseTopic,
+            model: outlineModel,
+            provider: fallbackProvider,
+            maxTokens: 2600,
+            topicContext: contextPack,
+          });
+          send('outline-fallback-prompt', { prompt: outlineRes.messages });
+          send('outline-fallback-response', { response: outlineRes.raw });
+          send('outline-fallback-complete', { outline: outlineRes.outline });
+        } catch (fallbackErr) {
+          send('outline-error', {
+            error: (fallbackErr as Error).message,
+            originalError: (err as Error).message,
+            ...errorTelemetry(fallbackErr, currentStage),
+            prompt: (fallbackErr as any).messages,
+            response: (fallbackErr as any).raw,
+            debug: (fallbackErr as any).debug,
+          });
+          throw fallbackErr;
+        }
+      } else {
       send('outline-error', {
         error: (err as Error).message,
         ...errorTelemetry(err, currentStage),
@@ -249,6 +289,7 @@ export async function generateAndPublish(
         debug: (err as any).debug,
       });
       throw err;
+      }
     }
     const outline = outlineRes.outline;
     send('outline-end', { outline });
@@ -367,9 +408,7 @@ export async function generateAndPublish(
     });
     if (!quality.ok || quality.stats.words < TARGET_ARTICLE_WORDS) {
       const qualityRepairProvider =
-        textProvider.type === 'jetson' && textProvider.fallback !== 'none'
-          ? { type: 'openai' as const }
-          : textProvider;
+        fallbackTextProvider(textProvider) || textProvider;
 
       for (
         let attempt = 1;
@@ -583,6 +622,16 @@ function describeTextProvider(provider: ReturnType<typeof textGenerationProvider
     return `Cloudflare Workers AI (${provider.model || 'model domyślny'})`;
   }
   return 'OpenAI';
+}
+
+function fallbackTextProvider(provider: TextGenerationProvider): TextGenerationProvider | undefined {
+  if (
+    (provider.type === 'jetson' || provider.type === 'cloudflare-ai') &&
+    provider.fallback !== 'none'
+  ) {
+    return { type: 'openai' };
+  }
+  return undefined;
 }
 
 function inferClosestTopic(baseTopic: string, hotTopics: Awaited<ReturnType<typeof getHotTopics>>[number][]) {
