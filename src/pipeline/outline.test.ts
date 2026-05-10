@@ -59,6 +59,35 @@ test('generateOutline rejects markdown in description', async () => {
   globalThis.fetch = original;
 });
 
+test('generateOutline rejects likely English title and description', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                finalTitle: 'Spain starts evacuating virus-hit cruise ship in Tenerife',
+                description: 'Cruise ship crisis reveals systemic fragility amid pandemic-era complacency',
+                sections: [
+                  { h2: 'S1', bullets: ['a', 'b'] },
+                  { h2: 'S2', bullets: ['a', 'b'] },
+                  { h2: 'S3', bullets: ['a', 'b'] },
+                ],
+                guardrails: [],
+              }),
+            },
+          },
+        ],
+      }),
+      { status: 200 },
+    ) as any;
+
+  await assert.rejects(() => generateOutline({ apiKey: 'k', baseTopic: 'T' }), /finalTitle must be in Polish/);
+  globalThis.fetch = original;
+});
+
 test('generateOutline replaces section headings that repeat the title', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = async () =>

@@ -16,6 +16,11 @@ const DESCRIPTION_PREFIX_REPLACEMENTS: Array<[RegExp, string]> = [
 ];
 
 const FORBIDDEN_DESCRIPTION_WORDS = /\b(satyra|satyrą|satyryczny|satyryczna|satyryczne|satyrycznym|satyrycznego|satyrycznie)\b/i;
+const POLISH_DIACRITIC_RE = /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/;
+const COMMON_ENGLISH_WORD_RE =
+  /\b(the|and|or|but|with|without|after|before|from|into|over|under|starts?|says?|calls?|evacuat(?:e|es|ing|ed)|virus-hit|cruise|ship|amid|reveals?|systemic|fragility|complacency|government|minister|election|party|talks?|state|security|market|world|right-wing|left-wing)\b/i;
+const COMMON_POLISH_WORD_RE =
+  /\b(i|oraz|ale|czy|bez|przez|dla|nad|pod|przy|gdy|jak|który|która|które|nie|się|jest|są|ma|mają|po|wobec|między|polska|europa|świat|rząd|państwo|wybory|statek|kryzys|procedura)\b/i;
 
 export function cleanArticleDescription(description: string): string {
   let cleaned = (description || '')
@@ -46,6 +51,18 @@ export function assertArticleDescription(description: string): void {
   }
   if (FORBIDDEN_DESCRIPTION_WORDS.test(description)) {
     throw new Error('Description mentions satire explicitly');
+  }
+}
+
+export function assertPolishArticleText(value: string, fieldName: string): void {
+  const text = (value || '').trim();
+  if (!text) {
+    throw new Error(`${fieldName} is empty`);
+  }
+
+  const hasPolishSignal = POLISH_DIACRITIC_RE.test(text) || COMMON_POLISH_WORD_RE.test(text);
+  if (COMMON_ENGLISH_WORD_RE.test(text) && !hasPolishSignal) {
+    throw new Error(`${fieldName} must be in Polish, got likely English text`);
   }
 }
 

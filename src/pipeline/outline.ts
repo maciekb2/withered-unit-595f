@@ -4,7 +4,7 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { outlineJsonSchema } from './schemas';
-import { assertArticleDescription, cleanArticleDescription } from './description';
+import { assertArticleDescription, assertPolishArticleText, cleanArticleDescription } from './description';
 
 export interface GenerateOutlineOptions {
   apiKey: string;
@@ -71,6 +71,8 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
       if (!outline.guardrails.includes(gr)) outline.guardrails.push(gr);
     }
 
+    assertPolishArticleText(outline.finalTitle, 'finalTitle');
+    assertPolishArticleText(outline.description, 'description');
     assertArticleDescription(outline.description);
     if (outline.sections.length !== 3) {
       throw new Error('Outline must have 3 sections');

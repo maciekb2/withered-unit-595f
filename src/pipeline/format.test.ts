@@ -14,3 +14,14 @@ test('formatFinal adds inferred topic tags', () => {
   });
   assert.deepEqual(result.tags, ['technologia-i-cyber']);
 });
+
+test('formatFinal rejects likely English titles', () => {
+  assert.throws(
+    () => formatFinal({
+      title: 'Spain starts evacuating virus-hit cruise ship in Tenerife',
+      description: 'Po kryzysie sanitarnym procedury wracają na pokład.',
+      markdown: 'Treść artykułu. '.repeat(80),
+    }),
+    /title must be in Polish/,
+  );
+});
