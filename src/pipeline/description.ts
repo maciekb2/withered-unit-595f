@@ -21,9 +21,12 @@ const COMMON_ENGLISH_WORD_RE =
   /\b(the|and|or|but|with|without|after|before|from|into|over|under|starts?|says?|calls?|evacuat(?:e|es|ing|ed)|virus-hit|cruise|ship|amid|reveals?|systemic|fragility|complacency|government|minister|election|party|talks?|state|security|market|world|right-wing|left-wing)\b/i;
 const COMMON_POLISH_WORD_RE =
   /\b(i|oraz|ale|czy|bez|przez|dla|nad|pod|przy|gdy|jak|który|która|które|nie|się|jest|są|ma|mają|po|wobec|między|polska|europa|świat|rząd|państwo|wybory|statek|kryzys|procedura)\b/i;
+const OBVIOUS_POLISH_NAME_REPLACEMENTS: Array<[RegExp, string]> = [
+  [/\bTenerife\b/g, 'Teneryfa'],
+];
 
 export function cleanArticleDescription(description: string): string {
-  let cleaned = (description || '')
+  let cleaned = normalizeObviousPolishNames(description || '')
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -40,6 +43,14 @@ export function cleanArticleDescription(description: string): string {
 
   if (!cleaned) return 'Komentarz o polityce, bezpieczeństwie i rachunkach, które wracają szybciej niż oficjalne deklaracje.';
   return cleaned;
+}
+
+export function normalizeObviousPolishNames(value: string): string {
+  let normalized = value || '';
+  for (const [pattern, replacement] of OBVIOUS_POLISH_NAME_REPLACEMENTS) {
+    normalized = normalized.replace(pattern, replacement);
+  }
+  return normalized;
 }
 
 export function assertArticleDescription(description: string): void {

@@ -25,3 +25,13 @@ test('formatFinal rejects likely English titles', () => {
     /title must be in Polish/,
   );
 });
+
+test('formatFinal normalizes obvious English place names in title', () => {
+  const result = formatFinal({
+    title: 'Tenerife ewakuuje statek z wirusem',
+    description: 'Po kryzysie sanitarnym procedury wracają na pokład.',
+    markdown: 'Treść artykułu. '.repeat(80),
+  });
+
+  assert.equal(result.title, 'Teneryfa ewakuuje statek z wirusem');
+});

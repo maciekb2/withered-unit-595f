@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertArticleDescription, cleanArticleDescription } from './description.js';
+import {
+  assertArticleDescription,
+  cleanArticleDescription,
+  normalizeObviousPolishNames,
+} from './description.js';
 
 test('cleanArticleDescription removes explicit satire labels', () => {
   assert.equal(
@@ -17,5 +21,12 @@ test('assertArticleDescription rejects explicit satire labels', () => {
   assert.throws(
     () => assertArticleDescription('Satyryczny komentarz o polityce.'),
     /satire explicitly/,
+  );
+});
+
+test('normalizeObviousPolishNames replaces obvious English place names', () => {
+  assert.equal(
+    normalizeObviousPolishNames('Tenerife ewakuuje statek z wirusem'),
+    'Teneryfa ewakuuje statek z wirusem',
   );
 });

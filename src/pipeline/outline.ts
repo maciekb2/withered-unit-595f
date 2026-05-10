@@ -4,7 +4,12 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import { outlineJsonSchema } from './schemas';
-import { assertArticleDescription, assertPolishArticleText, cleanArticleDescription } from './description';
+import {
+  assertArticleDescription,
+  assertPolishArticleText,
+  cleanArticleDescription,
+  normalizeObviousPolishNames,
+} from './description';
 
 export interface GenerateOutlineOptions {
   apiKey: string;
@@ -61,7 +66,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     const json = extractJson<any>(text);
 
     const outline: Outline = {
-      finalTitle: json.finalTitle,
+      finalTitle: normalizeObviousPolishNames(json.finalTitle),
       description: cleanArticleDescription(json.description),
       sections: cleanSectionHeadings(json.finalTitle, json.sections),
       guardrails: json.guardrails || [],
