@@ -18,6 +18,7 @@ import { TARGET_ARTICLE_WORDS, validateArticleQuality } from '../pipeline/valida
 import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
 import { textGenerationProviderFromEnv, type TextGenerationProvider } from '../pipeline/openai';
+import { ensurePolishArticleLanguage } from '../pipeline/languageGuard';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
@@ -396,6 +397,23 @@ export async function generateAndPublish(
     } else {
       send('✅ Walidacja treści OK', { stats: validation.stats });
     }
+
+    setStage('language-check');
+    send('language-check-start');
+    const languageRes = await ensurePolishArticleLanguage({
+      apiKey: env.OPENAI_API_KEY,
+      edited,
+      provider: textProvider,
+      model: repairModel,
+      contextPack,
+      maxAttempts: 2,
+    });
+    edited = languageRes.edited;
+    send('language-check', {
+      ok: languageRes.issues.length === 0,
+      repaired: languageRes.repaired,
+      issues: languageRes.issues,
+    });
 
     let article = formatFinal(edited);
     setStage('quality-check');

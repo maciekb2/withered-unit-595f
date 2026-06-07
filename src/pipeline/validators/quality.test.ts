@@ -34,12 +34,12 @@ test('validateArticleQuality warns about generic phrasing without failing', () =
     '## Parasol z metką',
     longParagraph('wielkie narracje'),
     '## Lekcja z przerwy',
-    longParagraph(),
+    longParagraph('Budżet przestaje być dekoracją i zaczyna być instrukcją obsługi państwa'),
     '## Polska puenta',
-    longParagraph(),
-    longParagraph(),
-    longParagraph(),
-    longParagraph(),
+    longParagraph('Warszawa nie musi czekać na cudzą pobudkę, jeśli sama pilnuje własnego zegarka'),
+    longParagraph('Przemysł obronny wraca z folderu obietnic do tabeli zamówień i terminów'),
+    longParagraph('Sojusze są ważne, ale własna logistyka decyduje, czy deklaracja ma koła'),
+    longParagraph('Najmniej widowiskowe decyzje bywają najbardziej odporne na pierwszy kryzys'),
   ].join('\n\n'));
 
   const result = validateArticleQuality(article, outline);
@@ -57,11 +57,11 @@ function articleWithBody(content: string): FinalJson {
 
 function longParagraph(extra = ''): string {
   const sentence = [
+    extra,
     'Europa przestaje traktować bezpieczeństwo jak rachunek dopisany drobnym drukiem do cudzej faktury',
     'Politycy odkrywają, że magazyny, fabryki i decyzje budżetowe są mniej efektowne niż konferencje, ale bardziej użyteczne',
     'W tej historii nie chodzi o panikę, tylko o nudną zdolność do wykonania obietnic',
     'Polska ma tu interes prosty: mniej teatralnych deklaracji, więcej realnej produkcji i odporności',
-    extra,
   ].filter(Boolean).join('. ');
   return `${sentence}. ${sentence}. ${sentence}.`;
 }

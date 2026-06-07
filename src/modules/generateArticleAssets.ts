@@ -7,6 +7,7 @@ import { validateAntiHallucination } from '../pipeline/validators/content';
 import { repairEdited } from '../pipeline/repair';
 import { logEvent } from '../utils/logger';
 import { buildContextPack } from '../pipeline/contextPack';
+import { ensurePolishArticleLanguage } from '../pipeline/languageGuard';
 import type { GenerateHeroOptions } from './heroImageGenerator';
 
 export interface GenerateArticleAssetsOptions {
@@ -123,6 +124,20 @@ export async function generateArticleAssets({
   } else {
     logEvent({ type: 'cli-content-validate-ok', stats: validation.stats });
   }
+
+  const languageRes = await ensurePolishArticleLanguage({
+    apiKey,
+    edited,
+    model: repairModelFinal || 'gpt-5',
+    contextPack,
+    maxAttempts: 2,
+  });
+  edited = languageRes.edited;
+  logEvent({
+    type: 'cli-language-check',
+    repaired: languageRes.repaired,
+    ok: languageRes.issues.length === 0,
+  });
 
   const article = formatFinal(edited);
   const heroPrompt = heroTemplate.replace('{title}', article.title);

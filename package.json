@@ -37,6 +37,7 @@
     "dev": "astro dev",
     "logs:audit": "node scripts/query-generation-logs.mjs",
     "preview": "npm run build && wrangler dev",
+    "test": "find src -name '*.test.ts' -print | xargs node --loader ./scripts/ts-test-loader.mjs --test",
     "types": "wrangler types"
   },
   "type": "module"
