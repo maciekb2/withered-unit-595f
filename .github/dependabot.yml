@@ -7,7 +7,7 @@ updates:
       day: monday
       time: "09:00"
       timezone: Europe/Warsaw
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     commit-message:
       prefix: deps
       include: scope
@@ -21,11 +21,10 @@ updates:
         update-types:
           - minor
           - patch
-      major:
-        patterns:
-          - "*"
+    ignore:
+      - dependency-name: "*"
         update-types:
-          - major
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
