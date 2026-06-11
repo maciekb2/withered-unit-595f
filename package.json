@@ -39,9 +39,9 @@
     "dev": "astro dev",
     "logs:audit": "node scripts/query-generation-logs.mjs",
     "preview": "npm run build && wrangler dev",
-    "test": "find src -name '*.test.ts' -print | xargs node --loader ./scripts/ts-test-loader.mjs --test",
-    "test:ci": "find src -name '*.test.ts' -print | sort | xargs node --loader ./scripts/ts-test-loader.mjs --test --test-reporter=spec",
-    "test:coverage": "find src -name '*.test.ts' -print | sort | xargs node --loader ./scripts/ts-test-loader.mjs --test --experimental-test-coverage",
+    "test": "find src -name '*.test.ts' -print | xargs node --experimental-loader ./scripts/ts-test-loader.mjs --test",
+    "test:ci": "find src -name '*.test.ts' -print | sort | xargs node --experimental-loader ./scripts/ts-test-loader.mjs --test --test-reporter=spec",
+    "test:coverage": "find src -name '*.test.ts' -print | sort | xargs node --experimental-loader ./scripts/ts-test-loader.mjs --test --experimental-test-coverage",
     "typecheck": "astro sync && tsc --noEmit",
     "types": "wrangler types"
   },
