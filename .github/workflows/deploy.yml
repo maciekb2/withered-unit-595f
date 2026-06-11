@@ -23,10 +23,10 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Generate Astro types
-        run: npx astro sync
       - name: Typecheck
-        run: npm exec tsc -- --noEmit
+        run: npm run typecheck
+      - name: Test
+        run: npm run test:ci
       - name: Build
         run: npm run build
       - name: Deploy
