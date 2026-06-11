@@ -116,6 +116,7 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+          include-hidden-files: true
 
   worker-dry-run:
     name: Cloudflare Worker Dry Run
@@ -162,4 +163,5 @@ jobs:
           test -f dist/index.html
           grep -q 'lang="pl"' dist/index.html
           grep -q 'data-site-header' dist/index.html
+          grep -q '^_worker\.js$' dist/.assetsignore
           test -f dist/worker.js
