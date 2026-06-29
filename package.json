@@ -20,13 +20,13 @@
     "astro": "5.18.2",
     "fast-xml-parser": "^4.5.6",
     "jose": "^5.10.0",
-    "jsonrepair": "^3.14.0",
+    "jsonrepair": "^3.14.1",
     "node-html-parser": "^7.1.0",
     "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260611.1",
-    "wrangler": "^4.100.0"
+    "@cloudflare/workers-types": "^4.20260629.1",
+    "wrangler": "^4.105.0"
   },
   "scripts": {
     "astro": "astro",
