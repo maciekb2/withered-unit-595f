@@ -1,8 +1,9 @@
 ---
 title: "Vijay w Tamil Nadu: kino weszło do urn i zgasiło stare salony"
-description: "Vijay zagrał politykom Tamil Nadu na nosie: gwiazda ekranu prawie wymiotła wybory i pokazała, że lud chce mitu, nie wiecznych układów."
+description: "Vijay niemal wywrócił układ polityczny Tamil Nadu, pokazując, że popularność ekranowa może stać się kanałem realnego buntu wobec partyjnej rutyny — ale nie zastępuje programu rządzenia."
 sourceUrl: "https://www.bbc.com/news/articles/c8xwjx54zggo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-05"
+updatedDate: "2026-07-11"
 heroImage: "/blog-images/2026-05-05-vijay-editorial.webp"
 tags: ["polityka-i-media"]
 views: 0

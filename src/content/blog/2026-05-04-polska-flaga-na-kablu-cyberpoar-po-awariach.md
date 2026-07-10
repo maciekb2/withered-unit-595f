@@ -1,9 +1,10 @@
 ---
 title: "Polska flaga na kablu: cyberpożar po awariach"
-description: "Po cyfrowych awariach państwo powinno przestać modlić się do routera i zacząć ćwiczyć odporność usług."
+description: "Cyfrowe awarie pokazują, że odporność państwa budują kopie zapasowe, procedury i komunikacja z obywatelami — nie patriotyczny slajd o cyberbezpieczeństwie."
 sourceUrl: "https://www.bbc.com/news/articles/cy0294829ndo?at_medium=RSS&at_campaign=rss"
 tags: ["technologia-i-cyber"]
 pubDate: "2026-05-04"
+updatedDate: "2026-07-11"
 heroImage: "/blog-images/2026-05-04-polska-kabel-editorial.webp"
 views: 0
 likes: 0

@@ -1,9 +1,10 @@
 ---
 title: "Teheran odciąga dym: Kijów bliżej rozejmu?"
-description: "Wojna Iranu może przewrotnie poprawiać pozycję Kijowa: Kreml traci komfort, Zachód liczy koszty chaosu, a rozejm brzmi mniej jak bajka, bardziej jak rachunek."
+description: "Wojna wokół Iranu może pośrednio zmienić kalkulacje wobec Ukrainy: Kreml traci komfort działania, a Zachód musi równolegle zarządzać kosztami kilku kryzysów."
 sourceUrl: "https://www.bbc.com/news/articles/cgjp7vpee03o?at_medium=RSS&at_campaign=rss"
 tags: ["geopolityka"]
 pubDate: "2026-05-04"
+updatedDate: "2026-07-11"
 heroImage: "/blog-images/2026-05-04-teheran-dym-editorial.webp"
 views: 0
 likes: 0
