@@ -2,7 +2,7 @@
 title: "Czarny niedźwiedź i państwo z regulaminem"
 description: "W Utsunomiyi złapano czarnego niedźwiedzia po serii zgłoszeń. Japoński porządek zderza się z naturą, która nie czyta regulaminów."
 pubDate: "2026-06-09"
-heroImage: "/blog-images/2026-06-09-czarny-niedwied-i-pastwo-z-regulaminem.png"
+heroImage: "/blog-images/2026-06-09-czarny-niedwied-i-pastwo-z-regulaminem-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

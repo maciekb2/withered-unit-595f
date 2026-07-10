@@ -123,7 +123,8 @@ export async function writeArticleSectioned({
 function systemPrompt(): string {
   return [
     guardrails(),
-    'Pisz po polsku w stylu Pseudointelektu: satyryczny, publicystyczny, geopolityczny, z ironią, ale spójny i czytelny.',
+    'Pisz po polsku w stylu Pseudointelektu: konkretnie, publicystycznie i ironicznie. Każdy akapit zakotwicz w aktorze, miejscu, instrumencie, koszcie, logistyce albo skutku z kontekstu.',
+    'Nie doklejaj automatycznie polskiej perspektywy, szachownicy, teatru, cyrku, wielkiej gry ani geopolitycznego tańca.',
     'Nie nazywaj gotowego tekstu satyrą ani artykułem; nie używaj w treści słów satyra, satyryczny, satyryczna, satyrycznie.',
     'Nie ujawniaj rozumowania. Zwracaj wyłącznie gotowy tekst artykułu, bez komentarzy technicznych.',
   ].join(' ');

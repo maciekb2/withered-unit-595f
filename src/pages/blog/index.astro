@@ -129,17 +129,30 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 			}
 
 			.featured-media {
-				min-height: 330px;
+				position: relative;
+				min-height: 0;
+				aspect-ratio: 3 / 2;
+				overflow: hidden;
 				background: var(--diplomatic-blue);
 			}
 
+			.featured-media::after,
+			.post-card-media::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background: linear-gradient(180deg, transparent 58%, rgba(4, 30, 23, 0.28));
+			}
+
 			.featured-media img,
-			.post-card img {
+			.post-card-media img {
 				display: block;
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
 				border-radius: 0;
+				filter: saturate(0.86) contrast(1.04);
 			}
 
 			.featured-body {
@@ -211,7 +224,7 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 
 			.post-card a {
 				display: grid;
-				grid-template-rows: 180px 1fr;
+				grid-template-rows: auto 1fr;
 				height: 100%;
 				overflow: hidden;
 				border: 1px solid rgba(28, 61, 90, 0.14);
@@ -220,6 +233,13 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 				color: inherit;
 				text-decoration: none;
 				transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+			}
+
+			.post-card-media {
+				position: relative;
+				aspect-ratio: 3 / 2;
+				overflow: hidden;
+				background: var(--diplomatic-blue);
 			}
 
 			.post-card a:hover,
@@ -304,9 +324,10 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
                 <main class="blog-page">
 			<section class="blog-intro" aria-labelledby="blog-title">
 				<div>
-					<h1 id="blog-title">Archiwum tekstów</h1>
+					<h1 id="blog-title">Kartoteka interesów</h1>
 					<p>
-						Najnowsze komentarze, satyryczne analizy i geopolityczne rachunki zysków, strat oraz publicznych min.
+						Porty, wybory, rakiety, surowce i publiczne miny. Wyszukaj temat,
+						zanim kolejny nagłówek ogłosi, że wszystko zaczęło się dziś rano.
 					</p>
 				</div>
 				<div class="blog-tools">
@@ -341,7 +362,7 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 						</div>
 						<div class="featured-body">
 							<p class="post-meta">
-								<span class="marker">Najnowszy wpis</span>
+								<span class="marker">Ostatnia depesza</span>
 								<span><FormattedDate date={featuredPost.data.pubDate} /></span>
 							</p>
 							<h2 class="featured-title">{featuredPost.data.title}</h2>
@@ -363,7 +384,9 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 								>
 									<a href={`/blog/${post.id}/`}>
 										{post.data.heroImage && (
-											<img width={720} height={405} src={post.data.heroImage} alt="" loading="lazy" />
+											<div class="post-card-media">
+												<img width={720} height={480} src={post.data.heroImage} alt="" loading="lazy" />
+											</div>
 										)}
 										<div class="post-card-body">
 											<p class="post-meta">

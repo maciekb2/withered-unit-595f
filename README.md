@@ -74,8 +74,9 @@ ustawienia modeli OpenAI:
   "vars": {
     "SLACK_WEBHOOK_URL": "<YOUR_SLACK_WEBHOOK_URL>",
     "OPENAI_TEXT_MODEL": "gpt-5",
-    "OPENAI_IMAGE_STYLE": "vivid",
-    "OPENAI_IMAGE_QUALITY": "hd"
+    "OPENAI_IMAGE_SIZE": "1536x1024",
+    "OPENAI_IMAGE_STYLE": "natural",
+    "OPENAI_IMAGE_QUALITY": "medium"
   }
 ```
 
@@ -87,7 +88,7 @@ pięciu ostatnich tytułów w celu uniknięcia powtarzania tematów.
 ### Automatyczne generowanie nowych wpisów
 Moduły w katalogu `src/modules` pozwalają na wygenerowanie treści artykułu oraz hero obrazka z wykorzystaniem API OpenAI. Przykładowe prompty znajdują się w `src/prompt/article-content.txt` oraz `src/prompt/hero-image.txt`.
 
-Hero obrazy są generowane przez model DALL·E 3. Funkcja `generateHeroImage()` przyjmuje opcjonalne parametry `style` i `quality`, które domyślnie ustawiono na `vivid` i `hd`, aby uzyskać wyraźny efekt zbliżony do tego w ChatGPT.
+Hero obrazy są generowane przez konfigurowalny model GPT Image. Domyślna kompozycja 3:2 i jakość `medium` są zablokowane wspólnym promptem redakcyjnym: ograniczona paleta, jedna metafora, bez tekstu i bez groteskowych karykatur.
 
 Do złożenia i zacommitowania wpisu służy skrypt `scripts/publish-article.ts` uruchamiany przez `tsx`:
 

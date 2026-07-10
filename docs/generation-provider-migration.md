@@ -109,9 +109,9 @@ Obrazki powinny dostać jawny model w konfiguracji:
 - `OPENAI_IMAGE_QUALITY`
 - `OPENAI_IMAGE_STYLE`
 
-Domyślny styl powinien być spójny dla całej strony: satyryczna ilustracja geopolityczna, redakcyjna, bez fotorealizmu udającego zdjęcie, bez tekstu na obrazie, z czytelną kompozycją pod kadr hero.
+Domyślny styl jest spójny z panelem Situation Room: czysta ilustracja redakcyjna 3:2, jedna metafora, ograniczona paleta zieleni, turkusu, kości słoniowej i starego złota, bez tekstu, wizualnego szumu, groteskowych karykatur i stereotypów.
 
-Implementacja zostawia obrazy w OpenAI API i ustawia domyślnie tani model `OPENAI_IMAGE_MODEL=gpt-image-1-mini` z `OPENAI_IMAGE_QUALITY=low`. Styl jest trzymany w promptcie, a nie w legacy parametrze DALL-E. Dla jakości można podnieść model do `gpt-image-1.5` albo jakość do `medium`.
+Implementacja zostawia obrazy w OpenAI API i ustawia `OPENAI_IMAGE_MODEL=gpt-image-1-mini`, poziomy rozmiar `1536x1024` oraz `OPENAI_IMAGE_QUALITY=medium`. Styl jest trzymany w promptcie, a nie w legacy parametrze DALL-E.
 
 OpenAI docs wskazują `gpt-image-1-mini` jako kosztową wersję GPT Image, więc to jest preferowany fallback kosztowy zamiast wracania do legacy DALL-E.
 

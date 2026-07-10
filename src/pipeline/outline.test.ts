@@ -115,7 +115,7 @@ test('generateOutline replaces section headings that repeat the title', async ()
 
   try {
     const res = await generateOutline({ apiKey: 'k', baseTopic: 'T' });
-    assert.equal(res.outline.sections[0].h2, 'Oś sporu');
+    assert.equal(res.outline.sections[0].h2, 'Zdarzenie');
     assert.equal(res.outline.sections[1].h2, 'Rachunek pod obrusem');
   } finally {
     globalThis.fetch = original;

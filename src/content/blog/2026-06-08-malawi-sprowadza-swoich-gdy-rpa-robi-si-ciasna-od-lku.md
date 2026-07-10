@@ -2,7 +2,7 @@
 title: "Malawi sprowadza swoich: gdy RPA robi się ciasna od lęku"
 description: "Malawi sprowadza obywateli z RPA po doniesieniach o przemocy wobec migrantów; państwo robi to, co powinno, gdy ulica myli gościa z wrogiem."
 pubDate: "2026-06-08"
-heroImage: "/blog-images/2026-06-08-malawi-sprowadza-swoich-gdy-rpa-robi-si-ciasna-od-lku.png"
+heroImage: "/blog-images/2026-06-08-malawi-sprowadza-swoich-gdy-rpa-robi-si-ciasna-od-lku-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

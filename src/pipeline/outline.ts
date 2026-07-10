@@ -37,11 +37,12 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
   const userPrompt =
     ctxBlock +
     `Temat bazowy: ${baseTopic}\n` +
-    'Przygotuj konspekt artykulu w stylu Pseudointelektu (PL-patriotyczny, ironiczny, publicystyczny).\n' +
+    'Przygotuj konkretny, ironiczny konspekt publicystyczny w stylu Pseudointelektu. Polska perspektywe dodaj tylko wtedy, gdy wynika z tematu.\n' +
     'Opis ma brzmiec jak naturalny lead tematyczny; nie uzywaj slow: satyra, satyryczny, satyryczna, satyrycznie, tekst, artykul.\n' +
     '3 sekcje; kazda dokladnie 2 krotkie bullet-pointy.\n' +
     'Naglowki sekcji h2 maja byc krotkimi etykietami watku, nie moga powtarzac finalTitle ani jego duzych fragmentow.\n' +
     'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
+    'Kazdy bullet ma wskazac konkretnego aktora, miejsce, instrument polityki, koszt, element logistyki albo bezposredni skutek. Bez ogolnikow o swiecie i historii.\n' +
     'W 1-2 bulletach wplec analogie z ostatnich 2 lat.\n' +
     'W calym artykule 3-5 zrodel, maks 1 na sekcje; jesli podajesz zrodlo, podaj je jako pelny URL http(s)://... w tym samym bullecie.\n' +
     'Gdy brak pewnych danych – wstaw dokladnie [[TODO-CLAIM]].\n' +
@@ -162,9 +163,9 @@ function fallbackHeading(index: number): string {
 }
 
 const SECTION_HEADING_FALLBACKS = [
-  'Oś sporu',
-  'Rachunek za bezpieczeństwo',
-  'Polska puenta',
+  'Zdarzenie',
+  'Mechanizm',
+  'Konsekwencje',
 ];
 
 const HEADING_STOPWORDS = new Set([

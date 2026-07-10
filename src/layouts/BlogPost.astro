@@ -91,17 +91,55 @@ const jsonLd = {
 			}
 			.hero-image {
 				width: 100%;
-                                padding: clamp(0.75rem, 2vw, 1.25rem) 0 0;
-                                background: var(--ivory);
+                                padding: clamp(0.75rem, 2vw, 1.5rem) 0;
+                                background:
+                                        linear-gradient(rgba(226, 206, 127, 0.045) 1px, transparent 1px),
+                                        linear-gradient(90deg, rgba(226, 206, 127, 0.045) 1px, transparent 1px),
+                                        #061d18;
+                                background-size: 44px 44px;
+			}
+			.hero-image__frame {
+				position: relative;
+				width: min(1120px, calc(100% - 2rem));
+				aspect-ratio: 3 / 2;
+				max-height: min(72vh, 740px);
+				margin: 0 auto;
+				overflow: hidden;
+				border: 1px solid rgba(226, 206, 127, 0.22);
+				background: #0b2c23;
+				box-shadow: 0 24px 64px rgba(2, 15, 12, 0.32);
+			}
+			.hero-image__frame::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background:
+					linear-gradient(180deg, rgba(3, 23, 18, 0.04), transparent 65%, rgba(3, 23, 18, 0.24)),
+					linear-gradient(90deg, rgba(229, 211, 145, 0.08), transparent 14%, transparent 86%, rgba(229, 211, 145, 0.08));
 			}
 			.hero-image img {
 				display: block;
-                                width: min(1020px, 100%);
-                                max-height: min(58vh, 620px);
+                                width: 100%;
+                                height: 100%;
                                 object-fit: cover;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				border-radius: 0;
+				filter: saturate(0.86) contrast(1.04);
+			}
+			.hero-image__label {
+				position: absolute;
+				top: 0.85rem;
+				left: 0.85rem;
+				z-index: 1;
+				padding: 0.4rem 0.52rem;
+				border: 1px solid rgba(242, 232, 190, 0.3);
+				color: rgba(246, 239, 210, 0.86);
+				background: rgba(4, 30, 23, 0.7);
+				font-family: "Archivo Variable", "Atkinson", sans-serif;
+				font-size: 0.58rem;
+				font-weight: 680;
+				letter-spacing: 0.14em;
+				backdrop-filter: blur(8px);
 			}
 			.prose {
 				width: min(760px, calc(100% - 2rem));
@@ -311,11 +349,15 @@ const jsonLd = {
                         @media (max-width: 680px) {
                                 .hero-image {
                                         padding-top: 0;
+                                        padding-bottom: 0;
                                 }
 
-                                .hero-image img {
-                                        border-radius: 0;
-                                        max-height: 42vh;
+                                .hero-image__frame {
+                                        width: 100%;
+                                        aspect-ratio: 4 / 3;
+                                        max-height: 58vh;
+                                        border-right: 0;
+                                        border-left: 0;
                                 }
 
                                 .title h1 {
@@ -337,9 +379,14 @@ const jsonLd = {
                                 data-article-year={pubDate.getFullYear()}
                                 data-article-age-days={Math.max(0, Math.floor((Date.now() - pubDate.getTime()) / 86400000))}
                         >
-				<div class="hero-image">
-					{heroImage && <img width={1020} height={510} src={heroImage} alt={title} />}
-				</div>
+				{heroImage && (
+					<div class="hero-image">
+						<div class="hero-image__frame">
+							<img width={1536} height={1024} src={heroImage} alt={title} />
+							<span class="hero-image__label" aria-hidden="true">PI // ILUSTRACJA REDAKCYJNA</span>
+						</div>
+					</div>
+				)}
 				<div class="prose">
 					<div class="title">
                                                 <div class="article-meta" aria-label="Metadane artykułu">

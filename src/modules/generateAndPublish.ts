@@ -104,8 +104,8 @@ export async function generateAndPublish(
         paragraphsPerSection: Number.parseInt(env.TEXT_SECTION_PARAGRAPHS || '', 10) || 3,
         sectionMaxTokens: Number.parseInt(env.TEXT_SECTION_MAX_TOKENS || '', 10) || 1800,
         imageModel: env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini',
-        imageSize: env.OPENAI_IMAGE_SIZE || '1024x1024',
-        imageQuality: env.OPENAI_IMAGE_QUALITY || 'low',
+        imageSize: env.OPENAI_IMAGE_SIZE || '1536x1024',
+        imageQuality: env.OPENAI_IMAGE_QUALITY || 'medium',
       },
     });
 
@@ -513,9 +513,9 @@ export async function generateAndPublish(
       apiKey: env.OPENAI_API_KEY,
       prompt: heroPrompt,
       model: env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini',
-      size: (env.OPENAI_IMAGE_SIZE as any) || '1024x1024',
-      style: (env.OPENAI_IMAGE_STYLE as any) || 'vivid',
-      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'low',
+      size: (env.OPENAI_IMAGE_SIZE as any) || '1536x1024',
+      style: (env.OPENAI_IMAGE_STYLE as any) || 'natural',
+      quality: (env.OPENAI_IMAGE_QUALITY as any) || 'medium',
     });
 
     setStage('github-publish');

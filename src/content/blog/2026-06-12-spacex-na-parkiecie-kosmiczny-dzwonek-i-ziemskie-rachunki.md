@@ -2,7 +2,7 @@
 title: "SpaceX na parkiecie: kosmiczny dzwonek i ziemskie rachunki"
 description: "SpaceX wychodzi na giełdę, a inwestorzy klaszczą jak na defiladzie. Warto sprawdzić, czy pod biało-czerwoną ciekawością nie kryje się zwykły rachunek ryzyka."
 pubDate: "2026-06-12"
-heroImage: "/blog-images/2026-06-12-spacex-na-parkiecie-kosmiczny-dzwonek-i-ziemskie-rachunki.png"
+heroImage: "/blog-images/2026-06-12-spacex-na-parkiecie-kosmiczny-dzwonek-i-ziemskie-rachunki-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

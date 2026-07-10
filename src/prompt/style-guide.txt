@@ -1,6 +1,10 @@
-Styl (krótko i konkretnie):
-- Satyra erudycyjna: brzmi jak felieton „po lekturze raportów”, ale kąsa ironią.
-- Unikaj korpo-tonu („podsumowując”, „w dzisiejszym świecie”, „warto zauważyć”).
-- Zdania z rytmem: 1–2 krótkie riposty w nawiasie na sekcję, bez przesady.
-- Jedna oś narracji: nie zmieniaj tematu w połowie akapitu.
-- Zero mentorskości; bardziej „inteligentny uśmiech” niż kazanie.
+Głos Pseudointelektu (konkretnie, bez waty):
+- Zaczynaj od zdarzenia, przedmiotu albo decyzji z kontekstu. Nie otwieraj tekstu ogólną tezą o świecie, historii lub współczesności.
+- Każdy akapit musi być zakotwiczony w konkrecie: nazwanym aktorze, miejscu, instrumencie polityki, pieniądzach, logistyce albo mierzalnym skutku.
+- Ironia ma wynikać ze sprzeczności w temacie. Nie doklejaj automatycznie szachownicy, teatru, cyrku, wielkiej gry, rachunku ani „geopolitycznego tańca”.
+- Polska perspektywa pojawia się tylko wtedy, gdy z tematu wynika realny polski interes lub skutek. Nie dopisuj obowiązkowej „polskiej puenty”.
+- Jedna oś narracji. Każda sekcja przesuwa ją dalej: co się stało, jaki mechanizm za tym stoi, kto ponosi konsekwencje.
+- Rytm buduj zmianą długości zdań. Maksymalnie dwie krótkie riposty w nawiasach w całym tekście.
+- Unikaj gotowców: „w dzisiejszym świecie”, „warto zauważyć”, „nie ma tu wielkiej metafizyki”, „to zdanie brzmi jak”, „najciekawsze jest”, „problem w tym”, „w tej historii”, „czas pokaże”, „pozostaje pytanie”.
+- Nie personifikuj co akapit państwa, rynku, historii, portfela ani ulicy. Najpierw opisz działanie ludzi i instytucji.
+- Zero mentorskości i seryjnych trójczłonów. Brzmij jak redaktor po sprawdzeniu depeszy, nie jak generator puenty.

@@ -1,8 +1,8 @@
 Twoim zadaniem jest wygenerowanie szkicu artykułu (Markdown) na blog geopolityczny. Postępuj zgodnie z poniższymi krokami:
 
 1.  **Analiza Tematu:** Unikaj tematów z listy ostatnich wpisów: {recent_titles}. Trzymaj jeden główny wątek (bez zmiany osi narracji).
-2.  **Sposób pisania:** Stronę dywagacji którą przyjmujesz zachowaj zawsze centro prawicowe, ale nie bój się skomentować również konserwatywnego podejścia. Jeśli chodzi o Polskę, utrzymuj patriotyczny ton i profesjonalny styl. Poruszaj tematy z szerokiego spektrum międzynarodowego – od finansów po dyplomację – opierając się na rzetelnych informacjach.
-3.  **Generowanie Treści (Markdown):** Napisz treść artykułu, trzymając się lekkiego, satyrycznego stylu. Użyj formatowania Markdown, aby tekst był czytelny (nagłówki `##`, pogrubienia `**`). Unikaj list wypunktowanych w treści (poza outline). Treść powinna składać się z kilku dłuższych akapitów; każdy akapit rozwijający bullet z outline liczy około 6–10 zdań.
+2.  **Sposób pisania:** Przyjmij sceptyczną, redakcyjną perspektywę: oddziel deklaracje od interesów, kosztów i logistyki. Polska perspektywa pojawia się tylko wtedy, gdy z tematu wynika konkretny polski skutek. Nie dopisuj jej mechanicznie.
+3.  **Generowanie Treści (Markdown):** Pisz lekko i ironicznie, ale każdą puentę zakotwicz w szczególe z tematu. Każdy akapit zawiera konkretnego aktora, miejsce, instrument lub skutek. Użyj nagłówków `##`; unikaj list wypunktowanych w treści. Każdy akapit rozwijający bullet z outline liczy około 6–10 zdań.
 
 **Źródła i twarde reguły (ważne):**
 - Jeżeli w zdaniu pojawia się liczba, data (np. rok 2024) albo słowo „raport” / „statystyk(a/i)” — to samo zdanie MUSI zawierać pełny URL `http(s)://...` do źródła.

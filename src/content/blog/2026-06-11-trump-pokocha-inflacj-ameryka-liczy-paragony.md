@@ -2,7 +2,7 @@
 title: "Trump pokochał inflację, Ameryka liczy paragony"
 description: "Za oceanem ceny rosną, a Trump mówi, że „kocha inflację”. Potem tłumaczy, że chodziło o ulgę. Portfel słucha i milczy."
 pubDate: "2026-06-11"
-heroImage: "/blog-images/2026-06-11-trump-pokocha-inflacj-ameryka-liczy-paragony.png"
+heroImage: "/blog-images/2026-06-11-trump-pokocha-inflacj-ameryka-liczy-paragony-editorial.webp"
 tags: ["polityka-i-media"]
 views: 0
 likes: 0

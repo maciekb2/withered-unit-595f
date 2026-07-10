@@ -27,8 +27,9 @@ test('generateHeroImage uses low-cost GPT Image model without DALL-E style param
     assert.equal(body.quality, 'low');
     assert.equal(body.style, undefined);
     assert.equal(body.response_format, undefined);
-    assert.match(body.prompt, /wczesniejszych obrazkach generowanych przez DALL-E 3/);
-    assert.match(body.prompt, /bez tekstu, napisow, logo/);
+    assert.match(body.prompt, /analitycznej kartoteki/);
+    assert.match(body.prompt, /bez tekstu, liter, cyfr, logo/);
+    assert.match(body.prompt, /bez fotorealizmu, groteskowych twarzy/);
   } finally {
     globalThis.fetch = original;
   }

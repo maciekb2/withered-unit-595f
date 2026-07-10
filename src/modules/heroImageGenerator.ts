@@ -5,13 +5,14 @@ import { retryFetch } from '../utils/retryFetch';
 const PSEUDOINTELEKT_HERO_STYLE_LOCK = `
 
 STALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO:
-- zachowaj wyglad jak we wczesniejszych obrazkach generowanych przez DALL-E 3 w trybie vivid;
-- satyryczna, redakcyjna ilustracja geopolityczna, nie fotografia i nie render 3D;
-- komiksowo-publicystyczny charakter, wyrazny glowny motyw, dynamiczny kadr 1:1;
-- zywe nasycone kolory, wysoki kontrast, lekko przerysowane postacie, symbole panstwowe i instytucjonalne;
-- subtelna tekstura druku, ostre kontury, plakatowy charakter, energia komentarza politycznego;
-- bez tekstu, napisow, logo, znakow wodnych, podpisow, UI, ramek i realistycznych twarzy konkretnych osob;
-- obraz ma byc czytelny jako hero bloga po przycieciu i w miniaturze.
+- czysta, wspolczesna ilustracja redakcyjna przypominajaca karte z analitycznej kartoteki;
+- jedna celna metafora geopolityczna, maksymalnie trzy czytelne elementy i duzo kontrolowanej pustej przestrzeni;
+- plaskie precyzyjne ksztalty, mocne sylwetki, cienkie linie kartograficzne lub techniczne;
+- ograniczona paleta: gleboka zielen, morski turkus, kosc sloniowa i stare zloto; przygaszona czerwien tylko jako maly akcent;
+- delikatny raster drukarski tylko w cieniach, bez malarskich smug, wizualnego halasu i neonowych gradientow;
+- poziomy kadr 3:2, glowny motyw w bezpiecznym centrum, czytelny jako hero i miniatura;
+- bez tekstu, liter, cyfr, logo, znakow wodnych, podpisow, UI i przypadkowych ikon;
+- bez fotorealizmu, groteskowych twarzy, karykatur konkretnych osob i stereotypowego przedstawiania narodowosci lub grup spolecznych.
 `.trim();
 
 export interface GenerateHeroOptions {
@@ -19,7 +20,7 @@ export interface GenerateHeroOptions {
   prompt: string;
   model?: string;
   /**
-   * Size of the generated image. Defaults to '1024x1024'.
+   * Size of the generated image. Defaults to the editorial 3:2 format.
    */
   size?: '256x256' | '512x512' | '1024x1024' | '1024x1536' | '1536x1024';
   /**
@@ -36,9 +37,9 @@ export async function generateHeroImage({
   apiKey,
   prompt,
   model = 'gpt-image-1-mini',
-  size = '1024x1024',
-  style = 'vivid',
-  quality = 'low',
+  size = '1536x1024',
+  style = 'natural',
+  quality = 'medium',
 }: GenerateHeroOptions): Promise<Buffer> {
   logEvent({ type: 'generate-hero-start' });
   const finalPrompt = withPseudointelektHeroStyle(prompt);

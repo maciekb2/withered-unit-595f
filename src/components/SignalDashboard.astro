@@ -42,11 +42,11 @@ const {
         <header class="dashboard-header">
             <div>
                 <p class="section-code">PANEL / 04</p>
-                <h2 id="signal-title">Aktualny sygnał</h2>
+                <h2 id="signal-title">Na stole redakcyjnym</h2>
             </div>
             <p>
-                Bez czerwonego telefonu i bez mapy z pinezkami. Najnowszy temat,
-                archiwum i kierunki obserwacji w jednym obrazie sytuacyjnym.
+                Tu ląduje to, co nie zmieściło się w pasku wiadomości: kto płaci,
+                kto przewozi, kto ogłasza sukces i dlaczego rachunek przychodzi później.
             </p>
         </header>
 
@@ -66,10 +66,10 @@ const {
                         <time>{featured.dateLabel}</time>
                     </div>
                     <div class="featured-copy">
-                        <p>Najnowsza analiza</p>
+                        <p>Depesza po odfiltrowaniu komunikatu</p>
                         <h3>{featured.title}</h3>
                         <span class="featured-description">{featured.description}</span>
-                        <span class="featured-link">Otwórz briefing <b aria-hidden="true">↗</b></span>
+                        <span class="featured-link">Rozłóż narrację <b aria-hidden="true">↗</b></span>
                     </div>
                 </a>
             )}
@@ -77,7 +77,7 @@ const {
             <aside class="status-console" aria-label="Stan serwisu">
                 <div class="console-head">
                     <span>STATUS REDAKCJI</span>
-                    <span class="console-ok">NOMINALNY</span>
+                    <span class="console-ok">CZUJNY</span>
                 </div>
                 <dl class="console-metrics">
                     <div>
@@ -96,13 +96,13 @@ const {
                     <div class="scope-grid" aria-hidden="true">
                         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                     </div>
-                    <strong>GLOBAL / SELEKTYWNIE PODEJRZLIWY</strong>
+                    <strong>PORTY / BUDŻETY / MÓWNICE / GRANICE</strong>
                 </div>
             </aside>
 
             <div class="topic-console">
                 <div class="console-head">
-                    <span>SEKTORY</span>
+                    <span>TROPY</span>
                     <a href="/tematy/">PEŁNA MAPA →</a>
                 </div>
                 <ol>
@@ -123,7 +123,7 @@ const {
 
             <div class="headline-console">
                 <div class="console-head">
-                    <span>OSTATNIE TRANSMISJE</span>
+                    <span>NOTATKI NA MARGINESIE</span>
                     <span>UTC+02</span>
                 </div>
                 <ol>
@@ -247,7 +247,7 @@ const {
     .featured-signal img {
         object-fit: cover;
         border-radius: 0;
-        filter: saturate(0.62) contrast(1.08) sepia(0.08);
+        filter: saturate(0.84) contrast(1.05);
         transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 500ms ease;
     }
 
