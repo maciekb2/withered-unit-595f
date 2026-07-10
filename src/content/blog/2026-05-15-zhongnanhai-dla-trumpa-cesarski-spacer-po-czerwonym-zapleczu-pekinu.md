@@ -1,8 +1,9 @@
 ---
 title: "Zhongnanhai dla Trumpa: cesarski spacer po czerwonym zapleczu Pekinu"
-description: "Xi oprowadza Trumpa po Zhongnanhai: gest władzy, teatr protokołu i lekcja, że w Pekinie nawet spacer potrafi być komunikatem do świata."
+description: "Xi oprowadza Trumpa po Zhongnanhai, zamkniętym zapleczu chińskiej władzy. Bez szerokiego przełomu handlowego Pekin wykorzystuje protokół, by ustawić własną narrację spotkania."
 sourceUrl: "https://www.bbc.com/news/articles/crrpj0ejxp8o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-15"
+updatedDate: "2026-07-11"
 heroImage: "/blog-images/2026-05-15-zhongnanhai-editorial.webp"
 tags: ["geopolityka", "technologia-i-cyber", "polityka-i-media"]
 views: 0

@@ -1,8 +1,9 @@
 ---
 title: "Kijów pod gruzem, Europa pod kołdrą"
-description: "Po rosyjskich uderzeniach w kijowskie bloki ratownicy wydobywają ofiary; w tle znów ta sama lekcja: imperium rozumie cywilów jako rubrykę w planie."
+description: "Po rosyjskich uderzeniach w kijowskie bloki ratownicy wydobywają ofiary, w tym dzieci. Ataki na cywilną codzienność są narzędziem presji, nie ubocznym szczegółem wojny."
 sourceUrl: "https://www.bbc.com/news/articles/cq5p8yygq94o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-14"
+updatedDate: "2026-07-11"
 heroImage: "/blog-images/2026-05-14-kijow-editorial.webp"
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 views: 0
