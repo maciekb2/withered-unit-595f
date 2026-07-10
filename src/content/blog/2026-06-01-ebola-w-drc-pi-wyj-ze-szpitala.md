@@ -3,7 +3,7 @@ title: "Ebola w DRC: pięć wyjść ze szpitala"
 description: "Pięciu ozdrowieńców opuszcza szpital, certyfikaty błyszczą, a system zdrowia nadal musi udowadniać, że nadzieja to nie jednorazowy komunikat."
 sourceUrl: "https://www.bbc.com/news/articles/cz928xq588no?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-01"
-heroImage: "/blog-images/2026-06-01-ebola-w-drc-pi-wyj-ze-szpitala.png"
+heroImage: "/blog-images/2026-06-01-ebola-drc-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

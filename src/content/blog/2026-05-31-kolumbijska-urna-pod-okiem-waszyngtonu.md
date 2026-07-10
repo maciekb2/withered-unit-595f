@@ -2,7 +2,7 @@
 title: "Kolumbijska urna pod okiem Waszyngtonu"
 description: "Kolumbia wybiera prezydenta, a w tle brzmi pytanie, czy Waszyngton dostanie partnera, czy kolejny sezon dyplomatycznej szarpaniny z Petro w tle."
 pubDate: "2026-05-31"
-heroImage: "/blog-images/2026-05-31-kolumbijska-urna-pod-okiem-waszyngtonu.png"
+heroImage: "/blog-images/2026-05-31-kolumbia-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0
