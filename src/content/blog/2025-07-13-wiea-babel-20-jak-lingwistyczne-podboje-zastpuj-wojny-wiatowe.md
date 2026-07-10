@@ -3,7 +3,7 @@ title: "Wieża Babel 2.0: Jak Lingwistyczne Podboje Zastępują Wojny Światowe"
 description: "W dobie globalizacji, gdzie aplikacje do tłumaczenia zamieniają nasiadówki ONZ w konkurs karaoke, podróże międzyjęzykowe nabierają nowego znaczenia. Czy nowe Imperium polega na poprawnym zastosowaniu zaimków?"
 tags: ["technologia-i-cyber"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-wiea-babel-20-jak-lingwistyczne-podboje-zastpuj-wojny-wiatowe.png"
+heroImage: "/blog-images/2025-07-13-babel-editorial.webp"
 views: 0
 likes: 0
 ---

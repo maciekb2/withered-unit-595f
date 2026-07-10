@@ -3,7 +3,7 @@ title: "Przewrót na Marsie: Jak Elon Musk Zdobywa międzyplanetarne Głosy na P
 description: "Podróż w głąb absurdalnych strategii wyborczych XXI wieku, gdzie kosmiczne ambicje spotykają się z politycznym teatrem."
 tags: ["geopolityka"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-przewrt-na-marsie-jak-elon-musk-zdobywa-midzyplanetarne-gosy-na-prezydenta.png"
+heroImage: "/blog-images/2025-07-13-mars-wybory-editorial.webp"
 views: 0
 likes: 0
 ---

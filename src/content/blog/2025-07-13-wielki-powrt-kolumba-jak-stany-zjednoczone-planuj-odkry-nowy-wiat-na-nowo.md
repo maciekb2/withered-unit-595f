@@ -3,7 +3,7 @@ title: "Wielki Powrót Kolumba: Jak Stany Zjednoczone Planują Odkryć Nowy Świ
 description: "Ironia o amerykańskich wyprawach geopolitycznych i nostalgii za dawnymi czasami wielkich odkrywców."
 tags: ["geopolityka"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-wielki-powrt-kolumba-jak-stany-zjednoczone-planuj-odkry-nowy-wiat-na-nowo.png"
+heroImage: "/blog-images/2025-07-13-kolumb-editorial.webp"
 views: 0
 likes: 0
 ---
