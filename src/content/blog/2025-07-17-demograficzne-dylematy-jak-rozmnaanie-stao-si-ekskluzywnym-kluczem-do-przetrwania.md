@@ -3,7 +3,7 @@ title: "Demograficzne Dylematy: Jak Rozmnażanie Stało się Ekskluzywnym Klucze
 description: "Witamy w kraju, gdzie powielanie gatunku stało się wyzwaniem większym niż udział w Kongresie WOŚP, a politycy boją się długofalowych inwestycji bardziej niż rekiny podatkowe nowych ulg!"
 tags: ["geopolityka"]
 pubDate: "2025-07-17"
-heroImage: "/blog-images/2025-07-17-demograficzne-dylematy-jak-rozmnaanie-stao-si-ekskluzywnym-kluczem-do-przetrwania.png"
+heroImage: "/blog-images/2025-07-17-demografia-editorial.webp"
 views: 0
 likes: 0
 ---
