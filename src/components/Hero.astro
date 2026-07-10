@@ -39,25 +39,24 @@ const latestArticle = liveHeadlines[0];
 
         <div class="cinema-topline" aria-hidden="true">
             <span>PSEUDO//INTEL</span>
-            <span class="topline-center">WIDOK GLOBALNY</span>
-            <span><i></i> SYGNAŁ OTWARTY</span>
+            <span class="topline-center">REJESTR ZALEŻNOŚCI</span>
+            <span><i></i> NASŁUCH AKTYWNY</span>
         </div>
 
         <div class="hero-panel">
             <div class="hero-copy">
-                <p class="eyebrow"><span></span> Porty · budżety · mównice</p>
+                <p class="eyebrow"><span></span> Analiza interesów / bez dekoracji</p>
                 <h1 id="hero-title">
-                    <span>Geopolityka</span>
-                    <strong>bez zadęcia.</strong>
+                    <span>Interesy świata.</span>
+                    <strong>Bez pudru.</strong>
                 </h1>
                 <p class="hero-lede">
-                    Kiedy minister mówi o wartościach, sprawdzamy terminal LNG.
-                    Kiedy generał pokazuje strzałki, zaglądamy do magazynu.
-                    Fakty, interesy i ironia — w tej kolejności.
+                    Polityka zaczyna się nie przy mównicy, lecz w porcie, budżecie i magazynie.
+                    Czytamy decyzje, ich koszt oraz to, co komunikat wygodnie przemilcza.
                 </p>
                 <div class="hero-actions">
                     <a class="hero-cta hero-cta-primary" href="#aktualny-sygnal" data-story-entry>
-                        <span>Otwórz obraz sytuacji</span>
+                        <span>Zobacz obraz sytuacji</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 5v14M6 13l6 6 6-6"></path>
                         </svg>
@@ -68,24 +67,24 @@ const latestArticle = liveHeadlines[0];
                             href={latestArticle.href}
                             data-track-home-article="hero"
                         >
-                            Czytaj najnowszą depeszę
+                            Przeczytaj ostatnią depeszę
                         </a>
                     )}
                 </div>
                 <dl class="hero-metrics" aria-label="Stan redakcji">
                     <div>
-                        <dt>Archiwum</dt>
+                        <dt>Materiały</dt>
                         <dd>{String(articleCount).padStart(2, '0')} tekstów</dd>
                     </div>
                     {lastPublishedLabel && (
                         <div>
-                            <dt>Ostatni sygnał</dt>
+                        <dt>Ostatnia publikacja</dt>
                             <dd>{lastPublishedLabel}</dd>
                         </div>
                     )}
                     <div>
-                        <dt>Filtr</dt>
-                        <dd>Mównica wyciszona</dd>
+                        <dt>Metoda</dt>
+                        <dd>Fakty przed retoryką</dd>
                     </div>
                 </dl>
             </div>
@@ -94,26 +93,26 @@ const latestArticle = liveHeadlines[0];
         <div class="story-layer" aria-label="Briefing Pseudointelektu">
             <article class="story-chapter" data-chapter="1">
                 <p class="chapter-index">01 / LOGISTYKA</p>
-                <h2>Granica kończy mapę.<br />Dostawa — dyskusję.</h2>
+                <h2>Najpierw trasa.<br />Potem sojusz.</h2>
                 <p>
-                    Port, kabel, rurociąg i termin dostawy mówią o sojuszach więcej
-                    niż wspólne zdjęcie po konferencji.
+                    Port, kabel, rurociąg i termin dostawy mówią o trwałości układu
+                    więcej niż wspólne zdjęcie po szczycie.
                 </p>
             </article>
             <article class="story-chapter" data-chapter="2">
                 <p class="chapter-index">02 / NARRACJE</p>
-                <h2>Mównica mówi o wartościach.<br />Budżet dopowiada resztę.</h2>
+                <h2>Komunikat kończy konferencję.<br />Decyzja zaczyna koszt.</h2>
                 <p>
-                    Oddzielamy decyzję od komunikatu o decyzji. Pierwsza przesuwa pieniądze
-                    i ludzi. Druga ma dobrze wyglądać w wieczornym serwisie.
+                    Oddzielamy ruch od jego opisu. Pierwszy przesuwa pieniądze, ludzi i ryzyko;
+                    drugi ma dobrze brzmieć w wieczornym serwisie.
                 </p>
             </article>
             <article class="story-chapter" data-chapter="3">
                 <p class="chapter-index">03 / ABSURD</p>
-                <h2>Strategia jest wielka.<br />Faktura zwykle większa.</h2>
+                <h2>Doktryna brzmi wznośle.<br />Faktura — wiążąco.</h2>
                 <p>
-                    Ironia zaczyna pracę tam, gdzie doktryna potyka się o cenę paliwa,
-                    kalendarz wyborczy albo człowieka, który miał tylko wykonać rozkaz.
+                    Ironia jest narzędziem kontroli jakości, gdy doktryna zderza się z ceną paliwa,
+                    kalendarzem wyborczym albo zwykłym wykonaniem decyzji.
                 </p>
             </article>
         </div>
@@ -127,9 +126,9 @@ const latestArticle = liveHeadlines[0];
                 <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
             <dl>
-                <div><dt>Źródło</dt><dd>Depesze / dane</dd></div>
-                <div><dt>Tryb</dt><dd>Między wierszami</dd></div>
-                <div><dt>Pewność narracji</dt><dd>Do korekty</dd></div>
+                <div><dt>Materiał</dt><dd>Depesze / dokumenty</dd></div>
+                <div><dt>Tryb odczytu</dt><dd>Fakty przed narracją</dd></div>
+                <div><dt>Status wniosków</dt><dd>Podlegają weryfikacji</dd></div>
             </dl>
         </aside>
 
@@ -140,7 +139,7 @@ const latestArticle = liveHeadlines[0];
         </div>
 
         <div class="scroll-cue" aria-hidden="true">
-            <span>Przewiń. Zobacz, co schowano pod legendą</span>
+            <span>Przewiń: od mapy do rachunku</span>
             <i></i>
         </div>
     </div>
@@ -288,7 +287,10 @@ const latestArticle = liveHeadlines[0];
     }
 
     .hero-copy {
-        width: min(680px, 57vw);
+        width: min(720px, 60vw);
+        padding: 1.1rem 0 1.2rem;
+        border-left: 1px solid rgba(217, 188, 95, 0.38);
+        padding-left: clamp(1rem, 2vw, 1.7rem);
     }
 
     .eyebrow,
@@ -335,8 +337,8 @@ const latestArticle = liveHeadlines[0];
     }
 
     .hero-lede {
-        max-width: 57ch;
-        margin: 1.9rem 0 0;
+        max-width: 54ch;
+        margin: 1.65rem 0 0;
         color: rgba(237, 239, 226, 0.76);
         font-size: clamp(1.04rem, 1.35vw, 1.2rem);
         line-height: 1.58;

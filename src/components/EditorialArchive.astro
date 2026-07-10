@@ -19,12 +19,12 @@ const { articles = [] } = Astro.props as Props;
         <header class="archive-header">
             <div>
                 <p class="section-code">ARCHIWUM / OSTATNIE ODCZYTY</p>
-                <h2 id="archive-title">Nagłówki się starzeją.<br />Interesy mają lepszą pamięć.</h2>
+                <h2 id="archive-title">Nagłówki gasną szybko.<br />Skutki decyzji — wolniej.</h2>
             </div>
             <div class="archive-intro">
                 <p>
-                    Wracamy do tekstów, kiedy kurz po konferencji już opadł. Wtedy najlepiej
-                    widać, kto zyskał port, kontrakt, korytarz albo kolejne pół roku spokoju.
+                    Wracamy do tekstów po pierwszym komunikacie. Wtedy widać, kto zyskał
+                    kontrakt, dostęp, czas albo wygodną wersję wydarzeń.
                 </p>
                 <a href="/blog">Przejdź do całego archiwum <span aria-hidden="true">→</span></a>
             </div>
@@ -47,7 +47,7 @@ const { articles = [] } = Astro.props as Props;
                         <time>{article.dateLabel}</time>
                         <h3>{article.title}</h3>
                         <p>{article.description}</p>
-                        <span class="card-link">Sprawdź rachunek <b aria-hidden="true">↗</b></span>
+                        <span class="card-link">Otwórz materiał <b aria-hidden="true">↗</b></span>
                     </div>
                 </a>
             ))}
@@ -58,21 +58,21 @@ const { articles = [] } = Astro.props as Props;
         <div class="manifesto-grid" aria-hidden="true"></div>
         <div class="manifesto-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="manifesto-shell">
-            <p class="section-code">MANIFEST / INSTRUKCJA OBSŁUGI MÓWNICY</p>
+            <p class="section-code">METODA / INSTRUKCJA CZYTANIA KOMUNIKATÓW</p>
             <div class="manifesto-layout">
-                <h2>Nie czytamy z fusów. Czytamy budżety, przypisy i rozkłady dostaw.</h2>
+                <h2>Nie przewidujemy przyszłości. Sprawdzamy, kto płaci za jej wersję.</h2>
                 <div>
                     <p>
-                        Polityka lubi wielkie rzeczowniki: bezpieczeństwo, suwerenność,
-                        porządek. My pytamy o cenę energii, przepustowość portu i termin wyborów.
+                        Polityka lubi duże słowa: bezpieczeństwo, suwerenność, porządek.
+                        My sprawdzamy cenę energii, przepustowość portu i kalendarz decyzji.
                     </p>
                     <p>
-                        Nie obiecujemy mapy przyszłości. Zostawiamy kilka niewygodnych pytań,
-                        krótki rachunek interesów i bezpieczny dystans od mównicy.
+                        Zostawiamy pytania, których nie załatwi konferencja prasowa: co się zmienia,
+                        kto ponosi koszt i komu służy przyjęta narracja.
                     </p>
                     <div class="manifesto-actions">
-                        <a class="manifesto-primary" href="/about">Poznaj autora</a>
-                        <a href="/contact">Nadaj własny sygnał</a>
+                        <a class="manifesto-primary" href="/about">O metodzie</a>
+                        <a href="/contact">Napisz do redakcji</a>
                     </div>
                 </div>
             </div>
