@@ -1,0 +1,478 @@
+---
+type Article = {
+    title: string;
+    description: string;
+    href: string;
+    image?: string;
+    dateLabel: string;
+};
+
+interface Props {
+    articles?: Article[];
+}
+
+const { articles = [] } = Astro.props as Props;
+---
+
+<section class="editorial-archive" aria-labelledby="archive-title">
+    <div class="archive-shell">
+        <header class="archive-header">
+            <div>
+                <p class="section-code">ARCHIWUM / OSTATNIE ODCZYTY</p>
+                <h2 id="archive-title">Świat zmienia temat.<br />My zachowujemy kontekst.</h2>
+            </div>
+            <div class="archive-intro">
+                <p>
+                    Depesza żyje godzinę, narracja znacznie dłużej. Wróć do tekstów,
+                    które nadal mówią coś o mechanice wielkiej polityki.
+                </p>
+                <a href="/blog">Przejdź do całego archiwum <span aria-hidden="true">→</span></a>
+            </div>
+        </header>
+
+        <div class="archive-grid">
+            {articles.map((article, index) => (
+                <a
+                    class="archive-card"
+                    href={article.href}
+                    data-track-home-article={`archive-${index + 1}`}
+                >
+                    <div class="card-media">
+                        {article.image && (
+                            <img src={article.image} alt="" loading="lazy" decoding="async" />
+                        )}
+                        <span class="card-index">0{index + 1}</span>
+                    </div>
+                    <div class="card-copy">
+                        <time>{article.dateLabel}</time>
+                        <h3>{article.title}</h3>
+                        <p>{article.description}</p>
+                        <span class="card-link">Czytaj analizę <b aria-hidden="true">↗</b></span>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </div>
+
+    <div class="manifesto">
+        <div class="manifesto-grid" aria-hidden="true"></div>
+        <div class="manifesto-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="manifesto-shell">
+            <p class="section-code">MANIFEST / BEZ CERTYFIKATU NIEOMYLNOŚCI</p>
+            <div class="manifesto-layout">
+                <h2>Świat nie potrzebuje kolejnego wszystkowiedzącego eksperta.</h2>
+                <div>
+                    <p>
+                        Potrzebuje ludzi, którzy potrafią odróżnić fakt od dekoracji,
+                        interes od deklaracji i powagę od napuszonego tonu.
+                    </p>
+                    <p>
+                        Pseudointelekt nie obiecuje mapy przyszłości. Daje kompas,
+                        kilka niewygodnych pytań i bezpieczny dystans od mównicy.
+                    </p>
+                    <div class="manifesto-actions">
+                        <a class="manifesto-primary" href="/about">Poznaj autora</a>
+                        <a href="/contact">Nadaj własny sygnał</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .editorial-archive {
+        color: #12372d;
+        background: #f1eee5;
+    }
+
+    .archive-shell {
+        width: min(1180px, calc(100% - 4rem));
+        margin: 0 auto;
+        padding: clamp(5rem, 10vw, 9rem) 0;
+    }
+
+    .archive-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.65fr);
+        align-items: end;
+        gap: clamp(2rem, 7vw, 7rem);
+        margin-bottom: 3rem;
+    }
+
+    .section-code {
+        margin: 0 0 0.75rem;
+        color: #72570c;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.64rem;
+        font-weight: 680;
+        letter-spacing: 0.16em;
+    }
+
+    h2 {
+        margin: 0;
+        color: #0b2c23;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: clamp(2.8rem, 5.7vw, 5.55rem);
+        font-variation-settings: "wdth" 94;
+        font-weight: 560;
+        letter-spacing: -0.055em;
+        line-height: 0.96;
+        text-wrap: balance;
+    }
+
+    .archive-intro p {
+        margin: 0;
+        color: #4f685f;
+        font-size: 0.98rem;
+        line-height: 1.55;
+    }
+
+    .archive-intro a {
+        margin-top: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: #173e32;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 680;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .archive-intro a span {
+        color: #a5821f;
+        transition: transform 160ms ease;
+    }
+
+    .archive-intro a:hover span,
+    .archive-intro a:focus-visible span {
+        transform: translateX(4px);
+    }
+
+    .archive-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        border-top: 1px solid rgba(18, 55, 45, 0.18);
+        border-left: 1px solid rgba(18, 55, 45, 0.18);
+    }
+
+    .archive-card {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        border-right: 1px solid rgba(18, 55, 45, 0.18);
+        border-bottom: 1px solid rgba(18, 55, 45, 0.18);
+        color: inherit;
+        background: rgba(255, 255, 255, 0.18);
+        text-decoration: none;
+        transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .card-media {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        background: #183e33;
+    }
+
+    .card-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 50%, rgba(5, 30, 24, 0.48));
+    }
+
+    .card-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0;
+        filter: saturate(0.68) contrast(1.04) sepia(0.08);
+        transition: transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 300ms ease;
+    }
+
+    .card-index {
+        position: absolute;
+        top: 0.8rem;
+        left: 0.8rem;
+        z-index: 1;
+        min-width: 35px;
+        min-height: 35px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(245, 232, 178, 0.34);
+        color: #f1e4ad;
+        background: rgba(4, 32, 25, 0.62);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        backdrop-filter: blur(7px);
+    }
+
+    .card-copy {
+        padding: clamp(1.2rem, 2.6vw, 2rem);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .card-copy time {
+        color: #6f560b;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.62rem;
+        font-weight: 650;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+    }
+
+    .card-copy h3 {
+        margin: 0.75rem 0 0;
+        color: #0e3228;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: clamp(1.35rem, 2.2vw, 2rem);
+        font-variation-settings: "wdth" 96;
+        font-weight: 590;
+        letter-spacing: -0.035em;
+        line-height: 1.05;
+        text-wrap: balance;
+    }
+
+    .card-copy p {
+        margin: 0.9rem 0 0;
+        overflow: hidden;
+        color: #50695f;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+    }
+
+    .card-link {
+        margin-top: auto;
+        padding-top: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        color: #173f33;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.65rem;
+        font-weight: 680;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .card-link b {
+        color: #9c7b1d;
+        font-size: 1rem;
+        transition: transform 180ms ease;
+    }
+
+    .archive-card:hover,
+    .archive-card:focus-visible {
+        background: rgba(255, 255, 255, 0.52);
+        outline: none;
+    }
+
+    .archive-card:hover img,
+    .archive-card:focus-visible img {
+        transform: scale(1.035);
+        filter: saturate(0.88) contrast(1.04);
+    }
+
+    .archive-card:hover .card-link b,
+    .archive-card:focus-visible .card-link b {
+        transform: translate(3px, -3px);
+    }
+
+    .manifesto {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        color: #eee9dc;
+        background:
+            radial-gradient(circle at 78% 52%, rgba(48, 141, 108, 0.2), transparent 29%),
+            linear-gradient(132deg, #08281f, #071d1a 60%, #0b2526);
+    }
+
+    .manifesto-grid {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.22;
+        background-image:
+            linear-gradient(rgba(226, 215, 170, 0.09) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(226, 215, 170, 0.09) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(circle at 78% 50%, black, transparent 60%);
+    }
+
+    .manifesto-orbit {
+        position: absolute;
+        top: 50%;
+        right: -7vw;
+        width: min(45vw, 620px);
+        aspect-ratio: 1;
+        border: 1px solid rgba(221, 188, 74, 0.18);
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    .manifesto-orbit::before,
+    .manifesto-orbit::after,
+    .manifesto-orbit i {
+        content: "";
+        position: absolute;
+        border: 1px solid rgba(224, 203, 123, 0.12);
+        border-radius: 50%;
+    }
+
+    .manifesto-orbit::before { inset: 14%; }
+    .manifesto-orbit::after { inset: 29%; }
+    .manifesto-orbit i:nth-child(1) { inset: 44%; background: rgba(213, 178, 58, 0.35); box-shadow: 0 0 50px rgba(213, 178, 58, 0.26); }
+    .manifesto-orbit i:nth-child(2) { width: 8px; height: 8px; top: 18%; left: 34%; background: #d8b441; box-shadow: 0 0 15px #d8b441; }
+    .manifesto-orbit i:nth-child(3) { width: 6px; height: 6px; right: 16%; bottom: 28%; background: #65b095; box-shadow: 0 0 15px #65b095; }
+
+    .manifesto-shell {
+        position: relative;
+        z-index: 1;
+        width: min(1180px, calc(100% - 4rem));
+        margin: 0 auto;
+        padding: clamp(5.5rem, 11vw, 10rem) 0;
+    }
+
+    .manifesto .section-code {
+        color: #d4af3b;
+    }
+
+    .manifesto-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.7fr);
+        align-items: end;
+        gap: clamp(2.5rem, 8vw, 8rem);
+    }
+
+    .manifesto h2 {
+        max-width: 16ch;
+        color: #f1ede3;
+    }
+
+    .manifesto-layout > div > p {
+        margin: 0 0 1rem;
+        color: rgba(237, 234, 218, 0.66);
+        font-size: 0.98rem;
+        line-height: 1.55;
+    }
+
+    .manifesto-actions {
+        margin-top: 1.7rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+    }
+
+    .manifesto-actions a {
+        min-height: 48px;
+        padding: 0.65rem 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(225, 205, 126, 0.24);
+        color: #eee8d3;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 680;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .manifesto-actions .manifesto-primary {
+        border-color: #d3ad37;
+        color: #102219;
+        background: #d3ad37;
+    }
+
+    .manifesto-actions a:hover,
+    .manifesto-actions a:focus-visible {
+        border-color: #ead05d;
+        outline: none;
+    }
+
+    .manifesto-actions .manifesto-primary:hover,
+    .manifesto-actions .manifesto-primary:focus-visible {
+        background: #e5c44f;
+    }
+
+    @media (max-width: 880px) {
+        .archive-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .archive-card {
+            grid-template-columns: minmax(220px, 0.8fr) 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        .card-media {
+            aspect-ratio: 1;
+        }
+
+        .manifesto-orbit {
+            opacity: 0.5;
+        }
+    }
+
+    @media (max-width: 680px) {
+        .archive-shell,
+        .manifesto-shell {
+            width: calc(100% - 2rem);
+        }
+
+        .archive-header,
+        .manifesto-layout {
+            grid-template-columns: 1fr;
+            gap: 1.4rem;
+        }
+
+        .archive-header h2,
+        .manifesto h2 {
+            font-size: clamp(2.75rem, 13vw, 4.25rem);
+        }
+
+        .archive-grid {
+            display: grid;
+        }
+
+        .archive-card {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+        }
+
+        .card-media {
+            aspect-ratio: 16 / 10;
+        }
+
+        .manifesto-orbit {
+            top: 14%;
+            right: -28%;
+            width: 90vw;
+        }
+
+        .manifesto-actions {
+            display: grid;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .archive-card,
+        .card-media img,
+        .card-link b,
+        .archive-intro a span {
+            transition: none;
+        }
+    }
+</style>

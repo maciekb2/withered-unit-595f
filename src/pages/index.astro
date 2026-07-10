@@ -1,394 +1,115 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
+import EditorialArchive from '../components/EditorialArchive.astro';
 import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import SignalDashboard from '../components/SignalDashboard.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getCollection } from 'astro:content';
 import { buildTopicIndex } from '../utils/topics';
 
 const posts = (await getCollection('blog')).sort((a, b) => {
-        const dateDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-        return dateDiff === 0 ? b.id.localeCompare(a.id) : dateDiff;
+    const dateDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+    return dateDiff === 0 ? b.id.localeCompare(a.id) : dateDiff;
 });
 
 const shortDateFormatter = new Intl.DateTimeFormat('pl-PL', {
-        day: '2-digit',
-        month: 'short',
+    day: '2-digit',
+    month: 'short',
 });
 
 const longDateFormatter = new Intl.DateTimeFormat('pl-PL', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
 });
 
 const latestHeadlines = posts.slice(0, 6).map((post) => ({
-        title: post.data.title,
-        href: `/blog/${post.id}/`,
-        dateLabel: shortDateFormatter.format(post.data.pubDate),
+    title: post.data.title,
+    href: `/blog/${post.id}/`,
+    dateLabel: shortDateFormatter.format(post.data.pubDate),
 }));
 
-const latestArticles = posts.slice(0, 3).map((post) => ({
-        title: post.data.title,
-        description: post.data.description,
-        href: `/blog/${post.id}/`,
-        image: post.data.heroImage,
-        dateLabel: longDateFormatter.format(post.data.pubDate),
-}));
+const toArticleCard = (post: (typeof posts)[number]) => ({
+    title: post.data.title,
+    description: post.data.description,
+    href: `/blog/${post.id}/`,
+    image: post.data.heroImage,
+    dateLabel: longDateFormatter.format(post.data.pubDate),
+});
 
-const topicHighlights = buildTopicIndex(posts).slice(0, 5);
+const featuredArticle = posts[0] ? toArticleCard(posts[0]) : undefined;
+const archiveArticles = posts.slice(1, 4).map(toArticleCard);
+const topicHighlights = buildTopicIndex(posts).slice(0, 5).map((topic) => ({
+    slug: topic.slug,
+    name: topic.name,
+    count: topic.posts.length,
+    description: topic.description,
+}));
 
 const lastPublishedLabel = posts[0]
-        ? longDateFormatter.format(posts[0].data.pubDate)
-        : undefined;
+    ? longDateFormatter.format(posts[0].data.pubDate)
+    : undefined;
 ---
 
 <!doctype html>
 <html lang="pl">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-                <style>
-                        main.full-width-banner {
-                                width: 100%;
-                                max-width: none;
-                                margin: 0;
-                                padding: 0;
-                        }
-                        .intro {
-                                width: min(1120px, calc(100% - 2rem));
-                                margin: 0 auto;
-                                padding: clamp(3rem, 6vw, 5rem) 0;
-                        }
-                        .intro-grid {
-                                display: grid;
-                                grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.7fr);
-                                gap: clamp(1.5rem, 5vw, 4rem);
-                                align-items: start;
-                        }
-                        .intro-copy {
-                                max-width: 720px;
-                        }
-                        .section-label {
-                                margin: 0 0 0.65rem;
-                                color: var(--diplomatic-blue);
-                                font-size: 0.76rem;
-                                font-weight: 700;
-                                letter-spacing: 0.13em;
-                                text-transform: uppercase;
-                        }
-                        .intro h2,
-                        .latest h2,
-                        .topic-routes h2 {
-                                margin-bottom: 0.75rem;
-                                font-size: clamp(1.75rem, 3vw, 2.55rem);
-                                color: var(--charcoal);
-                                text-wrap: balance;
-                        }
-                        .intro p {
-                                max-width: 64ch;
-                                color: rgba(var(--gray-dark), 0.94);
-                        }
-                        .brief-list {
-                                margin: 0;
-                                padding: 0;
-                                display: grid;
-                                gap: 0.75rem;
-                                list-style: none;
-                        }
-                        .brief-list li {
-                                display: grid;
-                                grid-template-columns: auto 1fr;
-                                gap: 0.75rem;
-                                align-items: start;
-                                padding: 0.9rem 0;
-                                border-top: 1px solid rgba(var(--gray-dark), 0.16);
-                        }
-                        .brief-list li:last-child {
-                                border-bottom: 1px solid rgba(var(--gray-dark), 0.16);
-                        }
-                        .brief-list strong {
-                                color: var(--charcoal);
-                        }
-                        .brief-mark {
-                                display: inline-grid;
-                                place-items: center;
-                                width: 2rem;
-                                height: 2rem;
-                                border-radius: 50%;
-                                color: var(--charcoal);
-                                background: var(--gold-accent);
-                                font-size: 0.92rem;
-                        }
-                        .intro .buttons {
-                                display: flex;
-                                flex-wrap: wrap;
-                                gap: 1rem;
-                                margin-top: 2rem;
-                        }
-                        .intro .buttons a {
-                                display: inline-flex;
-                                align-items: center;
-                                min-height: 44px;
-                                padding: 0.6em 1.2em;
-                                text-decoration: none;
-                                border-radius: 999px;
-                                border: 1px solid var(--diplomatic-blue);
-                                font-weight: 700;
-                        }
-                        .intro .buttons a.primary {
-                                background: var(--diplomatic-blue);
-                                color: var(--ivory);
-                        }
-                        .intro .buttons a.primary:hover {
-                                background: var(--gold-accent);
-                                color: var(--charcoal);
-                        }
-                        .intro .buttons a.secondary {
-                                background: transparent;
-                                color: var(--diplomatic-blue);
-                        }
-                        .intro .buttons a.secondary:hover {
-                                background: var(--dusty-beige);
-                        }
-                        .latest,
-                        .topic-routes {
-                                background: #fff;
-                                border-top: 1px solid rgba(var(--gray-dark), 0.12);
-                                border-bottom: 1px solid rgba(var(--gray-dark), 0.12);
-                        }
-                        .latest-inner,
-                        .topic-routes-inner {
-                                width: min(1120px, calc(100% - 2rem));
-                                margin: 0 auto;
-                                padding: clamp(2.6rem, 5vw, 4.5rem) 0;
-                        }
-                        .latest-header {
-                                display: flex;
-                                align-items: end;
-                                justify-content: space-between;
-                                gap: 1.5rem;
-                                margin-bottom: 1.4rem;
-                        }
-                        .latest-header p {
-                                max-width: 42ch;
-                                margin: 0;
-                                color: rgba(var(--gray-dark), 0.88);
-                        }
-                        .latest-grid {
-                                display: grid;
-                                grid-template-columns: repeat(3, minmax(0, 1fr));
-                                gap: 1rem;
-                        }
-                        .article-card {
-                                display: grid;
-                                grid-template-rows: auto 1fr;
-                                min-height: 100%;
-                                overflow: hidden;
-                                color: inherit;
-                                text-decoration: none;
-                                border: 1px solid rgba(var(--gray-dark), 0.14);
-                                border-radius: 8px;
-                                background: var(--ivory);
-                                box-shadow: 0 10px 26px rgba(var(--gray-dark), 0.08);
-                                transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-                        }
-                        .article-card:hover {
-                                transform: translateY(-3px);
-                                border-color: rgba(203, 161, 53, 0.55);
-                                box-shadow: 0 16px 34px rgba(var(--gray-dark), 0.14);
-                        }
-                        .article-card img {
-                                width: 100%;
-                                aspect-ratio: 16 / 10;
-                                object-fit: cover;
-                                border-radius: 0;
-                                background: var(--dusty-beige);
-                        }
-                        .article-card-body {
-                                display: grid;
-                                gap: 0.55rem;
-                                padding: 1rem;
-                        }
-                        .article-card time {
-                                color: var(--diplomatic-blue);
-                                font-size: 0.76rem;
-                                font-weight: 700;
-                                letter-spacing: 0.08em;
-                                text-transform: uppercase;
-                        }
-                        .article-card h3 {
-                                margin: 0;
-                                font-size: 1.05rem;
-                                line-height: 1.25;
-                                color: var(--charcoal);
-                        }
-                        .article-card p {
-                                margin: 0;
-                                color: rgba(var(--gray-dark), 0.9);
-                                font-size: 0.92rem;
-                                line-height: 1.5;
-                        }
-                        .topic-routes {
-                                background: var(--ivory);
-                        }
-                        .topic-routes-header {
-                                display: flex;
-                                align-items: end;
-                                justify-content: space-between;
-                                gap: 1.5rem;
-                                margin-bottom: 1.4rem;
-                        }
-                        .topic-routes-header p {
-                                max-width: 44ch;
-                                margin: 0;
-                                color: rgba(var(--gray-dark), 0.88);
-                        }
-                        .topic-pills {
-                                display: flex;
-                                flex-wrap: wrap;
-                                gap: 0.75rem;
-                                margin: 0;
-                                padding: 0;
-                                list-style: none;
-                        }
-                        .topic-pills a {
-                                display: inline-flex;
-                                align-items: center;
-                                min-height: 44px;
-                                padding: 0.62rem 0.92rem;
-                                border: 1px solid rgba(28, 61, 90, 0.16);
-                                border-radius: 999px;
-                                color: var(--diplomatic-blue);
-                                background: #fff;
-                                font-weight: 700;
-                                text-decoration: none;
-                                box-shadow: 0 8px 18px rgba(var(--gray-dark), 0.07);
-                                transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
-                        }
-                        .topic-pills a:hover,
-                        .topic-pills a:focus-visible {
-                                transform: translateY(-2px);
-                                border-color: rgba(203, 161, 53, 0.66);
-                                box-shadow: 0 12px 24px rgba(var(--gray-dark), 0.12);
-                                outline: none;
-                        }
-                        @media (max-width: 860px) {
-                                .intro-grid,
-                                .latest-grid {
-                                        grid-template-columns: 1fr;
-                                }
-                                .latest-header,
-                                .topic-routes-header {
-                                        align-items: start;
-                                        flex-direction: column;
-                                }
-                        }
-                        @media (max-width: 520px) {
-                                .intro,
-                                .latest-inner,
-                                .topic-routes-inner {
-                                        width: min(100%, calc(100% - 1.2rem));
-                                }
-                                .intro .buttons {
-                                        display: grid;
-                                }
-                                .intro .buttons a {
-                                        justify-content: center;
-                                }
-                        }
-                </style>
-        </head>
-        <body>
-                <Header />
-                <main class="full-width-banner">
-                        <Hero
-                                liveHeadlines={latestHeadlines}
-                                articleCount={posts.length}
-                                lastPublishedLabel={lastPublishedLabel}
-                        />
-                        <section class="intro" id="intro">
-                                <div class="intro-grid">
-                                        <div class="intro-copy">
-                                                <p class="section-label">O stronie</p>
-                                                <h2>O świecie da się pisać bez miny eksperta</h2>
-                                                <p>
-                                                        Pseudointelekt.pl to miejsce dla tych, którzy chcą czytać o polityce,
-                                                        konfliktach i dyplomacji bez akademickiej mgły i medialnego nadęcia.
-                                                        Jest kontekst, jest ironia, jest nieufność wobec gotowych odpowiedzi.
-                                                </p>
-                                                <p>
-                                                        Nie udaję, że mam mapę do przyszłości. Wolę sprawdzać, gdzie narracje
-                                                        zderzają się z interesami, a wielkie deklaracje z codziennym absurdem.
-                                                </p>
-                                                <div class="buttons">
-                                                        <a href="/blog" class="primary">Czytaj blog</a>
-                                                        <a href="/about" class="secondary">Kim jestem</a>
-                                                </div>
-                                        </div>
-                                        <ul class="brief-list" aria-label="Charakter publikacji">
-                                                <li>
-                                                        <span class="brief-mark">1</span>
-                                                        <span><strong>Szybki kontekst.</strong> Temat dnia bez udawania depeszy agencyjnej.</span>
-                                                </li>
-                                                <li>
-                                                        <span class="brief-mark">2</span>
-                                                        <span><strong>Satyryczny filtr.</strong> Wielka polityka brzmi inaczej, gdy zdjąć jej krawat.</span>
-                                                </li>
-                                                <li>
-                                                        <span class="brief-mark">3</span>
-                                                        <span><strong>Czytelny format.</strong> Krótki punkt wejścia, mocny obraz i komentarz, który nie potrzebuje przypisów do każdej ironii.</span>
-                                                </li>
-                                        </ul>
-                                </div>
-                        </section>
-                        <section class="topic-routes" aria-labelledby="topic-routes-title">
-                                <div class="topic-routes-inner">
-                                        <div class="topic-routes-header">
-                                                <div>
-                                                        <p class="section-label">Ścieżki tematyczne</p>
-                                                        <h2 id="topic-routes-title">Nie tylko najnowsze, także powracające</h2>
-                                                </div>
-                                                <p>Stałe tematy zbierają podobne teksty w jednym miejscu, zamiast chować je po datach.</p>
-                                        </div>
-                                        <ul class="topic-pills" aria-label="Najważniejsze tematy">
-                                                {topicHighlights.map((topic) => (
-                                                        <li>
-                                                                <a href={`/tematy/${topic.slug}/`}>
-                                                                        {topic.name} · {topic.posts.length}
-                                                                </a>
-                                                        </li>
-                                                ))}
-                                                <li><a href="/tematy/">Wszystkie tematy</a></li>
-                                        </ul>
-                                </div>
-                        </section>
-                        <section class="latest" aria-labelledby="latest-title">
-                                <div class="latest-inner">
-                                        <div class="latest-header">
-                                                <div>
-                                                        <p class="section-label">Najnowsze wpisy</p>
-                                                        <h2 id="latest-title">Ostatnie teksty bez dyplomatycznej waty</h2>
-                                                </div>
-                                                <p>Trzy najświeższe wpisy, zanim temat dnia przebierze się w kolejny komunikat.</p>
-                                        </div>
-                                        <div class="latest-grid">
-                                                {latestArticles.map((article) => (
-                                                        <a class="article-card" href={article.href}>
-                                                                {article.image && (
-                                                                        <img src={article.image} alt="" loading="lazy" />
-                                                                )}
-                                                                <div class="article-card-body">
-                                                                        <time>{article.dateLabel}</time>
-                                                                        <h3>{article.title}</h3>
-                                                                        <p>{article.description}</p>
-                                                                </div>
-                                                        </a>
-                                                ))}
-                                        </div>
-                                </div>
-                        </section>
-                </main>
-                <Footer />
-	</body>
+    <head>
+        <BaseHead
+            title={SITE_TITLE}
+            description={SITE_DESCRIPTION}
+            image={featuredArticle?.image}
+        />
+        <meta name="theme-color" content="#061d18" />
+        <style>
+            main.home-main {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .skip-link {
+                position: fixed;
+                top: 0.75rem;
+                left: 0.75rem;
+                z-index: 1000;
+                padding: 0.65rem 0.85rem;
+                color: #0b261e;
+                background: #e2bd4d;
+                text-decoration: none;
+                transform: translateY(-160%);
+                transition: transform 160ms ease;
+            }
+
+            .skip-link:focus {
+                transform: translateY(0);
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .skip-link { transition: none; }
+            }
+        </style>
+    </head>
+    <body data-page-section="home">
+        <a class="skip-link" href="#aktualny-sygnal">Przejdź do treści</a>
+        <Header overlay />
+        <main class="home-main">
+            <Hero
+                liveHeadlines={latestHeadlines}
+                articleCount={posts.length}
+                lastPublishedLabel={lastPublishedLabel}
+            />
+            <SignalDashboard
+                featured={featuredArticle}
+                topics={topicHighlights}
+                headlines={latestHeadlines}
+                articleCount={posts.length}
+                lastPublishedLabel={lastPublishedLabel}
+            />
+            <EditorialArchive articles={archiveArticles} />
+        </main>
+        <Footer />
+    </body>
 </html>

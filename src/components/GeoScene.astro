@@ -1,0 +1,589 @@
+<div class="geo-scene" data-geo-scene aria-hidden="true">
+    <canvas data-geo-canvas></canvas>
+    <div class="geo-fallback">
+        <div class="fallback-globe">
+            <span class="fallback-latitude latitude-a"></span>
+            <span class="fallback-latitude latitude-b"></span>
+            <span class="fallback-axis"></span>
+            <span class="fallback-scan"></span>
+            <i class="fallback-node node-a"></i>
+            <i class="fallback-node node-b"></i>
+            <i class="fallback-node node-c"></i>
+            <i class="fallback-node node-d"></i>
+        </div>
+    </div>
+</div>
+
+<script>
+    import type {
+        Mesh as ThreeMesh,
+        MeshBasicMaterial as ThreeMeshBasicMaterial,
+        QuadraticBezierCurve3 as ThreeQuadraticBezierCurve3,
+        WebGLRenderer as ThreeWebGLRenderer,
+    } from 'three';
+
+    type NetworkInformation = {
+        saveData?: boolean;
+    };
+
+    type NavigatorWithConnection = Navigator & {
+        connection?: NetworkInformation;
+    };
+
+    type TrackWindow = Window & {
+        pseudointelektTrack?: (eventName: string, params?: Record<string, unknown>) => void;
+    };
+
+    const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+
+    const sceneRoots = document.querySelectorAll<HTMLElement>('[data-geo-scene]');
+
+    sceneRoots.forEach(async (sceneRoot) => {
+        const canvas = sceneRoot.querySelector<HTMLCanvasElement>('[data-geo-canvas]');
+        const cinema = sceneRoot.closest<HTMLElement>('[data-scroll-cinema]');
+
+        if (!canvas || !cinema) return;
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const saveData = Boolean((navigator as NavigatorWithConnection).connection?.saveData);
+
+        if (reducedMotion || saveData) {
+            cinema.classList.remove('is-enhanced');
+            cinema.dataset.sceneMode = reducedMotion ? 'reduced-motion' : 'save-data';
+            return;
+        }
+
+        const onStoryEntry = (event: Event) => {
+            const target = event.currentTarget;
+            if (!(target instanceof HTMLAnchorElement)) return;
+            event.preventDefault();
+            const cinemaTop = cinema.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({
+                top: cinemaTop + window.innerHeight * 0.95,
+                behavior: 'smooth',
+            });
+            (window as TrackWindow).pseudointelektTrack?.('home_primary_cta_click', {
+                cta_target: 'story',
+            });
+        };
+
+        cinema.querySelectorAll<HTMLElement>('[data-story-entry]').forEach((entry) => {
+            entry.addEventListener('click', onStoryEntry);
+        });
+
+        cinema.dataset.sceneMode = 'standby';
+
+        await new Promise<void>((resolve) => {
+            const activate = () => {
+                sceneRoot.removeEventListener('pointermove', activate);
+                sceneRoot.removeEventListener('pointerdown', activate);
+                window.removeEventListener('scroll', activate);
+                window.removeEventListener('keydown', activate);
+                resolve();
+            };
+
+            sceneRoot.addEventListener('pointermove', activate, { once: true, passive: true });
+            sceneRoot.addEventListener('pointerdown', activate, { once: true, passive: true });
+            window.addEventListener('scroll', activate, { once: true, passive: true });
+            window.addEventListener('keydown', activate, { once: true });
+
+            if (window.scrollY > 4) queueMicrotask(activate);
+        });
+
+        let three: typeof import('three');
+        try {
+            three = await import('three');
+        } catch {
+            cinema.classList.remove('is-enhanced');
+            cinema.dataset.sceneMode = 'fallback';
+            return;
+        }
+
+        const {
+            AdditiveBlending,
+            AmbientLight,
+            BackSide,
+            BufferGeometry,
+            Color,
+            DirectionalLight,
+            Float32BufferAttribute,
+            FogExp2,
+            Group,
+            MathUtils,
+            Mesh,
+            MeshBasicMaterial,
+            MeshStandardMaterial,
+            PerspectiveCamera,
+            Points,
+            PointsMaterial,
+            QuadraticBezierCurve3,
+            Scene,
+            SphereGeometry,
+            SRGBColorSpace,
+            TorusGeometry,
+            TubeGeometry,
+            Vector3,
+            WebGLRenderer,
+        } = three;
+
+        const latLonToVector = (latitude: number, longitude: number, radius = 1.48) => {
+            const phi = MathUtils.degToRad(90 - latitude);
+            const theta = MathUtils.degToRad(longitude + 180);
+            return new Vector3(
+                -radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta),
+            );
+        };
+
+        let renderer: ThreeWebGLRenderer;
+        try {
+            renderer = new WebGLRenderer({
+                canvas,
+                alpha: true,
+                antialias: window.innerWidth > 720,
+                powerPreference: 'high-performance',
+            });
+        } catch {
+            cinema.dataset.sceneMode = 'fallback';
+            return;
+        }
+
+        renderer.setClearColor(0x000000, 0);
+        renderer.outputColorSpace = SRGBColorSpace;
+
+        const scene = new Scene();
+        scene.fog = new FogExp2(new Color(0x041b17), 0.085);
+
+        const camera = new PerspectiveCamera(40, 1, 0.1, 100);
+        camera.position.set(0, 0, 5.8);
+
+        const world = new Group();
+        scene.add(world);
+
+        const detail = window.innerWidth < 720 ? 40 : 64;
+        const globeGeometry = new SphereGeometry(1.45, detail, detail);
+        const globeMaterial = new MeshStandardMaterial({
+            color: 0x073e30,
+            emissive: 0x04231d,
+            emissiveIntensity: 0.7,
+            metalness: 0.12,
+            roughness: 0.72,
+            transparent: true,
+            opacity: 0.98,
+        });
+        const globe = new Mesh(globeGeometry, globeMaterial);
+        world.add(globe);
+
+        const wireMaterial = new MeshBasicMaterial({
+            color: 0xd9c273,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.085,
+        });
+        const wire = new Mesh(globeGeometry, wireMaterial);
+        wire.scale.setScalar(1.006);
+        world.add(wire);
+
+        const atmosphere = new Mesh(
+            new SphereGeometry(1.58, 48, 48),
+            new MeshBasicMaterial({
+                color: 0x3da987,
+                side: BackSide,
+                transparent: true,
+                opacity: 0.13,
+                blending: AdditiveBlending,
+            }),
+        );
+        world.add(atmosphere);
+
+        const signalMaterial = new MeshBasicMaterial({
+            color: 0xe3bd4d,
+            transparent: true,
+            opacity: 0.22,
+            blending: AdditiveBlending,
+        });
+        const coolSignalMaterial = new MeshBasicMaterial({
+            color: 0x62b7af,
+            transparent: true,
+            opacity: 0.16,
+            blending: AdditiveBlending,
+        });
+
+        const locations = [
+            [52.23, 21.01],
+            [38.9, -77.04],
+            [39.9, 116.4],
+            [35.69, 51.39],
+            [50.11, 8.68],
+            [41.01, 28.98],
+            [-1.29, 36.82],
+        ] as const;
+
+        const vectors = locations.map(([lat, lon]) => latLonToVector(lat, lon));
+        const nodeGeometry = new SphereGeometry(0.035, 12, 12);
+        vectors.forEach((position, index) => {
+            const node = new Mesh(
+                nodeGeometry,
+                index % 3 === 0 ? signalMaterial : coolSignalMaterial,
+            );
+            node.position.copy(position);
+            node.scale.setScalar(index === 0 ? 1.4 : 1);
+            world.add(node);
+        });
+
+        const arcPairs = [
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [1, 4],
+            [2, 5],
+            [3, 6],
+        ] as const;
+        const curves: ThreeQuadraticBezierCurve3[] = [];
+        const arcMeshes: ThreeMesh[] = [];
+
+        arcPairs.forEach(([from, to], index) => {
+            const start = vectors[from];
+            const end = vectors[to];
+            const midpoint = start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(2.12);
+            const curve = new QuadraticBezierCurve3(start, midpoint, end);
+            const material = (index % 2 === 0 ? signalMaterial : coolSignalMaterial).clone();
+            const arc = new Mesh(new TubeGeometry(curve, 48, 0.008, 5, false), material);
+            curves.push(curve);
+            arcMeshes.push(arc);
+            world.add(arc);
+        });
+
+        const pulseGeometry = new SphereGeometry(0.025, 10, 10);
+        const pulses = curves.map((curve, index) => {
+            const pulse = new Mesh(
+                pulseGeometry,
+                index % 2 === 0 ? signalMaterial : coolSignalMaterial,
+            );
+            pulse.userData.curve = curve;
+            pulse.userData.offset = index / curves.length;
+            world.add(pulse);
+            return pulse;
+        });
+
+        const scanRing = new Mesh(
+            new TorusGeometry(1.78, 0.008, 6, 160),
+            new MeshBasicMaterial({
+                color: 0xdab348,
+                transparent: true,
+                opacity: 0.28,
+                blending: AdditiveBlending,
+            }),
+        );
+        scanRing.rotation.x = Math.PI * 0.58;
+        scanRing.rotation.y = Math.PI * 0.16;
+        world.add(scanRing);
+
+        const secondaryRing = new Mesh(
+            new TorusGeometry(1.93, 0.004, 5, 144),
+            new MeshBasicMaterial({
+                color: 0x75c3ba,
+                transparent: true,
+                opacity: 0.13,
+                blending: AdditiveBlending,
+            }),
+        );
+        secondaryRing.rotation.x = Math.PI * 0.38;
+        secondaryRing.rotation.y = -Math.PI * 0.2;
+        world.add(secondaryRing);
+
+        const starGeometry = new BufferGeometry();
+        const starPositions: number[] = [];
+        const starCount = window.innerWidth < 720 ? 170 : 320;
+        for (let index = 0; index < starCount; index += 1) {
+            const radius = 5 + Math.random() * 7;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            starPositions.push(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta),
+            );
+        }
+        starGeometry.setAttribute('position', new Float32BufferAttribute(starPositions, 3));
+        const stars = new Points(
+            starGeometry,
+            new PointsMaterial({
+                color: 0xd7e3d6,
+                size: 0.018,
+                transparent: true,
+                opacity: 0.38,
+                depthWrite: false,
+            }),
+        );
+        scene.add(stars);
+
+        scene.add(new AmbientLight(0x82ae98, 1.35));
+        const keyLight = new DirectionalLight(0xf4d56f, 3.2);
+        keyLight.position.set(3.5, 2.2, 4.5);
+        scene.add(keyLight);
+        const rimLight = new DirectionalLight(0x5eb9ae, 2.2);
+        rimLight.position.set(-3.5, -1.2, -2.5);
+        scene.add(rimLight);
+
+        let scrollProgress = 0;
+        let pointerX = 0;
+        let pointerY = 0;
+        let frameId = 0;
+        let isVisible = true;
+        let storyStarted = false;
+        let storyCompleted = false;
+
+        const resize = () => {
+            const rect = sceneRoot.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            const mobile = rect.width < 720;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.75));
+            renderer.setSize(rect.width, rect.height, false);
+            camera.aspect = rect.width / rect.height;
+            camera.updateProjectionMatrix();
+            requestRender();
+        };
+
+        const updateProgress = () => {
+            const rect = cinema.getBoundingClientRect();
+            const scrollable = Math.max(1, rect.height - window.innerHeight);
+            scrollProgress = clamp01(-rect.top / scrollable);
+            cinema.style.setProperty('--story-progress', scrollProgress.toFixed(4));
+
+            const chapter = scrollProgress < 0.18
+                ? 0
+                : scrollProgress < 0.43
+                    ? 1
+                    : scrollProgress < 0.69
+                        ? 2
+                        : 3;
+            cinema.dataset.activeChapter = String(chapter);
+
+            const trackWindow = window as TrackWindow;
+            if (scrollProgress > 0.12 && !storyStarted) {
+                storyStarted = true;
+                trackWindow.pseudointelektTrack?.('home_story_start');
+            }
+            if (scrollProgress > 0.92 && !storyCompleted) {
+                storyCompleted = true;
+                trackWindow.pseudointelektTrack?.('home_story_complete');
+            }
+            requestRender();
+        };
+
+        const render = () => {
+            frameId = 0;
+            if (!isVisible || document.hidden) return;
+
+            const elapsed = performance.now() / 1000;
+
+            const mobile = window.innerWidth < 760;
+            world.position.x = mobile ? 0.12 : 1.25 - scrollProgress * 0.18;
+            world.position.y = mobile ? 0.74 - scrollProgress * 0.34 : 0.04;
+            world.rotation.x = 0.1 - scrollProgress * 0.22 + pointerY * 0.08;
+            world.rotation.y = -0.52 + scrollProgress * 1.9 + elapsed * 0.035 + pointerX * 0.12;
+            world.rotation.z = -0.04 + scrollProgress * 0.12;
+
+            const storyScale = 1 + Math.sin(scrollProgress * Math.PI) * 0.08;
+            world.scale.setScalar(mobile ? storyScale * 0.84 : storyScale);
+            camera.position.z = 5.8 - scrollProgress * 0.42;
+            camera.position.x = scrollProgress > 0.68 ? -0.14 : 0;
+
+            const signalStrength = 0.14 + clamp01((scrollProgress - 0.1) * 2.8) * 0.68;
+            arcMeshes.forEach((arc, index) => {
+                const material = arc.material as ThreeMeshBasicMaterial;
+                material.opacity = signalStrength * (index % 2 === 0 ? 1 : 0.7);
+            });
+
+            pulses.forEach((pulse, index) => {
+                const curve = pulse.userData.curve as ThreeQuadraticBezierCurve3;
+                const offset = pulse.userData.offset as number;
+                const point = curve.getPoint((elapsed * 0.11 + offset + scrollProgress * 0.18) % 1);
+                pulse.position.copy(point);
+                pulse.scale.setScalar(0.8 + Math.sin(elapsed * 3 + index) * 0.25);
+            });
+
+            scanRing.rotation.z = elapsed * 0.16 + scrollProgress * Math.PI * 1.5;
+            secondaryRing.rotation.z = -elapsed * 0.09 - scrollProgress * Math.PI;
+            stars.rotation.y = elapsed * 0.006 + scrollProgress * 0.12;
+            stars.rotation.x = scrollProgress * 0.04;
+
+            renderer.render(scene, camera);
+        };
+
+        const requestRender = () => {
+            if (frameId === 0 && isVisible && !document.hidden) {
+                frameId = window.requestAnimationFrame(render);
+            }
+        };
+
+        const onPointerMove = (event: PointerEvent) => {
+            pointerX = event.clientX / window.innerWidth - 0.5;
+            pointerY = event.clientY / window.innerHeight - 0.5;
+            requestRender();
+        };
+
+        sceneRoot.dataset.ready = 'true';
+        cinema.dataset.sceneMode = 'webgl';
+        cinema.classList.add('is-enhanced');
+        resize();
+        updateProgress();
+
+        const resizeObserver = new ResizeObserver(resize);
+        resizeObserver.observe(sceneRoot);
+
+        const visibilityObserver = new IntersectionObserver(([entry]) => {
+            isVisible = Boolean(entry?.isIntersecting);
+            if (isVisible) requestRender();
+            else if (frameId !== 0) {
+                window.cancelAnimationFrame(frameId);
+                frameId = 0;
+            }
+        }, { rootMargin: '20% 0px' });
+        visibilityObserver.observe(cinema);
+
+        cinema.addEventListener('pointermove', onPointerMove, { passive: true });
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        window.addEventListener('resize', updateProgress, { passive: true });
+        document.addEventListener('visibilitychange', requestRender);
+        requestRender();
+
+        window.addEventListener('pagehide', () => {
+            if (frameId !== 0) window.cancelAnimationFrame(frameId);
+            resizeObserver.disconnect();
+            visibilityObserver.disconnect();
+            renderer.dispose();
+            globeGeometry.dispose();
+            nodeGeometry.dispose();
+            pulseGeometry.dispose();
+            starGeometry.dispose();
+            globeMaterial.dispose();
+            wireMaterial.dispose();
+            signalMaterial.dispose();
+            coolSignalMaterial.dispose();
+        }, { once: true });
+    });
+</script>
+
+<style>
+    .geo-scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 800ms ease;
+    }
+
+    .geo-scene[data-ready="true"] canvas {
+        opacity: 1;
+    }
+
+    .geo-fallback {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        transform: translateX(min(24vw, 260px));
+        transition: opacity 500ms ease;
+    }
+
+    .geo-scene[data-ready="true"] .geo-fallback {
+        opacity: 0;
+    }
+
+    .fallback-globe {
+        position: relative;
+        width: min(48vw, 590px);
+        aspect-ratio: 1;
+        border: 1px solid rgba(220, 190, 93, 0.3);
+        border-radius: 50%;
+        background:
+            radial-gradient(circle at 68% 28%, rgba(222, 188, 72, 0.3), transparent 16%),
+            radial-gradient(circle at 42% 60%, rgba(72, 165, 136, 0.22), transparent 52%),
+            #07392d;
+        box-shadow:
+            inset -44px -24px 86px rgba(0, 0, 0, 0.48),
+            0 0 120px rgba(38, 136, 102, 0.22);
+    }
+
+    .fallback-globe::before,
+    .fallback-globe::after,
+    .fallback-latitude,
+    .fallback-axis {
+        content: "";
+        position: absolute;
+        border: 1px solid rgba(230, 220, 173, 0.18);
+        border-radius: 50%;
+    }
+
+    .fallback-globe::before {
+        inset: 9% 36%;
+    }
+
+    .fallback-globe::after {
+        inset: 0 18%;
+    }
+
+    .fallback-latitude {
+        left: 4%;
+        right: 4%;
+        height: 30%;
+    }
+
+    .latitude-a { top: 18%; }
+    .latitude-b { bottom: 18%; }
+
+    .fallback-axis {
+        inset: 42% 0;
+    }
+
+    .fallback-scan {
+        position: absolute;
+        inset: -8%;
+        border: 1px dashed rgba(211, 177, 66, 0.22);
+        border-radius: 50%;
+        transform: rotate(-18deg);
+    }
+
+    .fallback-node {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #e3bd4d;
+        box-shadow: 0 0 20px #e3bd4d;
+    }
+
+    .node-a { left: 24%; top: 31%; }
+    .node-b { right: 23%; top: 42%; }
+    .node-c { left: 46%; bottom: 21%; }
+    .node-d { right: 38%; top: 20%; }
+
+    @media (max-width: 760px) {
+        .geo-fallback {
+            align-items: start;
+            padding-top: 5.75rem;
+            transform: none;
+        }
+
+        .fallback-globe {
+            width: min(82vw, 430px);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        canvas {
+            display: none;
+        }
+    }
+</style>

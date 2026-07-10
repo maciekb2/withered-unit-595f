@@ -2,7 +2,7 @@
 import HeaderLink from './HeaderLink.astro';
 ---
 
-<div class="menu">
+<div class="menu" id="site-menu">
     <HeaderLink href="/">Strona główna</HeaderLink>
     <HeaderLink href="/blog">Blog</HeaderLink>
     <HeaderLink href="/tematy">Tematy</HeaderLink>
@@ -15,23 +15,51 @@ import HeaderLink from './HeaderLink.astro';
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: clamp(0.7rem, 1.6vw, 1.15rem);
+        gap: clamp(1rem, 2.15vw, 1.8rem);
         min-width: 0;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .menu::-webkit-scrollbar {
-        display: none;
     }
 
     @media (max-width: 760px) {
         .menu {
-            justify-content: flex-start;
-            width: 100%;
-            gap: 0.75rem;
-            padding: 0.08rem 0 0.18rem;
+            position: absolute;
+            top: calc(100% - 1px);
+            left: 0;
+            right: 0;
+            padding: 0.75rem;
+            display: grid;
+            align-items: stretch;
+            justify-content: stretch;
+            gap: 0;
+            border: 1px solid rgba(220, 188, 73, 0.2);
+            background: rgba(4, 28, 22, 0.98);
+            box-shadow: 0 24px 44px rgba(0, 10, 7, 0.38);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
         }
+
+        :global([data-site-header].menu-open) .menu {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .menu :global(a) {
+            width: 100%;
+            min-height: 48px;
+            padding: 0.65rem 0.35rem;
+            border-bottom: 1px solid rgba(224, 208, 145, 0.1);
+        }
+
+        .menu :global(a:last-child) {
+            border-bottom: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .menu { transition: none; }
     }
 </style>

@@ -28,7 +28,7 @@
   box-sizing: border-box;
 }
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 @font-face {
   font-family: "Atkinson";
@@ -58,7 +58,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 main {
   width: 720px;

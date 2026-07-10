@@ -4,28 +4,134 @@ const today = new Date();
 ---
 
 <footer>
-        &copy; {today.getFullYear()} {SITE_TITLE}. Wszelkie prawa zastrzeżone.
-        <div class="privacy"><a href="/privacy">Polityka prywatności</a></div>
+        <div class="footer-shell">
+                <a class="footer-brand" href="/" aria-label={`${SITE_TITLE} — strona główna`}>
+                        <img src="/pseudointelekt_logo_tekstura.svg" alt="" width="620" height="115" />
+                </a>
+                <p>
+                        Geopolityka, narracje i dystans.<br />Bez certyfikatu nieomylności.
+                </p>
+                <nav aria-label="Linki w stopce">
+                        <a href="/blog">Blog</a>
+                        <a href="/about">O mnie</a>
+                        <a href="/contact">Kontakt</a>
+                        <a href="/privacy">Prywatność</a>
+                </nav>
+        </div>
+        <div class="footer-bottom">
+                <span>&copy; {today.getFullYear()} {SITE_TITLE}</span>
+                <span>PSEUDO//INTEL · WARSZAWA</span>
+        </div>
 </footer>
+
 <style>
         footer {
                 width: 100%;
                 margin-top: auto;
-                padding: 0.5em 1em;
-                background: linear-gradient(var(--gray-gradient)) no-repeat;
-                color: rgb(var(--gray));
-                text-align: center;
+                padding: 0 2rem;
+                color: rgba(236, 230, 206, 0.68);
+                background: #03130f;
+                border-top: 1px solid rgba(215, 181, 61, 0.18);
                 box-sizing: border-box;
         }
-	.privacy {
-	margin-top: 0.5em;
-	}
-	.privacy a {
-	text-decoration: none;
-	color: rgb(var(--gray));
-	}
-	.privacy a:hover {
-	color: rgb(var(--gray-dark));
-	text-decoration: underline;
-	}
+
+        .footer-shell,
+        .footer-bottom {
+                width: min(1180px, 100%);
+                margin: 0 auto;
+        }
+
+        .footer-shell {
+                min-height: 160px;
+                padding: 2.5rem 0;
+                display: grid;
+                grid-template-columns: minmax(200px, 1fr) minmax(240px, 1fr) auto;
+                align-items: center;
+                gap: 2rem;
+        }
+
+        .footer-brand {
+                width: min(240px, 100%);
+                display: block;
+        }
+
+        .footer-brand img {
+                display: block;
+                width: 100%;
+                height: auto;
+                border-radius: 0;
+        }
+
+        .footer-shell p {
+                margin: 0;
+                color: rgba(236, 230, 206, 0.66);
+                font-size: 0.78rem;
+                line-height: 1.55;
+        }
+
+        nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 0.6rem 1rem;
+        }
+
+        nav a {
+                min-height: 40px;
+                display: inline-flex;
+                align-items: center;
+                color: rgba(240, 234, 213, 0.68);
+                font-family: "Archivo Variable", "Atkinson", sans-serif;
+                font-size: 0.66rem;
+                font-weight: 620;
+                letter-spacing: 0.06em;
+                text-decoration: none;
+                text-transform: uppercase;
+        }
+
+        nav a:hover,
+        nav a:focus-visible {
+                color: #dfbd4c;
+                outline: none;
+        }
+
+        .footer-bottom {
+                min-height: 54px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                border-top: 1px solid rgba(225, 208, 144, 0.1);
+                color: rgba(231, 223, 191, 0.64);
+                font-family: "Archivo Variable", "Atkinson", sans-serif;
+                font-size: 0.53rem;
+                letter-spacing: 0.12em;
+        }
+
+        @media (max-width: 760px) {
+                footer {
+                        padding: 0 1rem;
+                }
+
+                .footer-shell {
+                        grid-template-columns: 1fr;
+                        gap: 1.2rem;
+                        padding: 2.4rem 0;
+                }
+
+                .footer-brand {
+                        width: 210px;
+                }
+
+                nav {
+                        justify-content: flex-start;
+                }
+
+                .footer-bottom {
+                        align-items: flex-start;
+                        flex-direction: column;
+                        justify-content: center;
+                        gap: 0.25rem;
+                }
+        }
 </style>

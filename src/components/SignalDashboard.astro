@@ -1,0 +1,646 @@
+---
+type FeaturedArticle = {
+    title: string;
+    description: string;
+    href: string;
+    image?: string;
+    dateLabel: string;
+};
+
+type Topic = {
+    slug: string;
+    name: string;
+    count: number;
+    description: string;
+};
+
+type Headline = {
+    title: string;
+    href: string;
+    dateLabel?: string;
+};
+
+interface Props {
+    featured?: FeaturedArticle;
+    topics?: Topic[];
+    headlines?: Headline[];
+    articleCount?: number;
+    lastPublishedLabel?: string;
+}
+
+const {
+    featured,
+    topics = [],
+    headlines = [],
+    articleCount = 0,
+    lastPublishedLabel,
+} = Astro.props as Props;
+---
+
+<section class="signal-dashboard" id="aktualny-sygnal" aria-labelledby="signal-title">
+    <div class="dashboard-shell">
+        <header class="dashboard-header">
+            <div>
+                <p class="section-code">PANEL / 04</p>
+                <h2 id="signal-title">Aktualny sygnał</h2>
+            </div>
+            <p>
+                Bez czerwonego telefonu i bez mapy z pinezkami. Najnowszy temat,
+                archiwum i kierunki obserwacji w jednym obrazie sytuacyjnym.
+            </p>
+        </header>
+
+        <div class="dashboard-grid">
+            {featured && (
+                <a
+                    class="featured-signal"
+                    href={featured.href}
+                    data-track-home-article="featured"
+                >
+                    {featured.image && (
+                        <img src={featured.image} alt="" loading="lazy" decoding="async" />
+                    )}
+                    <span class="featured-shade" aria-hidden="true"></span>
+                    <div class="featured-status">
+                        <span><i></i> OSTATNIA DEPESZA</span>
+                        <time>{featured.dateLabel}</time>
+                    </div>
+                    <div class="featured-copy">
+                        <p>Najnowsza analiza</p>
+                        <h3>{featured.title}</h3>
+                        <span class="featured-description">{featured.description}</span>
+                        <span class="featured-link">Otwórz briefing <b aria-hidden="true">↗</b></span>
+                    </div>
+                </a>
+            )}
+
+            <aside class="status-console" aria-label="Stan serwisu">
+                <div class="console-head">
+                    <span>STATUS REDAKCJI</span>
+                    <span class="console-ok">NOMINALNY</span>
+                </div>
+                <dl class="console-metrics">
+                    <div>
+                        <dt>Archiwum</dt>
+                        <dd>{String(articleCount).padStart(2, '0')}</dd>
+                        <dd class="metric-note">opublikowanych tekstów</dd>
+                    </div>
+                    <div>
+                        <dt>Ostatnia publikacja</dt>
+                        <dd class="metric-date">{lastPublishedLabel || '—'}</dd>
+                        <dd class="metric-note">czas lokalny: Warszawa</dd>
+                    </div>
+                </dl>
+                <div class="console-scope">
+                    <span>ZAKRES OBSERWACJI</span>
+                    <div class="scope-grid" aria-hidden="true">
+                        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                    </div>
+                    <strong>GLOBAL / SELEKTYWNIE PODEJRZLIWY</strong>
+                </div>
+            </aside>
+
+            <div class="topic-console">
+                <div class="console-head">
+                    <span>SEKTORY</span>
+                    <a href="/tematy/">PEŁNA MAPA →</a>
+                </div>
+                <ol>
+                    {topics.map((topic, index) => (
+                        <li>
+                            <a href={`/tematy/${topic.slug}/`}>
+                                <span class="topic-index">{String(index + 1).padStart(2, '0')}</span>
+                                <span class="topic-name">
+                                    <strong>{topic.name}</strong>
+                                    <small>{topic.description}</small>
+                                </span>
+                                <span class="topic-count">{String(topic.count).padStart(2, '0')}</span>
+                            </a>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div class="headline-console">
+                <div class="console-head">
+                    <span>OSTATNIE TRANSMISJE</span>
+                    <span>UTC+02</span>
+                </div>
+                <ol>
+                    {headlines.slice(0, 4).map((headline, index) => (
+                        <li>
+                            <span class="headline-number">{String(index + 1).padStart(2, '0')}</span>
+                            <a href={headline.href} data-track-home-article="signal-list">
+                                {headline.title}
+                            </a>
+                            {headline.dateLabel && <span class="headline-date">{headline.dateLabel}</span>}
+                        </li>
+                    ))}
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .signal-dashboard {
+        position: relative;
+        overflow: hidden;
+        color: #e9e5d9;
+        background:
+            radial-gradient(circle at 16% 0%, rgba(171, 137, 33, 0.11), transparent 28%),
+            linear-gradient(145deg, #061d18 0%, #09261f 52%, #071b1c 100%);
+        border-top: 1px solid rgba(218, 185, 70, 0.2);
+    }
+
+    .signal-dashboard::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(223, 208, 147, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(223, 208, 147, 0.035) 1px, transparent 1px);
+        background-size: 40px 40px;
+        mask-image: linear-gradient(to bottom, black, transparent 84%);
+    }
+
+    .dashboard-shell {
+        position: relative;
+        z-index: 1;
+        width: min(1180px, calc(100% - 4rem));
+        margin: 0 auto;
+        padding: clamp(5rem, 9vw, 8.5rem) 0;
+    }
+
+    .dashboard-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.75fr);
+        align-items: end;
+        gap: clamp(2rem, 7vw, 7rem);
+        margin-bottom: 2.4rem;
+    }
+
+    .section-code {
+        margin: 0 0 0.6rem;
+        color: #cba83c;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.65rem;
+        font-weight: 650;
+        letter-spacing: 0.16em;
+    }
+
+    h2 {
+        margin: 0;
+        color: #f4f0e6;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: clamp(3rem, 6.5vw, 6.2rem);
+        font-variation-settings: "wdth" 92;
+        font-weight: 580;
+        letter-spacing: -0.055em;
+        line-height: 0.92;
+    }
+
+    .dashboard-header > p {
+        margin: 0;
+        color: rgba(232, 231, 215, 0.64);
+        font-size: 1rem;
+        line-height: 1.55;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
+        grid-template-areas:
+            "featured status"
+            "topics headlines";
+        border-top: 1px solid rgba(224, 202, 118, 0.16);
+        border-left: 1px solid rgba(224, 202, 118, 0.16);
+    }
+
+    .featured-signal,
+    .status-console,
+    .topic-console,
+    .headline-console {
+        border-right: 1px solid rgba(224, 202, 118, 0.16);
+        border-bottom: 1px solid rgba(224, 202, 118, 0.16);
+    }
+
+    .featured-signal {
+        grid-area: featured;
+        position: relative;
+        min-height: 560px;
+        overflow: hidden;
+        color: inherit;
+        text-decoration: none;
+        background: #102c24;
+    }
+
+    .featured-signal img,
+    .featured-shade {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .featured-signal img {
+        object-fit: cover;
+        border-radius: 0;
+        filter: saturate(0.62) contrast(1.08) sepia(0.08);
+        transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 500ms ease;
+    }
+
+    .featured-shade {
+        background:
+            linear-gradient(180deg, rgba(2, 19, 14, 0.14), rgba(2, 19, 14, 0.15) 30%, rgba(2, 19, 14, 0.94) 91%),
+            linear-gradient(90deg, rgba(2, 19, 14, 0.5), transparent 70%);
+    }
+
+    .featured-status {
+        position: absolute;
+        top: 1.2rem;
+        left: 1.2rem;
+        right: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: rgba(242, 237, 216, 0.74);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.58rem;
+        font-weight: 650;
+        letter-spacing: 0.14em;
+    }
+
+    .featured-status i {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 0.4rem;
+        border-radius: 50%;
+        background: #e0b83e;
+        box-shadow: 0 0 12px #e0b83e;
+    }
+
+    .featured-copy {
+        position: absolute;
+        left: clamp(1.25rem, 4vw, 3.2rem);
+        right: clamp(1.25rem, 4vw, 3.2rem);
+        bottom: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .featured-copy > p {
+        margin: 0 0 0.65rem;
+        color: #d7b343;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.65rem;
+        font-weight: 650;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+    }
+
+    .featured-copy h3 {
+        max-width: 18ch;
+        margin: 0;
+        color: #f4f0e7;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: clamp(2.1rem, 4.2vw, 4.3rem);
+        font-variation-settings: "wdth" 94;
+        font-weight: 580;
+        letter-spacing: -0.048em;
+        line-height: 0.98;
+        text-wrap: balance;
+    }
+
+    .featured-description {
+        max-width: 64ch;
+        margin-top: 1rem;
+        display: block;
+        color: rgba(239, 236, 220, 0.68);
+        font-size: 0.95rem;
+        line-height: 1.48;
+    }
+
+    .featured-link {
+        margin-top: 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: #efd46a;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 680;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .featured-link b {
+        font-size: 1.1rem;
+        transition: transform 180ms ease;
+    }
+
+    .featured-signal:hover img,
+    .featured-signal:focus-visible img {
+        transform: scale(1.035);
+        filter: saturate(0.82) contrast(1.06);
+    }
+
+    .featured-signal:hover .featured-link b,
+    .featured-signal:focus-visible .featured-link b {
+        transform: translate(3px, -3px);
+    }
+
+    .featured-signal:focus-visible {
+        outline: 2px solid #e4bd47;
+        outline-offset: -3px;
+    }
+
+    .status-console {
+        grid-area: status;
+        padding: 1.15rem;
+        background: rgba(6, 38, 30, 0.54);
+    }
+
+    .console-head {
+        min-height: 24px;
+        padding-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(224, 202, 118, 0.12);
+        color: rgba(229, 220, 181, 0.5);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.55rem;
+        font-weight: 650;
+        letter-spacing: 0.14em;
+    }
+
+    .console-head a {
+        color: #d5b343;
+        text-decoration: none;
+    }
+
+    .console-ok {
+        color: #80c69b;
+    }
+
+    .console-metrics {
+        margin: 0;
+    }
+
+    .console-metrics > div {
+        padding: 1.45rem 0;
+        border-bottom: 1px solid rgba(224, 202, 118, 0.12);
+    }
+
+    .console-metrics dt {
+        color: rgba(229, 220, 181, 0.5);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.58rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+    }
+
+    .console-metrics dd {
+        margin: 0.35rem 0 0;
+        color: #e3bc43;
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: clamp(2.6rem, 5vw, 4.6rem);
+        font-weight: 620;
+        letter-spacing: -0.06em;
+        line-height: 0.95;
+    }
+
+    .console-metrics dd.metric-date {
+        font-size: clamp(1.45rem, 2.7vw, 2.35rem);
+    }
+
+    .console-metrics .metric-note {
+        margin: 0.2rem 0 0;
+        color: rgba(232, 228, 209, 0.42);
+        font-size: 0.72rem;
+        letter-spacing: 0;
+        line-height: 1.3;
+    }
+
+    .console-scope {
+        padding-top: 1.35rem;
+        color: rgba(229, 220, 181, 0.5);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.55rem;
+        letter-spacing: 0.13em;
+    }
+
+    .scope-grid {
+        margin: 0.85rem 0;
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 3px;
+    }
+
+    .scope-grid i {
+        height: 7px;
+        background: rgba(215, 180, 61, 0.18);
+    }
+
+    .scope-grid i:nth-child(-n + 6) {
+        background: rgba(215, 180, 61, 0.72);
+    }
+
+    .console-scope strong {
+        color: rgba(236, 232, 215, 0.72);
+        font-size: 0.58rem;
+        font-weight: 620;
+    }
+
+    .topic-console {
+        grid-area: topics;
+        padding: 1.15rem;
+        background: rgba(5, 30, 24, 0.46);
+    }
+
+    .topic-console ol,
+    .headline-console ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .topic-console li {
+        border-bottom: 1px solid rgba(224, 202, 118, 0.1);
+    }
+
+    .topic-console li:last-child {
+        border-bottom: 0;
+    }
+
+    .topic-console li a {
+        min-height: 84px;
+        padding: 0.8rem 0;
+        display: grid;
+        grid-template-columns: 42px 1fr auto;
+        align-items: center;
+        gap: 0.75rem;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .topic-index,
+    .topic-count,
+    .headline-number,
+    .headline-date {
+        color: rgba(224, 205, 132, 0.42);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+    }
+
+    .topic-name {
+        display: grid;
+        gap: 0.15rem;
+    }
+
+    .topic-name strong {
+        color: rgba(244, 239, 222, 0.92);
+        font-family: "Archivo Variable", "Atkinson", sans-serif;
+        font-size: 0.94rem;
+        font-weight: 620;
+    }
+
+    .topic-name small {
+        max-width: 64ch;
+        overflow: hidden;
+        color: rgba(234, 230, 211, 0.46);
+        font-size: 0.72rem;
+        line-height: 1.35;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .topic-count {
+        min-width: 34px;
+        color: #d5b243;
+        font-size: 0.88rem;
+        text-align: right;
+    }
+
+    .topic-console a:hover .topic-name strong,
+    .topic-console a:focus-visible .topic-name strong {
+        color: #e5c453;
+    }
+
+    .topic-console a:focus-visible,
+    .headline-console a:focus-visible {
+        outline: 1px solid #d5b243;
+        outline-offset: 4px;
+    }
+
+    .headline-console {
+        grid-area: headlines;
+        padding: 1.15rem;
+        background: rgba(8, 35, 30, 0.56);
+    }
+
+    .headline-console li {
+        min-height: 76px;
+        padding: 0.75rem 0;
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        align-content: center;
+        gap: 0.12rem 0.5rem;
+        border-bottom: 1px solid rgba(224, 202, 118, 0.1);
+    }
+
+    .headline-console li:last-child {
+        border-bottom: 0;
+    }
+
+    .headline-number {
+        grid-row: 1 / 3;
+    }
+
+    .headline-console a {
+        overflow: hidden;
+        color: rgba(242, 238, 223, 0.82);
+        font-size: 0.77rem;
+        line-height: 1.25;
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .headline-console a:hover {
+        color: #e5c453;
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "featured"
+                "status"
+                "topics"
+                "headlines";
+        }
+
+        .status-console {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 1.2rem;
+        }
+
+        .status-console .console-head {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 680px) {
+        .dashboard-shell {
+            width: calc(100% - 2rem);
+            padding: 4.5rem 0;
+        }
+
+        .dashboard-header {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: clamp(3rem, 15vw, 4.6rem);
+        }
+
+        .featured-signal {
+            min-height: 520px;
+        }
+
+        .featured-copy h3 {
+            font-size: clamp(2.15rem, 10vw, 3rem);
+        }
+
+        .featured-description {
+            font-size: 0.85rem;
+        }
+
+        .status-console {
+            display: block;
+        }
+
+        .topic-name small {
+            display: none;
+        }
+
+        .topic-console li a {
+            min-height: 66px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .featured-signal img,
+        .featured-link b {
+            transition: none;
+        }
+    }
+</style>
