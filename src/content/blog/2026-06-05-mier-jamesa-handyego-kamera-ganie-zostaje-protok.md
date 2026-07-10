@@ -3,7 +3,7 @@ title: "Śmierć Jamesa Handy’ego: kamera gaśnie, zostaje protokół"
 description: "Hollywood zna czerwone dywany, ale tu zostaje zimny korytarz: James Handy, 81 lat, miał zginąć od ciosów nożem, a zatrzymano syna jego partnerki."
 sourceUrl: "https://www.bbc.com/news/articles/czd2dj24jgdo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-05"
-heroImage: "/blog-images/2026-06-05-mier-jamesa-handyego-kamera-ganie-zostaje-protok.png"
+heroImage: "/blog-images/2026-06-05-mier-jamesa-handyego-editorial.webp"
 tags: ["polityka-i-media"]
 views: 0
 likes: 0
