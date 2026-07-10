@@ -3,7 +3,7 @@ title: "Panda na musztrze: Pekin pokazuje siłę, Europa ćwiczy deeskalację"
 description: "Komentarz o chińskiej presji wokół Tajwanu i europejskim odruchu łagodzenia napięć, który bywa rozsądny, ale nie zawsze robi wrażenie na polityce siły."
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 pubDate: "2025-12-29"
-heroImage: "/blog-images/2025-12-29-panda-na-musztrze-pekin-grozi-europa-wymyla-deeskalacj.png"
+heroImage: "/blog-images/2025-12-29-panda-musztra-editorial.webp"
 views: 0
 likes: 0
 ---

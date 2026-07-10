@@ -3,7 +3,7 @@ title: "Chiński galop pod zielonym sztandarem: Zachód poucza, Pekin dostarcza"
 description: "Zielona transformacja mówi europejskim językiem wartości, ale zbyt często jedzie na chińskiej logistyce, bateriach i fabrykach."
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 pubDate: "2026-01-02"
-heroImage: "/blog-images/2026-01-02-zielona-krucjata-na-chiskiej-adowarce-zachd-poucza-pekin-kasuje.png"
+heroImage: "/blog-images/2026-01-02-chinski-galop-editorial.webp"
 views: 0
 likes: 0
 ---

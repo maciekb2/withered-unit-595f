@@ -3,7 +3,7 @@ title: "Suwerenność z metką: Somaliland i dyplomacja w witrynie"
 description: "Komentarz o Somalilandzie, uznaniu państwowości i pokusie traktowania suwerenności jak towaru, który można wystawić na politycznej promocji."
 tags: ["geopolityka"]
 pubDate: "2025-12-30"
-heroImage: "/blog-images/2025-12-30-suwerenno-na-wyprzeday-somaliland-i-dyplomacja-na-metki.png"
+heroImage: "/blog-images/2025-12-30-somaliland-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Zima w Nowym Jorku znów zaskoczyła klimatologów"
 description: "Satyryczny, PL-patriotyczny komentarz do nowojorskiej zimy, która zaskakuje klimatologów, a nas – ani trochę."
 tags: ["geopolityka"]
 pubDate: "2025-12-28"
-heroImage: "/blog-images/2025-12-28-zima-w-nowym-jorku-znw-zaskoczya-klimatologw.png"
+heroImage: "/blog-images/2025-12-28-nowy-jork-zima-editorial.webp"
 views: 0
 likes: 0
 ---

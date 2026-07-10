@@ -3,7 +3,7 @@ title: "Eurostar wraca na tory, a unijna narracja dalej goni rozkład"
 description: "Komentarz o kolei, która nie potrzebuje wielkich haseł, tylko torów, dyżurów, komunikatów i pasażerów traktowanych poważnie."
 tags: ["europa-i-unia", "polityka-i-media"]
 pubDate: "2025-12-31"
-heroImage: "/blog-images/2025-12-31-eurostar-wraca-na-tory-a-unijna-narracja-dalej-wykolejona.png"
+heroImage: "/blog-images/2025-12-31-eurostar-editorial.webp"
 views: 0
 likes: 0
 ---
