@@ -3,7 +3,7 @@ title: "Iran, USA i rozejm z tektury"
 description: "Iran odpowiada na świeże uderzenia USA atakiem na bazę; kruchy rozejm wygląda jak dyplomacja na zapałkach, a świat znów liczy, kto pierwszy mrugnie."
 sourceUrl: "https://www.bbc.com/news/articles/c98r2qy5809o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-28"
-heroImage: "/blog-images/2026-05-28-iran-usa-i-rozejm-z-tektury.png"
+heroImage: "/blog-images/2026-05-28-iran-usa-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

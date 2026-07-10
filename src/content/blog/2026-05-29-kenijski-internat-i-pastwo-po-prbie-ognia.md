@@ -3,7 +3,7 @@ title: "Kenijski internat i państwo po próbie ognia"
 description: "Kenijski internat spłonął, zginęło 16 uczniów, a zatrzymano ośmiu. Państwo ma mówić faktami, nie rytualnym oburzeniem."
 sourceUrl: "https://www.bbc.com/news/articles/cx21r3138m9o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-29"
-heroImage: "/blog-images/2026-05-29-kenijski-internat-i-pastwo-po-prbie-ognia.png"
+heroImage: "/blog-images/2026-05-29-kenijski-internat-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

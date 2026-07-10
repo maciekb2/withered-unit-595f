@@ -3,7 +3,7 @@ title: "Gaza: rozejm, który pachnie prochem"
 description: "Izraelski atak w Gazie miał zabić nowego szefa zbrojnego skrzydła Hamasu. Rozejm trwa na papierze, a region znów uczy pokory."
 sourceUrl: "https://www.bbc.com/news/articles/cjwppj1yn7go?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-27"
-heroImage: "/blog-images/2026-05-27-gaza-rozejm-ktry-pachnie-prochem.png"
+heroImage: "/blog-images/2026-05-27-gaza-editorial.webp"
 tags: ["gospodarka-i-energia"]
 views: 0
 likes: 0
