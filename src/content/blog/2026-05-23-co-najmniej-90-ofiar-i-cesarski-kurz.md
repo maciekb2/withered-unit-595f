@@ -3,7 +3,7 @@ title: "Co najmniej 90 ofiar i cesarski kurz"
 description: "W północnych Chinach eksplozja w kopalni węgla zabiła co najmniej 90 osób; państwowe media liczą ofiary, a my widzimy cenę taniej energii."
 sourceUrl: "https://www.bbc.com/news/articles/c5y0ve18qlko?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-23"
-heroImage: "/blog-images/2026-05-23-co-najmniej-90-ofiar-i-cesarski-kurz.png"
+heroImage: "/blog-images/2026-05-23-cesarski-kurz-editorial.webp"
 tags: ["polityka-i-media"]
 views: 0
 likes: 0

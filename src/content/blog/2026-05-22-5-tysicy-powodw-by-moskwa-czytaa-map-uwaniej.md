@@ -2,7 +2,7 @@
 title: "5 tysięcy powodów, by Moskwa czytała mapę uważniej"
 description: "5 tys. żołnierzy USA w Polsce: NATO klaszcze, Warszawa liczy konkrety, a Kreml znów odkrywa, że mapa Europy ma granice."
 pubDate: "2026-05-22"
-heroImage: "/blog-images/2026-05-22-5-tysicy-powodw-by-moskwa-czytaa-map-uwaniej.png"
+heroImage: "/blog-images/2026-05-22-moskwa-mapa-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

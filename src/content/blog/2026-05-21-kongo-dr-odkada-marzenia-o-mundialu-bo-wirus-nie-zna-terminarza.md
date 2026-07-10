@@ -3,7 +3,7 @@ title: "Kongo DR odkłada marzenia o mundialu, bo wirus nie zna terminarza"
 description: "Kongo DR odwołuje zgrupowanie przed mundialem, a Ebola przypomina, że nawet najgłośniejszy hymn przegrywa z sanitarną rzeczywistością."
 sourceUrl: "https://www.bbc.com/news/articles/c8d80856q2go?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-21"
-heroImage: "/blog-images/2026-05-21-kongo-dr-odkada-marzenia-o-mundialu-bo-wirus-nie-zna-terminarza.png"
+heroImage: "/blog-images/2026-05-21-kongo-ebola-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

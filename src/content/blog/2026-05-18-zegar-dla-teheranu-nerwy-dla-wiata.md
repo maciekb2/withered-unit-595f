@@ -3,7 +3,7 @@ title: "Zegar dla Teheranu, nerwy dla świata"
 description: "Trump pogania Iran, rozmowy drepczą w miejscu, a Zachód znów sprawdza, czy dyplomacja ma kręgosłup, czy tylko elegancki zegarek."
 sourceUrl: "https://www.bbc.com/news/articles/cd0p4y9y48xo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-18"
-heroImage: "/blog-images/2026-05-18-zegar-dla-teheranu-nerwy-dla-wiata.png"
+heroImage: "/blog-images/2026-05-18-teheran-zegar-editorial.webp"
 tags: ["geopolityka", "polityka-i-media"]
 views: 0
 likes: 0

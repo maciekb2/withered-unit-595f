@@ -3,7 +3,7 @@ title: "Flotylla do Gazy: morski test sumień i blokad"
 description: "Flotylla do Gazy zatrzymana na morzu staje się probierzem: humanitaryzm, blokada i siła państwa spotykają się tam, gdzie Europa spuszcza wzrok."
 sourceUrl: "https://www.bbc.com/news/articles/c142vz80553o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-19"
-heroImage: "/blog-images/2026-05-19-flotylla-do-gazy-morski-test-sumie-i-blokad.png"
+heroImage: "/blog-images/2026-05-19-flotylla-gaza-editorial.webp"
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 views: 0
 likes: 0
