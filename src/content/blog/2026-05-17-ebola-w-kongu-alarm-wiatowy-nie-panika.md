@@ -2,7 +2,7 @@
 title: "Ebola w Kongu: alarm światowy, nie panika"
 description: "WHO podnosi alarm przy Eboli w DR Kongu: trzeba chłodnej głowy, faktów i pomocy, a nie kolonialnego teatru strachu na eksport."
 pubDate: "2026-05-17"
-heroImage: "/blog-images/2026-05-17-ebola-w-kongu-alarm-wiatowy-nie-panika.png"
+heroImage: "/blog-images/2026-05-17-ebola-kongo-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

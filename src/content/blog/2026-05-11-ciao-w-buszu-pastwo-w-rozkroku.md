@@ -3,7 +3,7 @@ title: "Ciało w buszu, państwo w rozkroku"
 description: "W Nowej Południowej Walii znaleziono ciało, które policja łączy z uciekinierem poszukiwanym po potrójnym zabójstwie. Sprawa pachnie końcem pościgu i początkiem pytań."
 sourceUrl: "https://www.bbc.com/news/articles/cdjp9vzxlz7o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-11"
-heroImage: "/blog-images/2026-05-11-ciao-w-buszu-pastwo-w-rozkroku.png"
+heroImage: "/blog-images/2026-05-11-busz-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

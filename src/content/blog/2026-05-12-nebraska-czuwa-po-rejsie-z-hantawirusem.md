@@ -2,7 +2,7 @@
 title: "Nebraska czuwa po rejsie z hantawirusem"
 description: "Pasażerowie z rejsu pod obserwacją w Nebrasce: zdrowie publiczne znów sprawdza, czy procedury są tarczą, czy tylko elegancką pieczątką."
 pubDate: "2026-05-12"
-heroImage: "/blog-images/2026-05-12-nebraska-czuwa-po-rejsie-z-hantawirusem.png"
+heroImage: "/blog-images/2026-05-12-nebraska-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

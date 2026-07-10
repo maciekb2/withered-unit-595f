@@ -2,7 +2,7 @@
 title: "Ghana ewakuuje swoich z RPA: państwo kontra uliczna gościnność"
 description: "Ghana szykuje ewakuację 300 obywateli z RPA po antyimigranckich protestach. Państwo robi to, co powinno: liczy swoich ludzi, nie dobre chęci ulicy."
 pubDate: "2026-05-13"
-heroImage: "/blog-images/2026-05-13-ghana-ewakuuje-swoich-z-rpa-pastwo-kontra-uliczna-gocinno.png"
+heroImage: "/blog-images/2026-05-13-ghana-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

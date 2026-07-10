@@ -3,7 +3,7 @@ title: "Kijów pod gruzem, Europa pod kołdrą"
 description: "Po rosyjskich uderzeniach w kijowskie bloki ratownicy wydobywają ofiary; w tle znów ta sama lekcja: imperium rozumie cywilów jako rubrykę w planie."
 sourceUrl: "https://www.bbc.com/news/articles/cq5p8yygq94o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-14"
-heroImage: "/blog-images/2026-05-14-kijw-pod-gruzem-europa-pod-kodr.png"
+heroImage: "/blog-images/2026-05-14-kijow-editorial.webp"
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 views: 0
 likes: 0
