@@ -3,7 +3,7 @@ title: "Tarcza z papieru: gdy państwo nie ściga bandytów, ściga słowa"
 description: "Patriotyczna satyra o państwie, które ściga słowa zamiast bandytów; apel o realną ochronę obywateli."
 tags: ["geopolityka"]
 pubDate: "2025-12-21"
-heroImage: "/blog-images/2025-12-21-tarcza-z-papieru-gdy-pastwo-nie-ciga-bandytw-ciga-sowa.png"
+heroImage: "/blog-images/2025-12-21-tarcza-papieru-editorial.webp"
 views: 0
 likes: 0
 ---

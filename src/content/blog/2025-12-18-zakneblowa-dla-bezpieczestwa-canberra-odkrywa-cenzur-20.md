@@ -3,7 +3,7 @@ title: "Zakneblować dla bezpieczeństwa: Canberra odkrywa cenzurę 2.0"
 description: "Polski, satyryczny komentarz do canberskiej cenzury 2.0; o bezpieczeństwie, kneblach i granicach moderacji, z analogiami z ostatnich 2 lat."
 tags: ["geopolityka", "polityka-i-media"]
 pubDate: "2025-12-18"
-heroImage: "/blog-images/2025-12-18-zakneblowa-dla-bezpieczestwa-canberra-odkrywa-cenzur-20.png"
+heroImage: "/blog-images/2025-12-18-canberra-cenzura-editorial.webp"
 views: 0
 likes: 0
 ---

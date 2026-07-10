@@ -3,7 +3,7 @@ title: "Globalny HR naiwności: gdy Kim wysyła CV, korporacja wreszcie czyta dr
 description: "Satyryczny wykład z patriotycznej rekrutacji: gdy \"Kim\" wysyła CV, globalny HR wreszcie czyta drobny druk; jak Polska uczy świat sprawdzać tożsamości i źródła."
 tags: ["technologia-i-cyber"]
 pubDate: "2025-12-23"
-heroImage: "/blog-images/2025-12-23-globalny-hr-naiwnoci-gdy-kim-wysya-cv-korporacja-wreszcie-czyta-drobny-druk.png"
+heroImage: "/blog-images/2025-12-23-globalny-hr-editorial.webp"
 views: 0
 likes: 0
 ---

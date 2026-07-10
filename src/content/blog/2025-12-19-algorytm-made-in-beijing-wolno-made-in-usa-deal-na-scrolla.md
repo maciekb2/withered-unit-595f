@@ -3,7 +3,7 @@ title: "Algorytm Made in Beijing, wolność Made in USA: deal na scrolla"
 description: "Satyra o patriotycznej suwerenności scrolla: chiński algorytm, amerykańska wolność i polskie kciuki w jednym układzie."
 tags: ["geopolityka", "technologia-i-cyber"]
 pubDate: "2025-12-19"
-heroImage: "/blog-images/2025-12-19-algorytm-made-in-beijing-wolno-made-in-usa-deal-na-scrolla.png"
+heroImage: "/blog-images/2025-12-19-algorytm-scroll-editorial.webp"
 views: 0
 likes: 0
 ---
