@@ -3,7 +3,7 @@ title: "Komitet Dobrej Herbaty: Jak Brytyjska Polityka Odkrywa Nowe Schematy"
 description: "Z przymrużeniem oka na zaskakujące ruchy i nowości w brytyjskiej polityce. Zobacz, jak herbatka z mlekiem ustępuje miejsca nowoczesnym rytuałom politycznym."
 tags: ["polityka-i-media"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-komitet-dobrej-herbaty-jak-brytyjska-polityka-odkrywa-nowe-schematy.png"
+heroImage: "/blog-images/2025-07-13-herbata-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Geopolityka Kloców LEGO: Jak Światowe Potęgi Budują Nowe Imperia"
 description: "Przyjacielska konkurencja w budowaniu globalnych imperiów przy użyciu plastikowych kloców."
 tags: ["geopolityka", "polityka-i-media"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-geopolityka-klocw-lego-jak-wiatowe-potgi-buduj-nowe-imperia.png"
+heroImage: "/blog-images/2025-07-13-lego-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Jak Miłość i Niechęć na Równych Zasadach: Polska i Niemcy Bawią s
 description: "Bo nic tak nie scala sąsiadów jak wspólna pasja do politycznych ping-pongów, gdzie migranci stają się żetonami w grze bez reguł."
 tags: ["europa-i-unia"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-jak-mio-i-niech-na-rwnych-zasadach-polska-i-niemcy-bawi-si-w-graniczne-przepychanki.png"
+heroImage: "/blog-images/2025-07-13-polska-niemcy-editorial.webp"
 views: 0
 likes: 0
 ---

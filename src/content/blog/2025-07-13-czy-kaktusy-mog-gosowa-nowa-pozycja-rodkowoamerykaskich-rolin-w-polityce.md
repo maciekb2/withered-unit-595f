@@ -3,7 +3,7 @@ title: "Czy Kaktusy Mogą Głosować? Nowa Pozycja Środkowoamerykańskich Rośl
 description: "Odkrywamy, jak flora z pustyń wkracza na arenę międzynarodowej polityki. Przełomowe wydarzenia prowadzą do pytań, czy przy następnych wyborach powinniśmy spodziewać się głosującej fauny."
 tags: ["geopolityka"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-czy-kaktusy-mog-gosowa-nowa-pozycja-rodkowoamerykaskich-rolin-w-polityce.png"
+heroImage: "/blog-images/2025-07-13-kaktusy-editorial.webp"
 views: 0
 likes: 0
 ---

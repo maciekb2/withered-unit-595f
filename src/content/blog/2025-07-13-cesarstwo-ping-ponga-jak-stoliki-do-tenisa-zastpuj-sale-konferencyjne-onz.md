@@ -3,7 +3,7 @@ title: "Cesarstwo Ping-Ponga: Jak Stoliki do Tenisa Zastępują Sale Konferencyj
 description: "Odkrywamy nową platformę dla rozwiązania międzynarodowych konfliktów i pytamy, kto naprawdę rządzi paletką."
 tags: ["geopolityka"]
 pubDate: "2025-07-13"
-heroImage: "/blog-images/2025-07-13-cesarstwo-ping-ponga-jak-stoliki-do-tenisa-zastpuj-sale-konferencyjne-onz.png"
+heroImage: "/blog-images/2025-07-13-pingpong-editorial.webp"
 views: 0
 likes: 0
 ---
