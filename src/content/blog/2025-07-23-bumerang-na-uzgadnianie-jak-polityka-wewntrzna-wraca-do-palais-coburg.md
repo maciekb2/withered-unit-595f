@@ -14,7 +14,7 @@ W ciągłych perypetiach polityki międzynarodowej, jak na ironię, wracamy do s
 
 ### Pierwszy Rzut: Finansowe Rozgrywki
 
-Nie od dzisiaj wiadomo, że finanse to krwioobieg władzy. **Centralni bankierzy** z Berlina, Pekinu i Waszyngtonu przypominają artystów cyrkowych, kręcących talerzyki na cienkich drucikach. Każdy z nich twierdzi, że jego talerz obraca się najpiękniej, a pozostali próbują go zrzucić. 
+Nie od dzisiaj wiadomo, że finanse to krwioobieg władzy. **Centralni bankierzy** z Berlina, Pekinu i Waszyngtonu przypominają artystów cyrkowych, kręcących talerzyki na cienkich drucikach. Każdy z nich twierdzi, że jego talerz obraca się najpiękniej, a pozostali próbują go zrzucić.
 
 - Ten z Pekinu oferuje przyjaźń w zamian za niewielkie ustępstwa w formie infrastruktury.
 - Amerykanie odpowiadają szerokimi uśmiechami, oferując petrodolary w zamian za militarne gwarancje.

@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-## Smok w Klapkach: Chiński Eksport Kultury a Niedoceniana Potęga Popsika
-
 Na rynku międzynarodowym nie brakuje tytanów rywalizujących o uwagę świata. Chińska Republika Ludowa w ciągu ostatnich dekad wykazała się niebywałą skutecznością w eksporcie swojej kultury, produktów i technologii. Ale jak się okazuje, Polska, mając do dyspozycji jedynie popsik, gumowe klapki i beaty disco polo, skutecznie opiera się tej ekspansji. Drogi czytelniku, przygotuj się, bo oto Polska kontra chiński smok!
 
 ### Tani Plastik, Droga Strategia

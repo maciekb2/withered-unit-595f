@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-## Od Łopaty do Satelity: Gdy Rolnik Zostaje Astronautą
-
 Polska, kraj kojarzony niegdyś wyłącznie z uprawą ziemniaków i hodowlą trzody, dziś zdobywa kosmos. Tak, właśnie tam, gdzie nie spodziewaliśmy się zobaczyć rolnika w gumofilcach, teraz krążą satelity z orzełkiem na burcie – czyż to nie jest krzepiąca wizja?
 
 ### Polska Agencja Kosmiczna – Fabryka Marzeń

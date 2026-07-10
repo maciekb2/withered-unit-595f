@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Kolumbijska urna pod okiem Waszyngtonu
-
-Kolumbia wybiera prezydenta, a w tle brzmi pytanie, czy Waszyngton dostanie partnera, czy kolejny sezon dyplomatycznej szarpaniny z Petro w tle.
-
 Kolumbia wybiera prezydenta po miesiącach publicznych spięć między obecnym lewicowym prezydentem Gustavo Petro a Donaldem Trumpem. Źródło tematu: https://www.bbc.com/news/articles/c2027g423glo?at_medium=RSS&at_campaign=rss
 
 ## Urna i ambasada

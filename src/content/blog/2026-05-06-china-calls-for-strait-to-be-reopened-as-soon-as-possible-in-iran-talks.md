@@ -1,18 +1,13 @@
 ---
 title: "Pekin przy korku od ropy: Chiny proszą Iran o odetkanie cieśniny"
 description: "Wang Yi rozmawia z Teheranem o szybkim otwarciu Cieśniny Ormuz, bo światowy handel energią nie lubi, gdy ktoś trzyma rękę na zaworze."
+sourceUrl: "https://www.bbc.com/news/articles/c0m21mndm71o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-06"
 heroImage: "/blog-images/2026-05-06-china-calls-for-strait-to-be-reopened-as-soon-as-possible-in-iran-talks.png"
 tags: ["geopolityka", "gospodarka-i-energia"]
 views: 0
 likes: 0
 ---
-
-# Pekin przy korku od ropy: Chiny proszą Iran o odetkanie cieśniny
-
-Wang Yi rozmawia z Teheranem o szybkim otwarciu Cieśniny Ormuz, bo światowy handel energią nie lubi, gdy ktoś trzyma rękę na zaworze.
-
-Źródło tematu: https://www.bbc.com/news/articles/c0m21mndm71o?at_medium=RSS&at_campaign=rss
 
 ## Dyplomacja przy wąskim gardle
 

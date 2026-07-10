@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Nebraska czuwa po rejsie z hantawirusem
-
-Pasażerowie z rejsu pod obserwacją w Nebrasce: zdrowie publiczne znów sprawdza, czy procedury są tarczą, czy tylko elegancką pieczątką.
-
 Temat brzmi jak notatka z urzędu, ale ma w sobie cały współczesny teatr ostrożności: kilka miejsc, lista osób, choroba o trudnej nazwie i instytucje, które muszą mówić spokojnie, nawet gdy publiczność już dopowiada sobie muzykę z thrillera. BBC podało, że po rejsie związanym z hantawirusem monitorowanych jest 16 osób w Nebrasce, 2 w Atlancie i 6 w Kanadzie. Źródło tematu: https://www.bbc.com/news/articles/cwy2e9e1g0wo?at_medium=RSS&at_campaign=rss
 
 Nie ma tu jeszcze wielkiego dramatu, jest raczej test cierpliwości. Obserwacja zdrowotna działa najlepiej wtedy, gdy nie wygląda efektownie. Telefon, formularz, pytanie o samopoczucie, przypomnienie, że trzeba zgłosić objawy. Tyle. Żadnej fanfary, żadnej sceny na pokładzie, żadnej mowy końcowej. A jednak właśnie w tej nieefektownej sekwencji kryje się sens systemu: zanim ktokolwiek zacznie ogłaszać zwycięstwo albo katastrofę, ktoś musi ustalić, kto był gdzie i z kim.

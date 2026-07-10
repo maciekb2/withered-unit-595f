@@ -73,6 +73,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     '---',
     `title: "${yamlEscape(article.title)}"`,
     `description: "${yamlEscape(article.description)}"`,
+    ...(article.sourceUrl ? [`sourceUrl: "${yamlEscape(article.sourceUrl)}"`] : []),
     `pubDate: "${postDate}"`,
     `heroImage: "/blog-images/${imageName}"`,
     `tags: ${yamlStringArray(tags)}`,

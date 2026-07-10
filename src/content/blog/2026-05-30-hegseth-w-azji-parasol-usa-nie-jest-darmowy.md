@@ -1,18 +1,13 @@
 ---
 title: "Hegseth w Azji: parasol USA nie jest darmowy"
 description: "Waszyngton zapewnia azjatyckich sojuszników, że nie znika z mapy, ale rachunek za bezpieczeństwo ma być bardziej wspólny. Parasol tak, abonament też."
+sourceUrl: "https://www.bbc.com/news/articles/c5ye34k7yejo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-30"
 heroImage: "/blog-images/2026-05-30-hegseth-w-azji-parasol-usa-nie-jest-darmowy.png"
 tags: ["geopolityka"]
 views: 0
 likes: 0
 ---
-
-# Hegseth w Azji: parasol USA nie jest darmowy
-
-Waszyngton zapewnia azjatyckich sojuszników, że nie znika z mapy, ale rachunek za bezpieczeństwo ma być bardziej wspólny. Parasol tak, abonament też.
-
-Waszyngton zapewnia azjatyckich sojuszników, że nie znika z mapy, ale rachunek za bezpieczeństwo ma być bardziej wspólny. Parasol tak, abonament też. Źródło tematu: https://www.bbc.com/news/articles/c5ye34k7yejo?at_medium=RSS&at_campaign=rss
 
 ## Parasol i rachunek
 

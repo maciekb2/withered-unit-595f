@@ -7,7 +7,13 @@ export interface Outline {
 
 export interface Draft { markdown: string; }
 export interface Edited { markdown: string; title: string; description: string; }
-export interface FinalJson { title: string; description: string; content: string; tags?: string[]; }
+export interface FinalJson {
+  title: string;
+  description: string;
+  content: string;
+  tags?: string[];
+  sourceUrl?: string;
+}
 
 export interface EvidenceItem {
   url: string;

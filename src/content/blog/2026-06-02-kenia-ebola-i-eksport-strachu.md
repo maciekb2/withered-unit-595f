@@ -1,18 +1,13 @@
 ---
 title: "Kenia, Ebola i eksport strachu"
 description: "Plan amerykańskiego ośrodka kwarantanny Ebola w Kenii wywołał protesty; po śmierci dwóch osób widać, że bezpieczeństwa nie da się stawiać ponad głowami ludzi."
+sourceUrl: "https://www.bbc.com/news/articles/cvgz7zny3pzo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-02"
 heroImage: "/blog-images/2026-06-02-kenia-ebola-i-eksport-strachu.png"
 tags: ["geopolityka"]
 views: 0
 likes: 0
 ---
-
-# Kenia, Ebola i eksport strachu
-
-Plan amerykańskiego ośrodka kwarantanny Ebola w Kenii wywołał protesty; po śmierci dwóch osób widać, że bezpieczeństwa nie da się stawiać ponad głowami ludzi.
-
-Źródło tematu: https://www.bbc.com/news/articles/cvgz7zny3pzo?at_medium=RSS&at_campaign=rss
 
 ## Gniew przy bramie
 

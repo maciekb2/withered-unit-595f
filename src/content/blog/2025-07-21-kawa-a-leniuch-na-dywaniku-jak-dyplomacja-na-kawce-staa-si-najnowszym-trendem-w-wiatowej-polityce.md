@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-## Kawa a Leniuch na Dywaniku: Jak Dyplomacja na Kawce Stała się Najnowszym Trendem w Światowej Polityce
-
 Jest rok 2023, a światowy etap polityczny coraz bardziej przypomina kawiarnię pełną kontrastów. **Spotkania przy espresso** stają się nowym standardem, a formalność wielkich szczytów powoli traci na atrakcyjności. Jednak co to oznacza dla polityki międzynarodowej i czemu przyglądamy się temu z taką uwagą, niczym perfekto przerwie na kawę?
 
 ### Międzynarodowe Poranek

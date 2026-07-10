@@ -1,18 +1,13 @@
 ---
 title: "Teheran odciąga dym: Kijów bliżej rozejmu?"
 description: "Wojna Iranu może przewrotnie poprawiać pozycję Kijowa: Kreml traci komfort, Zachód liczy koszty chaosu, a rozejm brzmi mniej jak bajka, bardziej jak rachunek."
+sourceUrl: "https://www.bbc.com/news/articles/cgjp7vpee03o?at_medium=RSS&at_campaign=rss"
 tags: ["geopolityka"]
 pubDate: "2026-05-04"
 heroImage: "/blog-images/2026-05-04-teheran-odciga-dym-kijw-bliej-rozejmu.png"
 views: 0
 likes: 0
 ---
-
-# Teheran odciąga dym: Kijów bliżej rozejmu?
-
-Wojna Iranu może przewrotnie poprawiać pozycję Kijowa: Kreml traci komfort, Zachód liczy koszty chaosu, a rozejm brzmi mniej jak bajka, bardziej jak rachunek.
-
-Wojna Iranu może przewrotnie poprawiać pozycję Kijowa: Kreml traci komfort, Zachód liczy koszty chaosu, a rozejm brzmi mniej jak bajka, bardziej jak rachunek. Źródło tematu: https://www.bbc.com/news/articles/cgjp7vpee03o?at_medium=RSS&at_campaign=rss
 
 ## Efekt uboczny
 

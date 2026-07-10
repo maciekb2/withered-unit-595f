@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Kasa z Kremla na kredyt: polityka rachunkowa zamiast strategii
-
-Unijne pomysły na finansowanie Ukrainy z zamrożonych aktywów Kremla kuszą Excela, ale zdradzają brak kompasu: księgowość zastępuje strategię, a ryzyka lądują poza bilansem.
-
 ## Budżet na zastawach
 Bruksela rozważa pożyczkę zabezpieczoną na zamrożonych aktywach Kremla, opisywaną jako dziesiątki miliardów euro, co relacjonuje BBC https://www.bbc.com/news/articles/c9vjlj1ezpgo?at_medium=RSS&at_campaign=rss. Na papierze wygląda to nienagannie: Excel obiecuje porządek, a polityka udaje, że to program działania. Zastaw nie zastąpi decyzji o celach i kosztach, lecz przeniesie kłopot do innej kolumny. To jak malować dziurę w dachu farbą: ładniej z ulicy, mokrzej pod sufitem. Gdy zastaw staje się polityką, a polityka zjeżdża do księgowości, kupujemy czas na procent, który finalnie pokryje podatnik. Konstrukcja jest sprytna, ale nie odpowiada na pytanie, kto bierze ryzyko i na jak długo. Zastaw na cudzym majątku to wygodny skrót, lecz skróty w geopolityce lubią kończyć się objazdem. Jeśli strategia jest kompasem, tutaj słychać przede wszystkim szelest kalkulatora.
 

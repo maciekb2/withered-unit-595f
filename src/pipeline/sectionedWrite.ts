@@ -166,22 +166,14 @@ function buildSectionPrompt({
 }
 
 function assembleMarkdown({
-  outline,
-  lead,
   sections,
-  sourceUrl,
 }: {
   outline: Outline;
   lead: string;
   sections: { h2: string; markdown: string }[];
   sourceUrl: string;
 }): string {
-  const leadText = lead || outline.description;
-  const leadWithSource = `${withoutTrailingPunctuation(leadText)}. Źródło tematu: ${sourceUrl}`;
   return [
-    `# ${outline.finalTitle}`,
-    outline.description,
-    leadWithSource,
     ...sections.flatMap(section => [`## ${section.h2}`, section.markdown]),
   ]
     .map(part => part.trim())
@@ -306,8 +298,4 @@ function block(label: string, value: string): string {
 
 function clamp(value: string, max: number): string {
   return value.length > max ? value.slice(0, max) : value;
-}
-
-function withoutTrailingPunctuation(value: string): string {
-  return value.trim().replace(/[.!?…]+$/u, '');
 }

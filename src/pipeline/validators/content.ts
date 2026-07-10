@@ -8,6 +8,7 @@ function escapeRegExp(str: string): string {
 export function validateAntiHallucination(
   md: string,
   outline: Outline,
+  sourceUrl?: string,
 ): { ok: boolean; errors: string[]; stats: { claims: number; withSource: number; todo: number } } {
   const claims = extractClaims(md);
   const errors: string[] = [];
@@ -19,17 +20,11 @@ export function validateAntiHallucination(
   };
 
   const urls = md.match(/https?:\/\/\S+/gi) || [];
-  if (urls.length === 0) {
-    errors.push('ERROR: Brak linku do zrodla (w calym tekscie musi byc 1 URL do tematu)');
-  } else if (urls.length > 1) {
-    errors.push('ERROR: Wykryto wiecej niz 1 URL (w calym tekscie ma byc dokladnie 1 link do tematu)');
+  if (!sourceUrl || !/^https?:\/\//i.test(sourceUrl)) {
+    errors.push('ERROR: Brak poprawnego sourceUrl w metadanych artykulu');
   }
-
-  for (const claim of claims) {
-    const isKeyStat = claim.type === 'report' || /statystyk/i.test(claim.text);
-    if (isKeyStat && !claim.hasSource) {
-      errors.push('WARN: Kluczowa statystyka/raport bez zrodla w tym samym zdaniu');
-    }
+  if (urls.length > 0) {
+    errors.push('ERROR: URL zrodla ma byc w metadanych, nie w body artykulu');
   }
 
   if (stats.todo > 0) {

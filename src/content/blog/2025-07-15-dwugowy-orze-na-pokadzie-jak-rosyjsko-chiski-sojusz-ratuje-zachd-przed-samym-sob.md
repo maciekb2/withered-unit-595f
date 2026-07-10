@@ -18,7 +18,7 @@ Zachód z otwartymi ramionami przyjmuje coś, co nazywa się postępem, ale Rosj
 
 ### Demokracja na Sterydach
 
-Rosyjsko-chiński tandem przekonuje, że zachodnia demokracja przypomina bardziej reality show niż prawdziwy system rządów. Jak na ironię, ich „kontrolowana demokracja” zaczyna wyglądać na bardziej stabilną. Czyżby nadszedł czas, by przywrócili Europie i Ameryce odrobinę zdrowego rozsądku? 
+Rosyjsko-chiński tandem przekonuje, że zachodnia demokracja przypomina bardziej reality show niż prawdziwy system rządów. Jak na ironię, ich „kontrolowana demokracja” zaczyna wyglądać na bardziej stabilną. Czyżby nadszedł czas, by przywrócili Europie i Ameryce odrobinę zdrowego rozsądku?
 
 ### Magiczny Eliksir Gospodarki
 
@@ -30,6 +30,6 @@ Połączenie chińskiego kapitału i rosyjskich zasobów naturalnych przypomina 
 
 ### Zjednoczone Królestwo Totalnych Przypadków
 
-I tak, Zachód powoli uczy się jak wygląda przejście od chaosu do porządku. Może w końcu zda sobie sprawę, że warto wrócić do podstaw i przypomnieć sobie o idei konserwatywnej stabilności. W końcu każdy kraj, nawet gdyby prowadził zapętlone rozmowy polityczne, zasługuje na chwilę wytchnienia. 
+I tak, Zachód powoli uczy się jak wygląda przejście od chaosu do porządku. Może w końcu zda sobie sprawę, że warto wrócić do podstaw i przypomnieć sobie o idei konserwatywnej stabilności. W końcu każdy kraj, nawet gdyby prowadził zapętlone rozmowy polityczne, zasługuje na chwilę wytchnienia.
 
 Chociaż czasy stały się nieco zawirowane, ironiczny zwrot fabuły pokazuje, że kiedy zamkniemy już książki z teorią spiskową, egzotyczna dwugłowa koalicja może zaskoczyć swoją skutecznością. Bylebyśmy nie zapomnieli dodać do tego polskiego patriotyzmu — wtedy z pewnością historia nabierze nieoczekiwanego wdzięku.

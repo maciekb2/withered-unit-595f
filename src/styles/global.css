@@ -5,19 +5,19 @@
  */
 
 :root {
-  --royal-green: #014421;
-  --diplomatic-blue: #1c3d5a;
-  --gold-accent: #cba135;
-  --ivory: #f8f6f1;
-  --charcoal: #2d2d2d;
-  --dusty-beige: #e5d8c3;
+  --royal-green: #06251d;
+  --diplomatic-blue: #2f7e6d;
+  --gold-accent: #d9b53e;
+  --ivory: #f1eee5;
+  --charcoal: #0b261e;
+  --dusty-beige: #d8d0bd;
 
   --accent: var(--diplomatic-blue);
-  --accent-dark: #112434;
-  --black: 45, 45, 45; /* charcoal */
-  --gray: 229, 216, 195; /* dusty beige */
-  --gray-light: 248, 246, 241; /* ivory */
-  --gray-dark: 28, 61, 90; /* diplomatic blue */
+  --accent-dark: #a8831f;
+  --black: 11, 38, 30; /* Situation Room forest */
+  --gray: 216, 208, 189; /* dossier beige */
+  --gray-light: 241, 238, 229; /* ivory */
+  --gray-dark: 47, 126, 109; /* dossier teal */
   --gray-gradient: rgba(var(--gray-light), 80%), #fff;
   --box-shadow: 0 2px 6px rgba(var(--gray-dark), 25%),
     0 8px 24px rgba(var(--gray-dark), 33%), 0 16px 32px rgba(var(--gray-dark), 33%);
@@ -170,6 +170,163 @@ hr {
   clip-path: inset(50%);
   /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
   white-space: nowrap;
+}
+
+/* Shared Situation Room chrome for every non-home route. */
+body[data-page-section="archive"],
+body[data-page-section="topics"],
+body[data-page-section="topic"],
+body[data-page-section="privacy"],
+body[data-page-section="error"],
+body[data-page-section="contact"] {
+  color: #f1eee5;
+  background:
+    linear-gradient(rgba(224, 202, 118, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 202, 118, 0.035) 1px, transparent 1px),
+    #061d18;
+  background-size: 44px 44px;
+}
+
+body[data-page-section="archive"] main.blog-page,
+body[data-page-section="topics"] main,
+body[data-page-section="topic"] main,
+body[data-page-section="privacy"] main,
+body[data-page-section="error"] main {
+  color: #f1eee5;
+  background: transparent;
+}
+
+body[data-page-section="archive"] h1,
+body[data-page-section="archive"] h2,
+body[data-page-section="archive"] h3,
+body[data-page-section="topics"] h1,
+body[data-page-section="topics"] h2,
+body[data-page-section="topic"] h1,
+body[data-page-section="topic"] h2,
+body[data-page-section="privacy"] h1,
+body[data-page-section="privacy"] h2,
+body[data-page-section="error"] h1,
+body[data-page-section="error"] h2 {
+  color: #f1eee5 !important;
+  font-family: "Archivo Variable", "Atkinson", sans-serif;
+  letter-spacing: -0.04em;
+}
+
+body[data-page-section="archive"] .blog-intro,
+body[data-page-section="topics"] .topics-hero,
+body[data-page-section="topic"] .topic-hero {
+  color: #f1eee5 !important;
+  border-color: rgba(224, 202, 118, 0.18) !important;
+  background:
+    radial-gradient(circle at 78% 26%, rgba(47, 126, 109, 0.18), transparent 34%),
+    transparent !important;
+}
+
+body[data-page-section="archive"] .blog-intro p,
+body[data-page-section="archive"] .blog-count,
+body[data-page-section="topics"] .topics-hero p,
+body[data-page-section="topic"] .topic-hero p,
+body[data-page-section="privacy"] p {
+  color: rgba(236, 232, 215, 0.72) !important;
+}
+
+body[data-page-section="archive"] .blog-tools,
+body[data-page-section="archive"] .featured-link,
+body[data-page-section="archive"] .post-card a,
+body[data-page-section="archive"] .sidebar,
+body[data-page-section="topics"] .topics-stats,
+body[data-page-section="topics"] .topic-card,
+body[data-page-section="topic"] .topic-stat,
+body[data-page-section="topic"] .post-card a,
+body[data-page-section="topic"] .topic-aside {
+  color: #f1eee5 !important;
+  border-color: rgba(224, 202, 118, 0.18) !important;
+  background: rgba(7, 43, 33, 0.72) !important;
+  box-shadow: 0 18px 40px rgba(1, 13, 10, 0.22) !important;
+}
+
+body[data-page-section="archive"] .blog-search,
+body[data-page-section="archive"] .empty-results {
+  color: #f1eee5 !important;
+  border-color: rgba(224, 202, 118, 0.24) !important;
+  background: rgba(3, 29, 22, 0.76) !important;
+}
+
+body[data-page-section="archive"] .blog-tools label,
+body[data-page-section="archive"] .post-meta .marker,
+body[data-page-section="archive"] .post-card h3,
+body[data-page-section="archive"] .sidebar h3,
+body[data-page-section="archive"] .sidebar a,
+body[data-page-section="topics"] .topic-card h2,
+body[data-page-section="topic"] .post-card h2,
+body[data-page-section="topic"] .topic-aside h2 {
+  color: #e1bd45 !important;
+}
+
+body[data-page-section="archive"] .featured-description,
+body[data-page-section="archive"] .post-description,
+body[data-page-section="archive"] .sidebar li,
+body[data-page-section="topics"] .topic-card p,
+body[data-page-section="topic"] .post-card p,
+body[data-page-section="topic"] .topic-aside p {
+  color: rgba(236, 232, 215, 0.7) !important;
+}
+
+body[data-page-section="topics"] .topic-card__latest,
+body[data-page-section="topic"] .topic-aside {
+  border-color: rgba(224, 202, 118, 0.14) !important;
+  background: rgba(3, 29, 22, 0.7) !important;
+}
+
+body[data-page-section="topics"] .back-link,
+body[data-page-section="topic"] .back-link,
+body[data-page-section="topic"] .topic-aside a,
+body[data-page-section="topics"] .latest-strip a {
+  color: #d9b53e !important;
+}
+
+body[data-page-section="privacy"] main,
+body[data-page-section="error"] main {
+  width: min(900px, calc(100% - 2rem));
+  padding: clamp(4rem, 9vw, 8rem) 0;
+}
+
+body[data-page-section="privacy"] main::before,
+body[data-page-section="error"] main::before {
+  content: "PSEUDO//INTEL  ·  DOKUMENT ROBOCZY";
+  display: block;
+  margin-bottom: 1rem;
+  color: #d9b53e;
+  font-family: "Archivo Variable", "Atkinson", sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+body[data-page-section="contact"] .contact-hero {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(47, 126, 109, 0.2), transparent 36%),
+    #061d18 !important;
+}
+
+body[data-page-section="contact"] .contact-card {
+  border-color: rgba(224, 202, 118, 0.22) !important;
+  background: rgba(7, 43, 33, 0.88) !important;
+  box-shadow: 0 22px 48px rgba(1, 13, 10, 0.28) !important;
+}
+
+body[data-page-section="contact"] .contact-card h2,
+body[data-page-section="contact"] .contact-card label,
+body[data-page-section="contact"] .contact-card .status,
+body[data-page-section="contact"] .contact-card input,
+body[data-page-section="contact"] .contact-card textarea {
+  color: #f1eee5 !important;
+}
+
+body[data-page-section="contact"] .contact-card input,
+body[data-page-section="contact"] .contact-card textarea {
+  border-color: rgba(224, 202, 118, 0.28) !important;
+  background: rgba(3, 29, 22, 0.76) !important;
 }
 
 #like-btn {

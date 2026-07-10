@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Ghana ewakuuje swoich z RPA: państwo kontra uliczna gościnność
-
-Ghana szykuje ewakuację 300 obywateli z RPA po antyimigranckich protestach. Państwo robi to, co powinno: liczy swoich ludzi, nie dobre chęci ulicy.
-
 Gdy państwo działa dobrze, bywa nudne. Ma formularz, telefon, nazwisko urzędnika i listę, która nie wygląda jak wielka polityka, lecz jak zeszyt z nazwiskami. Dopiero kryzys pokazuje, że ta nuda jest luksusem. Według BBC 300 obywateli Ghany zgłosiło się do ambasady w Pretorii w sprawie ewakuacji z RPA po antyimigranckich protestach. Źródło tematu: https://www.bbc.com/news/articles/cedpv17gqqzo?at_medium=RSS&at_campaign=rss
 
 To nie jest opowieść o egzotyce odległego kryzysu. To opowieść o chwili, w której hasła o mobilności, pracy za granicą i afrykańskiej solidarności trafiają na chodnik, tłum i strach. Wtedy wielkie słowa robią się lekkie jak papier, a ciężar ma tylko jedno pytanie: kto odbierze telefon, kiedy obcy kraj przestaje być gościnny?

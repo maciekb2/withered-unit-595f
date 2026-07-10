@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-## SzwajCarski Złoty Róg: Jak Neutralność Przerodziła się w Ekonomiczną Alchemię
-
 W ciągu ostatnich lat, Szwajcaria zdołała przekształcić swoją neutralną pozycję na światowej scenie w prawdziwą żyłę złota. Jak kraj pozbawiony zarówno zasobów naturalnych, jak i militarnego pieprzu zdołał osiągnąć ekonomiczne Eldorado? Oto ironiczna opowieść o czynniku neutralności przetworzonym na złote franki.
 
 ### Neutralność, Nowy Kolonializm
@@ -22,7 +20,7 @@ Nie można zapominać, że Szwajcaria stała się również rajem dla dyplomató
 
 ### Największe Zyski z Braku Zysków
 
-No cóż, w świecie, gdzie niektórzy czekają na owoce swojej pracy przez dekady, Szwajcaria stała się państwem, które *na braku aktywów zarabia najwięcej*. Przykłady? Słynne odmowy przyłączenia się do Unii Europejskiej. Kiedy inni usiłują rozdzielić nadzwyczajne kłopoty w terminach jak Brexit, Helweci zbierają dywidendy z bycia wyjątkiem, a nie regułą. 
+No cóż, w świecie, gdzie niektórzy czekają na owoce swojej pracy przez dekady, Szwajcaria stała się państwem, które *na braku aktywów zarabia najwięcej*. Przykłady? Słynne odmowy przyłączenia się do Unii Europejskiej. Kiedy inni usiłują rozdzielić nadzwyczajne kłopoty w terminach jak Brexit, Helweci zbierają dywidendy z bycia wyjątkiem, a nie regułą.
 
 ### Lekcja dla Nas?
 

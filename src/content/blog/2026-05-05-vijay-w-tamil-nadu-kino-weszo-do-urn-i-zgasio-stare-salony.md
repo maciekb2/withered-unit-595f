@@ -1,18 +1,13 @@
 ---
 title: "Vijay w Tamil Nadu: kino weszło do urn i zgasiło stare salony"
 description: "Vijay zagrał politykom Tamil Nadu na nosie: gwiazda ekranu prawie wymiotła wybory i pokazała, że lud chce mitu, nie wiecznych układów."
+sourceUrl: "https://www.bbc.com/news/articles/c8xwjx54zggo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-05"
 heroImage: "/blog-images/2026-05-05-vijay-w-tamil-nadu-kino-weszo-do-urn-i-zgasio-stare-salony.png"
 tags: ["polityka-i-media"]
 views: 0
 likes: 0
 ---
-
-# Vijay w Tamil Nadu: kino weszło do urn i zgasiło stare salony
-
-Vijay zagrał politykom Tamil Nadu na nosie: gwiazda ekranu prawie wymiotła wybory i pokazała, że lud chce mitu, nie wiecznych układów.
-
-Vijay zagrał politykom Tamil Nadu na nosie: gwiazda ekranu prawie wymiotła wybory i pokazała, że lud chce mitu, nie wiecznych układów. Źródło tematu: https://www.bbc.com/news/articles/c8xwjx54zggo?at_medium=RSS&at_campaign=rss
 
 ## Gwiazda przy urnie
 

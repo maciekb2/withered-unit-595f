@@ -15,17 +15,19 @@ const outline: Outline = {
   guardrails: [],
 };
 
-test('fails missing source URL and warns for report without same-sentence source', () => {
+test('fails when sourceUrl metadata is missing', () => {
   const md = `## Sec1\nWedług najnowszego raportu Instytut XYZ donosi o problemie.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\ntekst`;
   const res = validateAntiHallucination(md, outline);
   assert.equal(res.ok, false);
-  assert(res.errors.some(e => e.includes('Brak linku do zrodla')));
-  assert(res.errors.some(e => e.includes('raport bez zrodla')));
+  assert(res.errors.some(e => e.includes('Brak poprawnego sourceUrl')));
 });
 
-test('warns for numbers without context', () => {
-  const md = `## Sec1\nWedług statystyk obecnie 10 osób czeka, w magazynie 20 produktów, a rok temu było 30.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\nŹródło tematu: https://example.com`;
-  const res = validateAntiHallucination(md, outline);
+test('accepts sourced metadata and rejects raw source URLs in body', () => {
+  const md = `## Sec1\nWedług statystyk obecnie 10 osób czeka, w magazynie 20 produktów, a rok temu było 30.\n\n## Sec2\ntekst\n\n## Sec3\ntekst\n\n## Sec4\ntekst`;
+  const res = validateAntiHallucination(md, outline, 'https://example.com/source');
   assert.equal(res.ok, true);
-  assert(res.errors.some(e => e.startsWith('WARN')));
+
+  const withRawUrl = validateAntiHallucination(`${md}\n\nhttps://example.com/source`, outline, 'https://example.com/source');
+  assert.equal(withRawUrl.ok, false);
+  assert(withRawUrl.errors.some(e => e.includes('metadanych, nie w body')));
 });

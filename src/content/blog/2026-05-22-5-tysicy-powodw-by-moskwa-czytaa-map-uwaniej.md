@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# 5 tysięcy powodów, by Moskwa czytała mapę uważniej
-
-5 tys. żołnierzy USA w Polsce: NATO klaszcze, Warszawa liczy konkrety, a Kreml znów odkrywa, że mapa Europy ma granice.
-
 Zapowiedź wysłania 5 tys. amerykańskich żołnierzy do Polski, przyjęta z uznaniem przez szefa NATO, brzmi jak komunikat wojskowy, ale działa także jak lekcja geografii politycznej. Źródło tematu: https://www.bbc.com/news/articles/cedpz9669deo?at_medium=RSS&at_campaign=rss
 
 W takich chwilach dyplomacja przestaje udawać, że wystarczy dobra mina i starannie wyprasowany garnitur. Liczą się obecność, logistyka, gotowość i to, czy sojusznik rzeczywiście pojawia się tam, gdzie mapa zaczyna parzyć w palce. Polska od lat słyszy, że jest ważna. Teraz dostaje sygnał mniej poetycki, za to bardziej zrozumiały dla tych, którzy wolą liczyć bataliony niż przecinki w deklaracjach.

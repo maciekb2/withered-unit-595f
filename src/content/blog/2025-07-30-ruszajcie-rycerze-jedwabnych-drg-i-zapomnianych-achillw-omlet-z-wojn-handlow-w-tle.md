@@ -16,7 +16,7 @@ Wszystko wskazuje na to, że organizują się nowe połacie dyplomatycznych klin
 
 ## Wojna Handlowa: Nowy Przepis z Tajemniczym Składnikiem
 
-Teraz, gdy różne kraje wymieniają się recepturami na międzynarodowe potyczki, my, jako patrioci, z niecierpliwością wyczekujemy, czy nasi dyplomaci podejmą wyzwanie i staną w kuchennej potyczce. Czy Polska proponuje swoją recepturę wzmacniającą narodową dumę w tej zupie globalnych interesów? 
+Teraz, gdy różne kraje wymieniają się recepturami na międzynarodowe potyczki, my, jako patrioci, z niecierpliwością wyczekujemy, czy nasi dyplomaci podejmą wyzwanie i staną w kuchennej potyczce. Czy Polska proponuje swoją recepturę wzmacniającą narodową dumę w tej zupie globalnych interesów?
 
 - **Przygody Rycerzy Jedwabnych Dróg** czy **Odyseja Europejska**? Otóż, jeden i drugi scenariusz oddają ten sam melodramatyczno-kulinarny taniec.
 - Co zyskujemy? Cóż, poza nowymi zębami ekonomicznych tarapatów — górskie powiewy świeżego Wschodu.

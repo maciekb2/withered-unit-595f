@@ -46,7 +46,7 @@ function buildRepairPrompt(
     `Wymagane naglowki sekcji (musza wystapic w tekscie dokladnie jako linie zaczynajace sie od "## "):\n${h2List}\n\n` +
     `Twarde reguly:\n` +
     `- W finalnym tekscie nie moze pozostac [[TODO-CLAIM]].\n` +
-    `- W calym tekscie ma byc dokladnie 1 URL: leadSourceUrl z kontekstu (i zadnych innych).\n` +
+    `- Nie wstawiaj URL do body; leadSourceUrl zostanie zapisany osobno w metadanych.\n` +
     `- Jesli pojawia sie niepewna liczba/data/raport — uogolnij; nie dopisuj nowych danych.\n` +
     `- Jesli blad dotyczy dlugosci, rozbuduj istniejace sekcje o konkretne akapity publicystyczne, bez lania wody i bez nowych zrodel.\n` +
     templateBlock +

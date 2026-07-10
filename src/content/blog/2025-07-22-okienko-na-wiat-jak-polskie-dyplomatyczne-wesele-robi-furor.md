@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-## Okienko na Świat: Jak Polskie Dyplomatyczne Wesele Robi Furorę
-
 W dzisiejszym, jak że przewrotnym świecie, Polska niespodziewanie staje się przystanią, gdzie wielkie potęgi chcą zawierać swoje dyplomatyczne, czy nawet cywilizacyjne sojusze. Przyjrzyjmy się, jak nasza dzielna ojczyzna subtelnie wkroczyła na scenę międzynarodowych podchodów, a wszystko dzięki naszemu uroczemu i nieco zwariowanemu podejściu do... dyplomacji!
 
 ### **Polska - Klejnot Pomiędzy Szczytami**

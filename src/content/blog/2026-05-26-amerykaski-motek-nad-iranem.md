@@ -1,18 +1,13 @@
 ---
 title: "Amerykański młotek nad Iranem"
 description: "Waszyngton znów uderza w irańskie cele, mówiąc o samoobronie; w tle katarskie rozmowy i pytanie, czy rakiety da się uciszyć komunikatem."
+sourceUrl: "https://www.bbc.com/news/articles/cvgzzn4y1n8o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-26"
 heroImage: "/blog-images/2026-05-26-amerykaski-motek-nad-iranem.png"
 tags: ["geopolityka", "polityka-i-media"]
 views: 0
 likes: 0
 ---
-
-# Amerykański młotek nad Iranem
-
-Waszyngton znów uderza w irańskie cele, mówiąc o samoobronie; w tle katarskie rozmowy i pytanie, czy rakiety da się uciszyć komunikatem.
-
-Waszyngton znów uderza w irańskie cele, mówiąc o samoobronie; w tle katarskie rozmowy i pytanie, czy rakiety da się uciszyć komunikatem. Źródło tematu: https://www.bbc.com/news/articles/cvgzzn4y1n8o?at_medium=RSS&at_campaign=rss
 
 ## Samoobrona z megafonem
 

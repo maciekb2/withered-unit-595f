@@ -1,18 +1,13 @@
 ---
 title: "Madryt na kolanach, Europa w popłochu"
 description: "Madryt stał się konfesjonałem pod gołym niebem: tłum przy papieskiej mszy pokazał, że Europa wciąż umie klęknąć, choć salon woli udawać zdziwienie."
+sourceUrl: "https://www.bbc.com/news/articles/c4gyejvzx9eo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-07"
 heroImage: "/blog-images/2026-06-07-madryt-na-kolanach-europa-w-popochu.png"
 tags: ["geopolityka", "europa-i-unia", "gospodarka-i-energia"]
 views: 0
 likes: 0
 ---
-
-# Madryt na kolanach, Europa w popłochu
-
-Madryt stał się konfesjonałem pod gołym niebem: tłum przy papieskiej mszy pokazał, że Europa wciąż umie klęknąć, choć salon woli udawać zdziwienie.
-
-Madryt stał się konfesjonałem pod gołym niebem: tłum przy papieskiej mszy pokazał, że Europa wciąż umie klęknąć, choć salon woli udawać zdziwienie. Źródło tematu: https://www.bbc.com/news/articles/c4gyejvzx9eo?at_medium=RSS&at_campaign=rss
 
 ## Tłum
 

@@ -1,18 +1,13 @@
 ---
 title: "Kremlowska noc nad Ukrainą: rakiety, ruiny i stara bajka o „obronie”"
 description: "Moskwa znów udaje meteorologię: spadają rakiety, giną ludzie, a propaganda tłumaczy, że to tylko kolejny odcinek imperialnej troski."
+sourceUrl: "https://www.bbc.com/news/articles/clyp6831yp5o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-24"
 heroImage: "/blog-images/2026-05-24-kremlowska-noc-nad-ukrain-rakiety-ruiny-i-stara-bajka-o-obronie.png"
 tags: ["geopolityka", "technologia-i-cyber", "gospodarka-i-energia"]
 views: 0
 likes: 0
 ---
-
-# Kremlowska noc nad Ukrainą: rakiety, ruiny i stara bajka o „obronie”
-
-Moskwa znów udaje meteorologię: spadają rakiety, giną ludzie, a propaganda tłumaczy, że to tylko kolejny odcinek imperialnej troski.
-
-Źródło tematu: https://www.bbc.com/news/articles/clyp6831yp5o?at_medium=RSS&at_campaign=rss
 
 ## Bilans nocy
 

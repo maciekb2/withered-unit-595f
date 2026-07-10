@@ -5,7 +5,8 @@ Wymagania:
 - Trzymaj się konspektu: dokładnie 3 sekcje, nagłówki dokładnie jak w outline ("## ...") i w tej samej kolejności.
 - Każdy bullet rozwiń w spójny akapit 6–10 zdań (bez list wypunktowanych w treści).
 - Nie dodawaj nowych faktów poza tym, co wynika z kontekstu i ogólnej wiedzy; jeśli brak pewności, uogólnij (nie wstawiaj [[TODO-CLAIM]] w finalnym wyniku).
-- W całym artykule ma się pojawić dokładnie 1 link URL do źródła tematu: użyj `leadSourceUrl` z KONTEKSTU (JSON). Nie dodawaj innych URL.
+- Nie wstawiaj URL do body. `leadSourceUrl` z KONTEKSTU zostanie zapisany osobno w metadanych i pokazany przez layout artykułu.
+- Zwróć wyłącznie właściwe body: zacznij od pierwszego nagłówka `##`. Nie powtarzaj tytułu jako `#`, nie wstawiaj opisu/ leadu z outline i nie dodawaj osobnego wiersza „Źródło tematu”. Źródło oraz lead wyświetla layout strony.
 - Nie nazywaj gotowego tekstu satyrą ani artykułem. W polu description i w treści nie używaj słów: satyra, satyryczny, satyryczna, satyrycznie.
 
 Format wyjściowy (bez komentarzy i bez markdown fences):

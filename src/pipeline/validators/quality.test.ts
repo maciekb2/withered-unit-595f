@@ -47,6 +47,46 @@ test('validateArticleQuality warns about generic phrasing without failing', () =
   assert(result.warnings.some(warning => warning.includes('Generyczne frazy')));
 });
 
+test('validateArticleQuality rejects repeated title and lead in body', () => {
+  const description = 'Europa ogłosiła nowy plan, ale jego wykonanie zależy od fabryk, budżetów i terminów dostaw.';
+  const article: FinalJson = {
+    title: outline.finalTitle,
+    description,
+    content: [
+      `# ${outline.finalTitle}`,
+      description,
+      '## Parasol z metką',
+      longParagraph(),
+      '## Lekcja z przerwy',
+      longParagraph('Drugi odrębny akapit analizuje wykonanie decyzji'),
+      '## Polska puenta',
+      longParagraph('Trzeci odrębny akapit opisuje konsekwencje decyzji'),
+    ].join('\n\n'),
+  };
+
+  const result = validateArticleQuality(article, outline);
+  assert.equal(result.ok, false);
+  assert(result.errors.some(error => error.includes('powtorzonego tytulu')));
+  assert(result.errors.some(error => error.includes('powtarza opis/lead')));
+});
+
+test('validateArticleQuality rejects near-duplicate paragraphs', () => {
+  const first = longParagraph('Port przyjął nowy ładunek po decyzji rządu');
+  const second = first.replace('nowy ładunek', 'kolejny ładunek');
+  const article = articleWithBody([
+    '## Parasol z metką',
+    first,
+    '## Lekcja z przerwy',
+    second,
+    '## Polska puenta',
+    longParagraph('Odrębny akapit opisuje końcowy skutek decyzji'),
+  ].join('\n\n'));
+
+  const result = validateArticleQuality(article, outline);
+  assert.equal(result.ok, false);
+  assert(result.errors.some(error => error.includes('powtorzone akapity')));
+});
+
 function articleWithBody(content: string): FinalJson {
   return {
     title: outline.finalTitle,

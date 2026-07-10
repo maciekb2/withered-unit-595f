@@ -89,7 +89,7 @@ export async function generateArticleAssets({
   });
   let edited = writeRes.edited;
 
-  const validation = validateAntiHallucination(edited.markdown, outline);
+  const validation = validateAntiHallucination(edited.markdown, outline, finalLeadUrl);
   if (!validation.ok) {
     const errs = validation.errors.filter(e => e.startsWith('ERROR'));
     logEvent({ type: 'cli-content-validate-failed', errors: errs, stats: validation.stats });
@@ -109,7 +109,7 @@ export async function generateArticleAssets({
         maxTokens: 2500,
       });
       edited = repairRes.edited;
-      const after = validateAntiHallucination(edited.markdown, outline);
+      const after = validateAntiHallucination(edited.markdown, outline, finalLeadUrl);
       if (after.ok) {
         logEvent({ type: 'cli-repair-complete', attempt, stats: after.stats });
         fixed = true;
@@ -140,6 +140,7 @@ export async function generateArticleAssets({
   });
 
   const article = formatFinal(edited);
+  if (leadSourceUrl) article.sourceUrl = leadSourceUrl;
   const heroPrompt = heroTemplate.replace('{title}', article.title);
   const heroImage = await generateHeroImage({
     apiKey,

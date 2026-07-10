@@ -6,6 +6,7 @@ import {
   normalizeObviousPolishNames,
 } from './description';
 import { tagsForArticle } from '../utils/topics';
+import { normalizeArticleBody } from './articleBody';
 
 export function formatFinal(edited: Edited): FinalJson {
   const description = cleanArticleDescription(edited.description);
@@ -16,13 +17,14 @@ export function formatFinal(edited: Edited): FinalJson {
   assertPolishArticleText(title, 'title');
   assertPolishArticleText(description, 'description');
   assertArticleDescription(description);
-  if (edited.markdown.length < 800) {
+  const content = normalizeArticleBody(edited.markdown, title, description);
+  if (content.length < 800) {
     throw new Error('content too short');
   }
   return {
     title,
     description,
-    content: edited.markdown,
+    content,
     tags: tagsForArticle(edited.title, description),
   };
 }

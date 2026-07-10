@@ -1,18 +1,13 @@
 ---
 title: "Iran hamuje amerykański triumfalizm"
 description: "Teheran studzi zapowiedzi Waszyngtonu: porozumienie z USA ma nie być na wyciągnięcie ręki, choć dyplomatyczne fanfary już proszą się o werbel."
+sourceUrl: "https://www.bbc.com/news/articles/cglpp2yk336o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-25"
 heroImage: "/blog-images/2026-05-25-iran-hamuje-amerykaski-triumfalizm.png"
 tags: ["geopolityka"]
 views: 0
 likes: 0
 ---
-
-# Iran hamuje amerykański triumfalizm
-
-Teheran studzi zapowiedzi Waszyngtonu: porozumienie z USA ma nie być na wyciągnięcie ręki, choć dyplomatyczne fanfary już proszą się o werbel.
-
-Teheran studzi zapowiedzi Waszyngtonu: porozumienie z USA ma nie być na wyciągnięcie ręki, choć dyplomatyczne fanfary już proszą się o werbel. Źródło tematu: https://www.bbc.com/news/articles/cglpp2yk336o?at_medium=RSS&at_campaign=rss
 
 ## Zimny prysznic
 

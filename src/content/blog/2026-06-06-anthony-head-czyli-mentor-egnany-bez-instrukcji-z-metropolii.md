@@ -1,18 +1,13 @@
 ---
 title: "Anthony Head, czyli mentor żegnany bez instrukcji z metropolii"
 description: "Po śmierci Anthony’ego Heada wracają Giles i Rupert Mannion: brytyjski dryg, który polski widz czytał po swojemu, bez klękania przed salonem."
+sourceUrl: "https://www.bbc.com/news/articles/cd0p0rz4n0mo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-06"
 heroImage: "/blog-images/2026-06-06-anthony-head-czyli-mentor-egnany-bez-instrukcji-z-metropolii.png"
 tags: ["geopolityka"]
 views: 0
 likes: 0
 ---
-
-# Anthony Head, czyli mentor żegnany bez instrukcji z metropolii
-
-Po śmierci Anthony’ego Heada wracają Giles i Rupert Mannion: brytyjski dryg, który polski widz czytał po swojemu, bez klękania przed salonem.
-
-Źródło tematu: https://www.bbc.com/news/articles/cd0p0rz4n0mo?at_medium=RSS&at_campaign=rss
 
 ## Ostatni ukłon
 

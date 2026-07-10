@@ -14,6 +14,16 @@ export function validateFinalJson(a: FinalJson): { ok: boolean; errs: string[] }
   if (!a.content || a.content.length < 800) {
     errs.push('content must be at least 800 chars');
   }
+  if (a.sourceUrl != null) {
+    try {
+      const sourceUrl = new URL(a.sourceUrl);
+      if (!['http:', 'https:'].includes(sourceUrl.protocol)) {
+        errs.push('sourceUrl must use http or https');
+      }
+    } catch {
+      errs.push('sourceUrl must be a valid URL');
+    }
+  }
   if (a.tags != null) {
     if (!Array.isArray(a.tags)) {
       errs.push('tags must be an array');

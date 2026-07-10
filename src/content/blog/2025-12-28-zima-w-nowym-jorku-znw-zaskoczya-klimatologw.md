@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Zima w Nowym Jorku znów zaskoczyła klimatologów
-
 ## Gdy Wielkie Jabłko widzi płatek śniegu
 Nowy Jork udaje zdumienie na widok śniegu, jakby to był rzadki okaz w muzeum, a nie sezonowy gość z północy. U nas na taki pokaz mówimy ziewając: to tylko wtorek, szanowni państwo. Media wieszczą historyczność, ulice robią swój melodramat, a metro udaje, że pierwszy raz widzi biały puch. Zimowa aura, jak zwykle, gra na nerwach wielkiego miasta, które wie wszystko o modzie, a wciąż myli się co do pogody. BBC zebrała zachwyt i lament w jedną opowieść, więc kto chce, niech odłoży kakao i przeczyta ją tutaj (żeby nie było, że zmyślamy): https://www.bbc.com/news/articles/cdj817m37rgo?at_medium=RSS&at_campaign=rss. A my, patrząc na ten spektakl zza Wisły, prychamy pod nosem: drogie Wielkie Jabłko, ta pora roku ma w nazwie akcent na „zima”. I choć brzmi to niemiło, śnieg nie jest klęską żywiołową, tylko realnym testem organizacji.
 

@@ -1,4 +1,9 @@
 import type { FinalJson, Outline } from '../types';
+import {
+  headingRepeatsTitle,
+  isRedundantLeadBlock,
+  normalizeArticleFragment,
+} from '../articleBody';
 
 export interface QualityValidationResult {
   ok: boolean;
@@ -22,6 +27,13 @@ const GENERIC_PHRASES = [
   'świat pod lupą',
   'czas pokaże',
   'nie sposób nie zauważyć',
+  'nie ma tu wielkiej metafizyki',
+  'to zdanie brzmi jak',
+  'najciekawsze jest',
+  'problem w tym',
+  'w tej historii',
+  'pozostaje pytanie',
+  'geopolityczny taniec',
 ];
 
 export function validateArticleQuality(
@@ -31,12 +43,24 @@ export function validateArticleQuality(
   const errors: string[] = [];
   const warnings: string[] = [];
   const content = article.content || '';
+  const blocks = content
+    .split(/\n{2,}/)
+    .map(part => part.trim())
+    .filter(Boolean);
   const h2Headings = [...content.matchAll(/^##\s+(.+)$/gm)].map(match => match[1].trim());
   const paragraphs = content
     .split(/\n{2,}/)
     .map(part => part.trim())
     .filter(part => part && !/^#{1,6}\s+/.test(part));
   const words = (content.match(/\p{L}[\p{L}\p{M}-]*/gu) || []).length;
+
+  if (blocks[0] && headingRepeatsTitle(blocks[0], article.title)) {
+    errors.push('ERROR: Body zaczyna sie od powtorzonego tytulu artykulu');
+  }
+
+  if (paragraphs.some(paragraph => isRedundantLeadBlock(paragraph, article.description))) {
+    errors.push('ERROR: Body powtarza opis/lead wyswietlany juz pod tytulem');
+  }
 
   if (words < MIN_ARTICLE_WORDS) {
     errors.push(
@@ -103,15 +127,31 @@ function headingTooCloseToTitle(title: string, heading: string): boolean {
 }
 
 function repeatedParagraphCount(paragraphs: string[]): number {
-  const seen = new Set<string>();
   let repeated = 0;
-  for (const paragraph of paragraphs) {
-    const normalized = normalize(paragraph).slice(0, 260);
-    if (normalized.length < 80) continue;
-    if (seen.has(normalized)) repeated += 1;
-    seen.add(normalized);
+  const normalized = paragraphs
+    .map(paragraph => normalizeArticleFragment(paragraph))
+    .filter(paragraph => paragraph.length >= 80);
+  for (let index = 0; index < normalized.length; index++) {
+    for (let previous = 0; previous < index; previous++) {
+      if (paragraphsAreNearDuplicates(normalized[index], normalized[previous])) {
+        repeated += 1;
+        break;
+      }
+    }
   }
   return repeated;
+}
+
+function paragraphsAreNearDuplicates(left: string, right: string): boolean {
+  if (left === right) return true;
+  if (left.length >= 120 && right.length >= 120 && (left.startsWith(right) || right.startsWith(left))) {
+    return true;
+  }
+  const leftTokens = new Set(left.split(/\s+/));
+  const rightTokens = new Set(right.split(/\s+/));
+  const union = new Set([...leftTokens, ...rightTokens]);
+  const common = [...leftTokens].filter(token => rightTokens.has(token)).length;
+  return union.size > 0 && common / union.size >= 0.92;
 }
 
 function meaningfulTokens(value: string): string[] {

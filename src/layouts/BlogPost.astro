@@ -22,12 +22,17 @@ const {
     pubDate,
     updatedDate,
     heroImage,
+    sourceUrl,
     tags = [],
     likes,
     prev,
     next,
     related = [],
 } = Astro.props as Props;
+
+const sourceHost = sourceUrl
+        ? new URL(sourceUrl).hostname.replace(/^www\./, '')
+        : undefined;
 
 const frontmatterTopics = topicsFromTags(tags);
 const articleTopics = frontmatterTopics.length
@@ -179,7 +184,8 @@ const jsonLd = {
                                 line-height: 1.3;
 			}
                         .article-meta span,
-                        .article-meta button {
+                        .article-meta button,
+                        .article-meta a {
                                 display: inline-flex;
                                 align-items: center;
                                 min-height: 2rem;
@@ -218,6 +224,21 @@ const jsonLd = {
                                 cursor: default;
                                 opacity: 0.78;
                                 transform: none;
+                        }
+                        .source-link {
+                                gap: 0.35rem;
+                                padding: 0.22rem 0.58rem;
+                                border: 1px solid rgba(28, 61, 90, 0.16);
+                                border-radius: 999px;
+                                color: var(--diplomatic-blue);
+                                background: rgba(255, 255, 255, 0.62);
+                                font-weight: 700;
+                                text-decoration: none;
+                        }
+                        .source-link:hover,
+                        .source-link:focus-visible {
+                                border-color: rgba(203, 161, 53, 0.7);
+                                outline: none;
                         }
                         .article-content {
                                 font-size: clamp(1rem, 1.5vw, 1.08rem);
@@ -370,7 +391,7 @@ const jsonLd = {
                 </style>
 	</head>
 
-	<body>
+	<body data-page-section="article">
 		<Header />
 		<main>
 			<article
@@ -399,6 +420,11 @@ const jsonLd = {
                                                                 )
                                                         }
                                                         <span class="metric">Wyświetlenia: <strong id="view-count">0</strong></span>
+                                                        {sourceUrl && sourceHost && (
+                                                                <a class="source-link" href={sourceUrl} target="_blank" rel="noreferrer">
+                                                                        Źródło: {sourceHost} <span aria-hidden="true">↗</span>
+                                                                </a>
+                                                        )}
                                                         <button class="like-control" id="like-btn" type="button" aria-label="Polub wpis">
                                                                 <span aria-hidden="true">♡</span>
                                                                 <span>Polubienia: <strong id="like-count">{likes ?? 0}</strong></span>

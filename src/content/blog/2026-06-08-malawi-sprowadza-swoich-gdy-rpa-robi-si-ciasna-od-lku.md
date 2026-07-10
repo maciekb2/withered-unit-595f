@@ -1,51 +1,39 @@
 ---
 title: "Malawi sprowadza swoich: gdy RPA robi się ciasna od lęku"
-description: "Malawi sprowadza obywateli z RPA po doniesieniach o przemocy wobec migrantów; państwo robi to, co powinno, gdy ulica myli gościa z wrogiem."
+description: "Do Malawi wróciło 171 obywateli, którzy schronili się w obozach po przemocy w RPA. Repatriacje odsłaniają napięcie między kontrolą migracji a ksenofobią."
+sourceUrl: "https://www.bbc.com/news/articles/cnv9dz3reego?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-08"
+updatedDate: "2026-07-10"
 heroImage: "/blog-images/2026-06-08-malawi-sprowadza-swoich-gdy-rpa-robi-si-ciasna-od-lku-editorial.webp"
-tags: ["geopolityka"]
+tags: ["geopolityka", "polityka-i-media"]
 views: 0
 likes: 0
 ---
 
-# Malawi sprowadza swoich: gdy RPA robi się ciasna od lęku
+## Pierwszy transport wraca do Malawi
 
-Malawi sprowadza obywateli z RPA po doniesieniach o przemocy wobec migrantów; państwo robi to, co powinno, gdy ulica myli gościa z wrogiem.
+Do Malawi przybyła grupa 171 obywateli repatriowanych z Republiki Południowej Afryki. Wśród powracających było 115 mężczyzn, 43 kobiety i 13 dzieci. Według władz w Lilongwe ludzie ci znaleźli się wcześniej w tymczasowych obozach w Mossel Bay, razem z innymi cudzoziemcami szukającymi schronienia. Rząd określił operację jako dobrowolną repatriację i zapowiedział, że jest to pierwsza grupa mieszkańców Malawi wysiedlonych z Prowincji Przylądkowej Zachodniej, która wróciła do kraju.
 
-Malawi sprowadza obywateli z RPA po doniesieniach o przemocy wobec migrantów; państwo robi to, co powinno, gdy ulica myli gościa z wrogiem. Źródło tematu: https://www.bbc.com/news/articles/cnv9dz3reego?at_medium=RSS&at_campaign=rss
+Transport zorganizowano po doniesieniach o przemocy i zastraszaniu migrantów. W Mossel Bay miały miejsce akcje prowadzone od drzwi do drzwi, a w regionie zginęło dwóch obywateli Mozambiku. Zdjęcia opublikowane przez rząd Malawi pokazują długą kolejkę ludzi czekających na rejestrację na pustym stadionie. Za urzędowym określeniem „repatriacja” stoją więc bardzo praktyczne czynności: potwierdzenie tożsamości, transport, miejsce przyjęcia oraz pomoc dla osób, które zostawiły w RPA pracę i część dobytku.
 
-## Powrót
+Powrót nie rozwiązuje przyczyn wyjazdu. Wielu obywateli państw regionu pracuje w RPA dlatego, że tamtejsza gospodarka oferuje większy rynek i więcej możliwości zarobku. Kiedy bezpieczeństwo znika, kraj pochodzenia musi szybko zbudować drogę powrotną, nawet jeśli nie ma gotowego programu reintegracji. Dla powracających jest to jednocześnie ulga i porażka planu życiowego. Granica staje się bezpieczna dopiero po jej przekroczeniu w przeciwnym kierunku.
 
-Malawi zaczyna sprowadzać obywateli z RPA w chwili, gdy doniesienia o przemocy wobec migrantów przestają być odległym szumem, a stają się sprawą państwową. Nie ma tu wielkiej metafizyki. Jest transport, lista nazwisk, nerwowe telefony i ta dość stara prawda, że obywatel za granicą nie przestaje być obywatelem tylko dlatego, że przekroczył granicę. Państwo, które wcześniej mogło mówić o szansach, pracy i migracji, teraz mówi językiem powrotu. To język mniej elegancki, ale za to zrozumiały.
+## Repatriacje obejmują cały region
 
-Powrót nie wygląda jak zwycięstwo. Raczej jak cofnięcie się o krok przed drzwiami, za którymi zrobiło się zbyt głośno. Ci, którzy wyjeżdżali z nadzieją na lepsze życie, wracają nie dlatego, że skończył się sen o zarobku, lecz dlatego, że zbyt łatwo można zostać uznanym za kogoś obcego, a potem za winnego. To właśnie w tej kolejności działa uliczna podejrzliwość: najpierw wskazuje palcem, później dopisuje uzasadnienie. Reszta jest już logistyką.
+Malawi nie działa samo. Ghana, Nigeria i Zimbabwe również zorganizowały transport dla swoich obywateli po doniesieniach o ksenofobicznej przemocy w RPA. Do Zimbabwe wróciły 74 osoby przewiezione z Mossel Bay. Część rodzin mówiła, że opuściła Prowincję Przylądkową Zachodnią z obawy o bezpieczeństwo dzieci. Ghana wysłała samolot po niemal 300 obywateli z Johannesburga, a w kolejnych dniach do Akry dotarła grupa około 680 osób.
 
-Malawi nie jest jedynym krajem afrykańskim, który reaguje na sytuację w RPA, ale jego decyzja pokazuje mechanizm w najczystszej postaci. Gdy hostujący kraj przestaje być bezpiecznym miejscem dla przybyszów, kraj pochodzenia musi nagle stać się portem. Nawet jeśli port jest skromny, nawet jeśli nie ma marmurowych terminali ani wielkich deklaracji. W takich chwilach liczy się nie dekoracja, lecz kierunek: ludzie mają wrócić żywi, możliwie spokojnie, bez dodatkowego upokorzenia po drodze.
+Nigeria planowała pierwszy lot ewakuacyjny dla 270 obywateli, ale przesunęła go z powodów logistycznych. Do powrotu sprawdzono i dopuszczono już ponad 500 Nigeryjczyków. Prezydent Bola Tinubu zatwierdził łącznie pięć lotów. Skala działań pokazuje, że nie chodzi o pojedynczy incydent ani wyłącznie o Malawi. Kilka rządów równocześnie uznało, że ryzyko jest wystarczające, by uruchomić kosztowną operację transportową.
 
-Najbardziej gorzki jest fakt, że repatriacja brzmi w urzędowym języku niemal schludnie. Jakby chodziło o przesunięcie teczki z jednej półki na drugą. Tymczasem za tym słowem stoi pęknięcie: ktoś, kto wyjechał, musi uznać, że miejsce, które miało być szansą, stało się ryzykiem. I państwo musi uznać to samo. Nie po to, by wygłaszać kazania, lecz by podstawiać transport. Czasami cywilizacja ma bardzo prosty kształt. Ma miejsce siedzące.
+Między państwami pojawił się przy tym spór o opis sytuacji. Minister spraw zagranicznych RPA Ronald Lamola zarzucił swojemu ghańskiemu odpowiednikowi Samuelowi Okudzeto Ablakwie rozpowszechnianie nieprawdziwych informacji o ofiarach przemocy. Ablakwa mówił o cudzoziemcach zabitych i rannych w atakach oraz apelował do Unii Afrykańskiej o przeprowadzenie dochodzenia. Lamola kwestionował część tych danych i twierdził, że władze RPA nie posiadają informacji o rannych Ghańczykach leczonych w szpitalach.
 
-## Tło
+Spór dyplomatyczny nie zmienia faktu, że rządy wysyłają autobusy i samoloty. Gdy jeden kraj mówi o przesadzonej narracji, a drugi rejestruje setki osób do ewakuacji, wiarygodność mierzy się nie tylko komunikatem, ale decyzjami operacyjnymi. Ghana domaga się także odszkodowań za mienie pozostawione przez repatriowanych obywateli. To przenosi sprawę z poziomu bezpieczeństwa ulicznego na poziom odpowiedzialności państwowej.
 
-RPA od lat przyciąga ludzi z regionu, bo bywa postrzegana jako większy rynek, większa obietnica i większa scena. Ale większa scena ma też ciemniejsze kulisy. Doniesienia o przemocy wobec migrantów wpisują się w napięcie, którego nie da się sprowadzić do jednego incydentu ani jednego hasła. Wrogość wobec przyjezdnych nie pojawia się znikąd. Zwykle dojrzewa w rozmowach, w oskarżeniach rzucanych półgłosem, w politycznym wygodnictwie i w przekonaniu, że najłatwiej wskazać winnego po akcencie, paszporcie albo twarzy.
+## Granica między kontrolą a samosądem
 
-To nie znaczy, że każdy konflikt społeczny ma prostą etykietę. Przeciwnie: im prostsza etykieta, tym bardziej podejrzana. Migranci stają się często ekranem, na który rzutuje się lęk, bezrobocie, gniew i poczucie porzucenia. Ekran nie odpowiada. Ekran można popchnąć. Wtedy ulica zyskuje złudzenie sprawczości, a państwo odkrywa, że problem, który długo dało się opisywać jako „napięcie”, nagle wymaga konwojów, telefonów alarmowych i decyzji podejmowanych bez teatralnych pauz.
+Antymigracyjne grupy w RPA żądają, by osoby bez odpowiednich dokumentów opuściły kraj, i wyznaczyły termin do 30 czerwca. Prezydent Cyril Ramaphosa zapowiedział przyspieszenie działań przeciw nielegalnej migracji oraz deportacji osób bez prawa pobytu. Jednocześnie ostrzegł obywateli, by nie brali prawa we własne ręce. W wystąpieniu podkreślił, że w RPA nie ma miejsca na ksenofobię, rasizm, afrofobię ani inne formy nietolerancji.
 
-Malawi nie podejmuje więc decyzji w próżni. Reaguje na klimat, w którym obywatel za granicą może stać się zakładnikiem cudzej frustracji. To szczególnie trudne, bo migracja w regionie nie jest kaprysem ani egzotyczną przygodą. Jest sposobem radzenia sobie z nierównością szans, różnicami między gospodarkami i zwykłą potrzebą zarobku. Gdy ten przepływ zostaje zatruty strachem, cierpi nie tylko pojedynczy człowiek. Cierpi cała wyobraźnia o sąsiedztwie.
+To rozróżnienie jest kluczowe. Państwo może kontrolować granice, sprawdzać status pobytowy i wykonywać decyzje deportacyjne. Grupa mieszkańców nie może natomiast zastępować urzędu, chodzić od domu do domu i wskazywać ludzi na podstawie pochodzenia. Gdy te dwie rzeczy zostają wrzucone do jednego worka, walka z nielegalną migracją staje się wygodnym alibi dla przemocy wobec każdego, kto wygląda lub brzmi jak cudzoziemiec.
 
-W tej historii RPA nie jest abstrakcją, a Malawi nie jest tylko administracją od powrotów. Oba państwa spotykają się w punkcie, w którym regionalna współzależność pokazuje swoją mniej pocztówkową twarz. Jedni potrzebują rynku pracy, drudzy szukają pracy na rynku. Jedni mówią o porządku, drudzy o bezpieczeństwie. A między nimi stoi człowiek, który chciał po prostu żyć trochę lepiej i nagle dowiaduje się, że jego obecność stała się politycznym paliwem. Bardzo wydajnym, niestety.
+Rząd RPA rozważa również obciążanie państw przyjmujących kosztami deportacji ich obywateli. Taki pomysł może uporządkować finansowanie procedur, ale zaostrzy relacje z sąsiadami, jeśli zostanie wprowadzony w atmosferze wzajemnych oskarżeń. Państwa regionu już ponoszą koszty lotów, transportu lądowego i przyjmowania powracających. Jednocześnie oczekują od Pretorii ochrony legalnie przebywających migrantów oraz wyjaśnienia przypadków przemocy.
 
-Dlatego transport obywateli do Malawi jest nie tylko techniczną odpowiedzią na doniesienia o przemocy. Jest także sygnałem, że granica nie kończy odpowiedzialności. Państwo nie może obiecać obywatelowi szczęścia za granicą, ale może przynajmniej nie udawać, że nie słyszy, gdy robi się niebezpiecznie. To minimum, a zarazem maksimum wielu realnych polityk: usłyszeć, policzyć, zabrać, przyjąć. Mało efektowne? Owszem. Ale w kryzysie nadmiar efektu bywa pierwszym objawem braku treści.
-
-## Obowiązek
-
-Obowiązek państwa w takich sytuacjach jest mniej romantyczny, niż lubią to przedstawiać przemówienia. Nie polega na tym, by wygrać konkurs na najpiękniejsze współczucie. Polega na tym, by zorganizować powrót, nie zgubić ludzi w procedurze i nie zamienić ich strachu w materiał do autopromocji. Malawi ma tu zadanie proste tylko na papierze. W praktyce każdy powrót oznacza kontakt z rodzinami, ocenę ryzyka, zapewnienie transportu i przyjęcie tych, którzy wracają często z poczuciem porażki, choć to nie oni stworzyli zagrożenie.
-
-Słowo „repatriacja” lubi udawać neutralność. Brzmi jak czynność z instrukcji, gdzie wszystko ma rubrykę i pieczątkę. Ale człowiek wracający z powodu lęku nie jest przesyłką zwrotną. Ma za sobą wybór, koszt, często długi czas oczekiwania na poprawę życia. Państwo powinno więc działać trzeźwo, ale nie bezdusznie. Zimna głowa jest potrzebna, zimne serce już mniej. Różnica bywa subtelna tylko dla tych, którzy nigdy nie musieli wracać w pośpiechu.
-
-Właśnie tu zaczyna się test. Nie w deklaracji, że „nasi obywatele są ważni”, bo to potrafi powiedzieć każdy rzecznik w czystej koszuli. Test zaczyna się wtedy, gdy trzeba tę ważność przeliczyć na miejsca w transporcie, godziny odjazdu, informację dla rodzin i podstawowe poczucie, że powrót nie jest karą. Ludzie, którzy wracają, nie powinni słyszeć między wierszami, że zawiedli. Zawiódł raczej porządek, który pozwala, by migrant stał się wygodnym celem.
-
-Malawi, sprowadzając swoich obywateli, wykonuje gest elementarny, a przez to politycznie mocny. Nie grozi, nie pręży mięśni, nie musi wpisywać całej sprawy w wielką opowieść o dumie narodowej. Wystarczy, że mówi: jeśli jest niebezpiecznie, wracajcie. W czasach, gdy wiele państw najpierw pyta o koszty wizerunkowe, taka prostota ma swoją wagę. Oczywiście nie rozwiązuje problemu przemocy wobec migrantów w RPA. Nie ma takiej ambicji. Ale oddziela ludzi od najbliższego zagrożenia, a to w kryzysie nie jest przypis, tylko sedno.
-
-Pozostaje pytanie, co stanie się potem. Powrót może być początkiem opieki albo końcem zainteresowania. Może oznaczać realne wsparcie albo tylko chwilę na zdjęcie z administracyjnym uśmiechem. Tego nie da się rozstrzygnąć samym komunikatem. Da się jednak zauważyć, że pierwsza decyzja została podjęta po właściwej stronie: po stronie ludzi, którzy znaleźli się w sytuacji strachu. A kiedy ulica myli gościa z wrogiem, państwo pochodzenia nie powinno urządzać seminarium z cierpliwości. Powinno otworzyć drzwi.
-
-Najlepsza polityka w takiej chwili nie potrzebuje fanfar. Potrzebuje konsekwencji. Malawi może nie naprawić napięć w RPA, nie odmieni regionalnej migracji i nie unieważni społecznych lęków, które tak łatwo przyklejają się do obcych. Może jednak zrobić rzecz podstawową: nie zostawić swoich samych. To niewiele, jeśli mierzyć skalą problemu. To bardzo dużo, jeśli mierzyć skalą ludzkiego strachu. A czasem właśnie ta druga skala jest jedyną uczciwą.
+Przyjazd 171 Malawijczyków zamyka pierwszy etap ich podróży, lecz nie zamyka sprawy. Powracający będą potrzebowali zakwaterowania, pracy i pomocy w odzyskaniu stabilności. RPA musi z kolei wykazać, że potrafi egzekwować prawo migracyjne bez pozostawiania ulicy w roli sędziego. W przeciwnym razie kolejne rządy będą organizować następne konwoje, a regionalna współpraca zostanie sprowadzona do rozkładu ewakuacji. Państwo zaczyna się tam, gdzie kończy się samosąd — i gdzie ktoś bierze odpowiedzialność za bezpieczny powrót.

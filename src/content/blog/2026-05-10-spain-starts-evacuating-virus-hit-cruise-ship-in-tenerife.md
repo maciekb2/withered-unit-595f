@@ -1,18 +1,13 @@
 ---
 title: "Teneryfa ewakuuje statek z wirusem: wakacje spotkały procedurę"
 description: "Kryzys na wycieczkowcu MV Hondius przypomina, że po pandemii zostały nie tylko wspomnienia, ale też pytanie o realną gotowość instytucji."
+sourceUrl: "https://www.bbc.com/news/articles/cn7pzmg8zeno?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-10"
 heroImage: "/blog-images/2026-05-10-spain-starts-evacuating-virus-hit-cruise-ship-in-tenerife.png"
 tags: ["technologia-i-cyber"]
 views: 0
 likes: 0
 ---
-
-# Teneryfa ewakuuje statek z wirusem: wakacje spotkały procedurę
-
-Kryzys na wycieczkowcu MV Hondius przypomina, że po pandemii zostały nie tylko wspomnienia, ale też pytanie o realną gotowość instytucji.
-
-Kryzys na wycieczkowcu MV Hondius przypomina, że po pandemii zostały nie tylko wspomnienia, ale też pytanie o realną gotowość instytucji. Źródło tematu: https://www.bbc.com/news/articles/cn7pzmg8zeno?at_medium=RSS&at_campaign=rss
 
 ## Echo pandemicznej pamięci
 

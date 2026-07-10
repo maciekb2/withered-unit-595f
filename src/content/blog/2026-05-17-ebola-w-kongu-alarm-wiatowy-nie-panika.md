@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Ebola w Kongu: alarm światowy, nie panika
-
-WHO podnosi alarm przy Eboli w DR Kongu: trzeba chłodnej głowy, faktów i pomocy, a nie kolonialnego teatru strachu na eksport.
-
 WHO podnosi alarm przy Eboli w DR Kongu i od razu warto odróżnić dwie rzeczy: decyzję instytucji od odruchu publiczności. Pierwsza ma porządkować działania, druga lubi dopisywać muzykę grozy. Źródło tematu: https://www.bbc.com/news/articles/c2l2p0wwzzdo?at_medium=RSS&at_campaign=rss
 
 W tej sprawie najważniejsza jest właśnie proporcja. Mamy chorobę ciężką, budzącą zrozumiały lęk, ale nie mamy ogłoszenia pandemii. Mamy alarm międzynarodowy, ale nie zaproszenie do zbiorowego zaciskania zębów przed ekranem. To różnica większa, niż zwykle mieści się w pasku informacyjnym.

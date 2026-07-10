@@ -96,12 +96,17 @@ const newest = [...posts]
 <style>
   .sidebar {
     padding: 1em;
-    background: rgb(var(--gray-light));
-    border-radius: 12px;
+    color: var(--ivory);
+    background: rgba(7, 43, 33, 0.78);
+    border: 1px solid rgba(224, 202, 118, 0.2);
+    border-radius: 0;
     width: 280px;
+    box-shadow: 0 14px 34px rgba(2, 20, 15, 0.22);
   }
   h3 {
     margin-top: 0;
+    color: var(--gold-accent);
+    font-family: 'Archivo Variable', sans-serif;
   }
   ul {
     list-style: none;
@@ -111,10 +116,11 @@ const newest = [...posts]
     margin-bottom: 0.5em;
   }
   a {
+    color: rgba(241, 238, 229, 0.82);
     text-decoration: none;
   }
   .count {
     margin-left: 0.5em;
-    color: rgb(var(--gray));
+    color: var(--gold-accent);
   }
 </style>

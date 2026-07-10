@@ -50,9 +50,8 @@ test('writeArticleSectioned composes one sourced long article from smaller model
     assert(res.edited.markdown.includes('## Druga sekcja'));
     assert(res.edited.markdown.includes('## Trzecia sekcja'));
     assert(res.edited.markdown.length > 800);
-    assert.deepEqual(res.edited.markdown.match(/https?:\/\/\S+/g), [
-      'https://example.com/source',
-    ]);
+    assert.equal(res.edited.markdown.match(/https?:\/\/\S+/g), null);
+    assert.doesNotMatch(res.edited.markdown, /^#\s|Opis testowy/m);
   } finally {
     globalThis.fetch = original;
   }

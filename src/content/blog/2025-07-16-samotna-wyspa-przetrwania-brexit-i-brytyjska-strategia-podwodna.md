@@ -8,8 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Samotna Wyspa Przetrwania: Brexit i Brytyjska Strategia Podwodna
-
 ## Wprowadzenie
 
 W brytyjskiej polityce, nic nie przypomina brexitowego bumerangu. Świat nie spodziewał się, że Albion tak bardzo pokocha niezależność, że zanurzy się w deepsy podwodnych strategii geopolitycznych. Dziś przyjrzymy się jak Wielka Brytania przekształca swoje podwodne ambicje w prawdziwy delfinowy balet, tworząc jednocześnie nową definicję suwerenności i wolności od logiki.

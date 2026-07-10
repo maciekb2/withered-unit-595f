@@ -37,4 +37,4 @@ Polska z kolei, daleka od idei "otwartych drzwi", podkreśla znaczenie bezpiecze
 
 I tak toczy się taniec dwóch największych krajów Unii Europejskiej, które niby są przyjaciółmi, a jednak *ciągle coś nie gra*. Utrzymajmy jednak, że dyplomacja to nieustanne szukanie kompromisów i kto wie, może kiedyś doczekamy się miłej zakończenia tej historii, gdzie „granica” nie będzie już słowem na wagę złota.
 
-Dopóki co, pozostaje nam tylko się śmiać i czekać na kolejny zwrot akcji w tej niekończącej się opowieści o miłości, niechęci i politycznych decyzjach w stylu kamikadze. 
+Dopóki co, pozostaje nam tylko się śmiać i czekać na kolejny zwrot akcji w tej niekończącej się opowieści o miłości, niechęci i politycznych decyzjach w stylu kamikadze.

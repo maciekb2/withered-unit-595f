@@ -17,7 +17,7 @@ likes: 0
 
 ## Polska Dusza w Kosmosie
 
-**Polska od wieków balansująca** na krawędzi Wschodu i Zachodu, dziś z jednakową gracją podbija kosmos z centrum Polski. 
+**Polska od wieków balansująca** na krawędzi Wschodu i Zachodu, dziś z jednakową gracją podbija kosmos z centrum Polski.
 
 Czy astronauci mogą szukać natchnienia w naszych polskich wartościach, łącząc technologię z duchowością? Wszak każdy wie, że **przyzwoitość nie jest domeną jednej nacji.**
 
@@ -26,7 +26,7 @@ Czy astronauci mogą szukać natchnienia w naszych polskich wartościach, łącz
 
 ## Ekonomia i Wyścig Na Marsa
 
-**Weterani rynkowi**, choć mocno zakorzenieni w ziemskiej krainie giełdy, też dostają możliwość snucia marzeń o kierunkach kosmicznych korzyn. Sugerują, że być może dałoby się z Marsa przesyłać wodę w sensacyjnych ilościach, podczas gdy **traktory zapuszczą zagon w marsjańskim gruncie**. 
+**Weterani rynkowi**, choć mocno zakorzenieni w ziemskiej krainie giełdy, też dostają możliwość snucia marzeń o kierunkach kosmicznych korzyn. Sugerują, że być może dałoby się z Marsa przesyłać wodę w sensacyjnych ilościach, podczas gdy **traktory zapuszczą zagon w marsjańskim gruncie**.
 
 Czy prowizoryczne układy międzyplanetarne staną się nową normą?
 Czy eksportowana technologia z terenów mazowieckich i podkarpackich przetrwa w próżni kosmosu?

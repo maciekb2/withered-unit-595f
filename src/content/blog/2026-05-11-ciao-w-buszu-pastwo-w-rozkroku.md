@@ -1,16 +1,13 @@
 ---
 title: "Ciało w buszu, państwo w rozkroku"
 description: "W Nowej Południowej Walii znaleziono ciało, które policja łączy z uciekinierem poszukiwanym po potrójnym zabójstwie. Sprawa pachnie końcem pościgu i początkiem pytań."
+sourceUrl: "https://www.bbc.com/news/articles/cdjp9vzxlz7o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-05-11"
 heroImage: "/blog-images/2026-05-11-ciao-w-buszu-pastwo-w-rozkroku.png"
 tags: ["geopolityka"]
 views: 0
 likes: 0
 ---
-
-# Ciało w buszu, państwo w rozkroku
-
-W Nowej Południowej Walii znaleziono ciało, które policja łączy z uciekinierem poszukiwanym po potrójnym zabójstwie. Sprawa pachnie końcem pościgu i początkiem pytań. Źródło tematu: https://www.bbc.com/news/articles/cdjp9vzxlz7o?at_medium=RSS&at_campaign=rss
 
 Ta historia ma w sobie ten szczególny rodzaj urzędowego finału, który nie brzmi jak finał. Ciało znalezione, podejrzenie sformułowane, służby ostrożne, opinia publiczna gotowa dopisać ostatnią scenę, choć protokół jeszcze trzyma pióro nad kartką. W takim momencie państwo mówi językiem warunkowym, a ludzie słyszą tryb dokonany. Jedno i drugie jest zrozumiałe. Jedno i drugie jest niebezpieczne.
 

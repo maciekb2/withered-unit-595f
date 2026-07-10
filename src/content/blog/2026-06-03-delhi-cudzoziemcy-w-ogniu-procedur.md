@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Delhi: cudzoziemcy w ogniu procedur
-
-Śmiertelny pożar w Delhi uderzył w cudzoziemców szukających leczenia. Gorzka lekcja: prestiż państwa zaczyna się od drzwi ewakuacyjnych.
-
 Śmiertelny pożar w Delhi uderzył w cudzoziemców szukających leczenia. Wśród co najmniej 21 zabitych byli obcy obywatele, a wielu poszkodowanych przyjechało z Azji Południowej do Indii po leczenie albo po to, by towarzyszyć bliskim. Źródło tematu: https://www.bbc.com/news/articles/czd29327qzvo?at_medium=RSS&at_campaign=rss
 
 ## Ofiary

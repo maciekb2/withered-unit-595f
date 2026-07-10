@@ -8,10 +8,6 @@ views: 0
 likes: 0
 ---
 
-# Atlantycka kłótnia przy rodzinnej zastawie: Berlin liczy parasole, Waszyngton rachunki
-
-Transatlantycki rachunek za bezpieczeństwo: Berlin liczy parasole, Waszyngton faktury, a Polska pilnuje wschodniej flanki.
-
 Transatlantycki rachunek za bezpieczeństwo wraca na stół: Berlin liczy parasole, Waszyngton faktury, a Polska sprawdza, czy nad wschodnią flanką nadal jest realny dach. Źródło tematu: https://www.bbc.com/news/articles/clyplg23l30o?at_medium=RSS&at_campaign=rss
 
 ## Parasol z metką

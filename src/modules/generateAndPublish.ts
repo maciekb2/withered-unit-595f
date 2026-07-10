@@ -336,7 +336,7 @@ export async function generateAndPublish(
     send('write-end', { title: edited.title });
 
     setStage('content-validation');
-    const validation = validateAntiHallucination(edited.markdown, outline);
+    const validation = validateAntiHallucination(edited.markdown, outline, leadSourceUrl);
     const warns = validation.errors.filter(e => e.startsWith('WARN'));
     if (warns.length) {
       send('⚠️ Ostrzeżenia walidatora', {
@@ -380,7 +380,7 @@ export async function generateAndPublish(
         }
 
         edited = repairRes.edited;
-        const after = validateAntiHallucination(edited.markdown, outline);
+        const after = validateAntiHallucination(edited.markdown, outline, leadSourceUrl);
         if (after.ok) {
           send('repair-end', { attempt, ok: true, stats: after.stats });
           fixed = true;
@@ -503,6 +503,8 @@ export async function generateAndPublish(
         stats: quality.stats,
       });
     }
+
+    article.sourceUrl = leadSourceUrl;
 
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
 
