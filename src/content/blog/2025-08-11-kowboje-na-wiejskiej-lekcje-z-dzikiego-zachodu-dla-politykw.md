@@ -3,7 +3,7 @@ title: "Kowboje na Wiejskiej: Lekcje z Dzikiego Zachodu dla Polityków"
 description: "Zamiast biurokracji, politycy mogliby zacząć od prostych zasad kowbojów. Czy rewolwer i kodeks honorowy rozwiązałyby problemy polityczne?"
 tags: ["geopolityka"]
 pubDate: "2025-08-11"
-heroImage: "/blog-images/2025-08-11-kowboje-na-wiejskiej-lekcje-z-dzikiego-zachodu-dla-politykw.png"
+heroImage: "/blog-images/2025-08-11-kowboje-editorial.webp"
 views: 0
 likes: 0
 ---

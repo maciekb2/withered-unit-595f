@@ -3,7 +3,7 @@ title: "Dwugłowy Orzeł na Pokładzie: Jak Rosyjsko-Chiński Sojusz Ratuje Zach
 description: "Przygotujcie popcorn, bo Rosja i Chiny postanowiły naprawić świat. I to wszystko zanim Zachód zdążył się zorientować, że nie da się przewrócić G7 jednym kliknięciem."
 tags: ["geopolityka"]
 pubDate: "2025-07-15"
-heroImage: "/blog-images/2025-07-15-dwugowy-orze-na-pokadzie-jak-rosyjsko-chiski-sojusz-ratuje-zachd-przed-samym-sob.png"
+heroImage: "/blog-images/2025-07-15-dwuglowy-orzel-editorial.webp"
 views: 0
 likes: 0
 ---

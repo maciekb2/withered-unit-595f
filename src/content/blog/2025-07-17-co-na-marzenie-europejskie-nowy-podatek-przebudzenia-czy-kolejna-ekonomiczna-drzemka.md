@@ -3,7 +3,7 @@ title: "Cło na Marzenie Europejskie: Nowy Podatek Przebudzenia czy Kolejna Ekon
 description: "Czy Unia Europejska naprawdę myślała, że stanie się fortecą bez opłat celnych? Oto jak nowa taryfa zmienia Stary Kontynent w supermarket z agencją celną na każdym rogu."
 tags: ["europa-i-unia", "gospodarka-i-energia"]
 pubDate: "2025-07-17"
-heroImage: "/blog-images/2025-07-17-co-na-marzenie-europejskie-nowy-podatek-przebudzenia-czy-kolejna-ekonomiczna-drzemka.png"
+heroImage: "/blog-images/2025-07-17-clo-europa-editorial.webp"
 views: 0
 likes: 0
 ---
