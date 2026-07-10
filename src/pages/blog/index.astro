@@ -21,7 +21,10 @@ const filters = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sor
 <!doctype html>
 <html lang="pl">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead
+			title="Blog geopolityczny — analizy i komentarze | Pseudointelekt"
+			description="Analizy geopolityki, gospodarki, technologii i mediów. Pseudointelekt sprawdza decyzje, interesy oraz koszty, które zostają po nagłówkach."
+		/>
 		<style>
 			main.blog-page {
 				color: var(--ivory);

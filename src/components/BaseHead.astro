@@ -16,6 +16,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title, description, image = '/pseudointelekt_logo_tekstura.svg', type = 'website' } = Astro.props;
 const imageURL = new URL(image, Astro.site);
 const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
+const websiteJsonLd = type === 'website'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Pseudointelekt',
+      url: new URL('/', Astro.site).toString(),
+      inLanguage: 'pl-PL',
+      description,
+    }
+  : undefined;
 ---
 
 <!-- Global Metadata --> 
@@ -23,7 +33,7 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon_P1.svg" />
 <meta name="generator" content={Astro.generator} />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
@@ -31,16 +41,19 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
+<link rel="alternate" type="application/rss+xml" title="Pseudointelekt — RSS" href="/rss.xml" />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<meta name="author" content="Pseudointelekt" />
 <meta name="keywords" content={SITE_KEYWORDS} />
 {hasGoogleVerification && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
+<meta property="og:locale" content="pl_PL" />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
@@ -52,6 +65,8 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={imageURL} />
+
+{websiteJsonLd && <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />}
 
 <script define:vars={{ ga4Id: GA4_MEASUREMENT_ID }}>
 (() => {

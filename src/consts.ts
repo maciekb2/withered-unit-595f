@@ -2,8 +2,9 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 
-export const SITE_TITLE = "pseudointelekt.pl";
-export const SITE_DESCRIPTION = "Geopolityka, komentarz i satyra bez zadęcia";
+export const SITE_TITLE = "Pseudointelekt";
+export const SITE_DESCRIPTION =
+  "Pseudointelekt: geopolityka, polityka, gospodarka i media czytane przez interesy, decyzje oraz ich koszt — z analitycznym dystansem.";
 export const CONTACT_EMAIL = "info@pseudointelekt.pl";
 export const SITE_KEYWORDS =
   "geopolityka, blog, komentarz, humor, polityka";
