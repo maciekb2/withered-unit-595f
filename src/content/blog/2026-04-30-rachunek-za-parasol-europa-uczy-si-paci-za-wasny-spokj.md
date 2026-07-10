@@ -3,7 +3,7 @@ title: "Rachunek za parasol: Europa uczy się płacić za własny spokój"
 description: "Satyryczny tekst o tym, jak Europa odkrywa cenę własnego bezpieczeństwa, a Polska domaga się mniej westchnień i więcej realnej obrony."
 sourceUrl: "https://www.bbc.com/news/articles/ce3pw5x3z54o?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-04-30"
-heroImage: "/blog-images/2026-04-30-rachunek-za-parasol-europa-uczy-si-paci-za-wasny-spokj.png"
+heroImage: "/blog-images/2026-04-30-europa-parasol-editorial.webp"
 views: 0
 likes: 0
 ---
