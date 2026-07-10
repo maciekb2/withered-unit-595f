@@ -3,7 +3,7 @@ title: "Supreme Friend: elity w BCC i zasady w SPAM-ie"
 description: "Satyrą o protokołach: gdy frekwencja rośnie, decydenci wybierają BCC, a zasady wpadają do SPAM-u. Telefony bywają skuteczniejsze niż czołgi. Źródła w nawiasach."
 tags: ["geopolityka"]
 pubDate: "2025-09-21"
-heroImage: "/blog-images/2025-09-21-supreme-friend-elity-w-bcc-i-zasady-w-spam-ie.png"
+heroImage: "/blog-images/2025-09-21-bcc-spam-editorial.webp"
 views: 0
 likes: 0
 ---

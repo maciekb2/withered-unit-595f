@@ -3,7 +3,7 @@ title: "Heathrow na Blue Screen: granica zaczyna się w firewallu"
 description: "BSOD na salonach, granice w firewallach. Heathrow i NATS uczą, że suwerenność to logi i standardy. Polska: 4,12% PKB na obronę, NIS2 do 17.10.2024. Źródła w tekście."
 tags: ["geopolityka", "technologia-i-cyber", "europa-i-unia"]
 pubDate: "2025-09-20"
-heroImage: "/blog-images/2025-09-20-heathrow-na-blue-screen-granica-zaczyna-si-w-firewallu.png"
+heroImage: "/blog-images/2025-09-20-heathrow-firewall-editorial.webp"
 views: 0
 likes: 0
 ---

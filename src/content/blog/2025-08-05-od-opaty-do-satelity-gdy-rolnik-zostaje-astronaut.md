@@ -3,7 +3,7 @@ title: "Od Łopaty do Satelity: Gdy Rolnik Zostaje Astronautą"
 description: "Skąd w Polsce mamy tak wielu kosmicznych rolników i co słychać na orbicie polskiej polityki?"
 tags: ["geopolityka"]
 pubDate: "2025-08-05"
-heroImage: "/blog-images/2025-08-05-od-opaty-do-satelity-gdy-rolnik-zostaje-astronaut.png"
+heroImage: "/blog-images/2025-08-05-rolnik-astronauta-editorial.webp"
 views: 0
 likes: 0
 ---
