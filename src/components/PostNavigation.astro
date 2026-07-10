@@ -30,10 +30,8 @@ const { prev, next } = Astro.props as NavProps;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
-    width: min(100%, 640px);
-    margin: 3rem auto 1.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(var(--gray-dark), 0.18);
+    width: 100%;
+    margin: 1rem 0 0;
 }
 .post-nav a {
     min-height: 8rem;
@@ -43,12 +41,10 @@ const { prev, next } = Astro.props as NavProps;
     align-content: space-between;
     gap: 0.85rem;
     padding: 1rem;
-    border: 1px solid rgba(var(--gray-dark), 0.2);
-    border-radius: 8px;
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(var(--gray-light), 0.84)),
-        var(--ivory);
-    box-shadow: 0 10px 24px rgba(var(--gray-dark), 0.08);
+    border: 1px solid rgba(224, 202, 118, 0.2);
+    border-radius: 12px;
+    background: rgba(7, 43, 33, 0.78);
+    box-shadow: 0 14px 30px rgba(1, 13, 10, 0.2);
     transition:
         border-color 180ms ease,
         box-shadow 180ms ease,
@@ -56,9 +52,9 @@ const { prev, next } = Astro.props as NavProps;
 }
 .post-nav a:hover,
 .post-nav a:focus-visible {
-    color: rgb(var(--gray-dark));
+    color: var(--ivory);
     border-color: rgba(203, 161, 53, 0.76);
-    box-shadow: 0 14px 30px rgba(var(--gray-dark), 0.14);
+    box-shadow: 0 18px 34px rgba(1, 13, 10, 0.28);
     transform: translateY(-2px);
 }
 .post-nav a:focus-visible {
@@ -72,7 +68,7 @@ const { prev, next } = Astro.props as NavProps;
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    color: rgba(var(--gray-dark), 0.72);
+    color: rgba(241, 238, 229, 0.62);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0;
@@ -88,13 +84,13 @@ const { prev, next } = Astro.props as NavProps;
     height: 1.65rem;
     border-radius: 999px;
     background: rgba(203, 161, 53, 0.18);
-    color: var(--accent-dark);
+    color: var(--gold-accent);
     font-size: 1rem;
     line-height: 1;
 }
 .post-nav .title {
     display: block;
-    color: rgb(var(--black));
+    color: var(--ivory);
     font-size: 0.98rem;
     font-weight: 700;
     line-height: 1.25;
