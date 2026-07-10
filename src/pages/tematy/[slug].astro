@@ -209,6 +209,50 @@ const pageDescription = `${topicDefinition.description} Najnowsze wpisy i powią
           width: min(100%, calc(100% - 1.2rem));
         }
       }
+
+      /* Topic detail uses the same dossier rhythm as the archive. */
+      .topic-hero {
+        background: linear-gradient(180deg, rgba(7, 43, 33, 0.98), rgba(4, 32, 24, 0.96));
+        color: var(--ivory);
+        border-bottom-color: rgba(224, 202, 118, 0.22);
+      }
+      .topic-hero p { color: rgba(241, 238, 229, 0.72); }
+      .back-link { color: var(--gold-accent); }
+      .back-link:hover { color: var(--ivory); }
+      .topic-stat {
+        border-color: rgba(224, 202, 118, 0.24);
+        border-radius: 0;
+        background: rgba(3, 29, 22, 0.72);
+        box-shadow: 0 16px 36px rgba(2, 20, 15, 0.24);
+      }
+      .topic-stat span { color: rgba(241, 238, 229, 0.65); }
+      .topic-content { grid-template-columns: minmax(0, 1fr) 280px; }
+      .post-list { gap: 0.85rem; }
+      .post-card a {
+        grid-template-columns: 220px minmax(0, 1fr);
+        border-color: rgba(224, 202, 118, 0.18);
+        border-radius: 0;
+        background: rgba(7, 43, 33, 0.72);
+        box-shadow: 0 14px 30px rgba(2, 20, 15, 0.2);
+      }
+      .post-card img { min-height: 150px; }
+      .post-card__body { padding: 1.1rem 1.2rem 1.1rem 0; }
+      .post-date { color: var(--gold-accent); }
+      .post-card h2 { color: var(--ivory); }
+      .post-card p { color: rgba(241, 238, 229, 0.7); }
+      .topic-aside {
+        border-color: rgba(224, 202, 118, 0.2);
+        border-radius: 0;
+        background: rgba(7, 43, 33, 0.78);
+        box-shadow: 0 14px 30px rgba(2, 20, 15, 0.2);
+      }
+      .topic-aside h2 { color: var(--gold-accent); }
+      .topic-aside p { color: rgba(241, 238, 229, 0.7); }
+      .topic-aside a { color: var(--gold-accent); }
+      @media (max-width: 860px) {
+        .post-card a { grid-template-columns: 180px minmax(0, 1fr); }
+        .post-card__body { padding: 1rem 1rem 1rem 0; }
+      }
     </style>
   </head>
   <body data-page-section="topic">
