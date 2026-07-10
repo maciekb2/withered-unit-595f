@@ -3,7 +3,7 @@ title: "Jak Tu Traktory na Marsie stawiamy: Podboje Geopolityczne XXI wieku"
 description: "Kiedy Bałtyk jest bardziej gorący od Śródziemnomorza, a globalne elity przepisują mapę świata przy kawie na balkonie, warto zastanowić się, gdzie kończą się nasze cele i zaczynają cudze sny o potędze."
 tags: ["geopolityka"]
 pubDate: "2025-08-07"
-heroImage: "/blog-images/2025-08-07-jak-tu-traktory-na-marsie-stawiamy-podboje-geopolityczne-xxi-wieku.png"
+heroImage: "/blog-images/2025-08-07-traktory-mars-editorial.webp"
 views: 0
 likes: 0
 ---
