@@ -2,7 +2,7 @@
 title: "Delhi: cudzoziemcy w ogniu procedur"
 description: "Śmiertelny pożar w Delhi uderzył w cudzoziemców szukających leczenia. Gorzka lekcja: prestiż państwa zaczyna się od drzwi ewakuacyjnych."
 pubDate: "2026-06-03"
-heroImage: "/blog-images/2026-06-03-delhi-cudzoziemcy-w-ogniu-procedur.png"
+heroImage: "/blog-images/2026-06-03-delhi-editorial.webp"
 tags: ["geopolityka"]
 views: 0
 likes: 0

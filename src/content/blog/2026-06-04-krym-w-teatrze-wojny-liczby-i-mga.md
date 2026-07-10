@@ -3,7 +3,7 @@ title: "Krym w teatrze wojny: liczby i mgła"
 description: "Rosyjsko wspierani urzędnicy oskarżają Ukrainę o ataki na okupowanym Krymie; liczby brzmią twardo, lecz szczegóły wciąż toną we mgle."
 sourceUrl: "https://www.bbc.com/news/articles/c0r2klj0nyxo?at_medium=RSS&at_campaign=rss"
 pubDate: "2026-06-04"
-heroImage: "/blog-images/2026-06-04-krym-w-teatrze-wojny-liczby-i-mga.png"
+heroImage: "/blog-images/2026-06-04-krym-editorial.webp"
 tags: ["geopolityka", "polityka-i-media"]
 views: 0
 likes: 0
