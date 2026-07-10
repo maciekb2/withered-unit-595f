@@ -3,7 +3,7 @@ title: "Okienko na Świat: Jak Polskie Dyplomatyczne Wesele Robi Furorę"
 description: "Kiedy się żenić? Najlepiej gdy świat spogląda na Polskę jak na bajkę, w której wszyscy chcą zagrać główne role."
 tags: ["geopolityka"]
 pubDate: "2025-07-22"
-heroImage: "/blog-images/2025-07-22-okienko-na-wiat-jak-polskie-dyplomatyczne-wesele-robi-furor.png"
+heroImage: "/blog-images/2025-07-22-wesele-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Kawa a Leniuch na Dywaniku: Jak Dyplomacja na Kawce Stała się Najnowsz
 description: "Czy to możliwe, że rozmowy bilateralne przy kawie mogą mieć większe znaczenie niż wielkie szczyty? Oto jak światowi liderzy odkrywają uroki mniej formalnych spotkań, a dyplomacja przy espresso zyskuje na popularności."
 tags: ["geopolityka"]
 pubDate: "2025-07-21"
-heroImage: "/blog-images/2025-07-21-kawa-a-leniuch-na-dywaniku-jak-dyplomacja-na-kawce-staa-si-najnowszym-trendem-w-wiatowej-polityce.png"
+heroImage: "/blog-images/2025-07-21-kawa-dyplomacja-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Smok w Klapkach: Chiński Eksport Kultury a Niedoceniana Potęga Popsika
 description: "Chińska strategia 'miękkiej siły' przez tanie klapki na bazarze. Jak nasze podwórkowe sandały walczą z azjatyckim smokiem na arenie globalnej."
 tags: ["geopolityka"]
 pubDate: "2025-07-19"
-heroImage: "/blog-images/2025-07-19-smok-w-klapkach-chiski-eksport-kultury-a-niedoceniana-potga-popsika.png"
+heroImage: "/blog-images/2025-07-19-smok-klapki-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Bumerang na Uzgadnianie: Jak Polityka Wewnętrzna Wraca do Palais Coburg
 description: "Ambasadorzy z całego świata odkrywają, że dyplomacja to nie tylko eleganckie garnitury, ale też recykling obietnic pustych jak bumerang."
 tags: ["geopolityka", "technologia-i-cyber", "polityka-i-media"]
 pubDate: "2025-07-23"
-heroImage: "/blog-images/2025-07-23-bumerang-na-uzgadnianie-jak-polityka-wewntrzna-wraca-do-palais-coburg.png"
+heroImage: "/blog-images/2025-07-23-bumerang-editorial.webp"
 views: 0
 likes: 0
 ---
