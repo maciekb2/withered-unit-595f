@@ -3,7 +3,7 @@ title: "SzwajCarski Złoty Róg: Jak Neutralność Przerodziła się w Ekonomicz
 description: "Szwajcaria odkryła sposób na przemianę neutralności w czysty zysk, a reszta świata traci rachubę z zawiścią."
 tags: ["geopolityka"]
 pubDate: "2025-07-27"
-heroImage: "/blog-images/2025-07-27-szwajcarski-zoty-rg-jak-neutralno-przerodzia-si-w-ekonomiczn-alchemi.png"
+heroImage: "/blog-images/2025-07-27-szwajcaria-zloty-rog-editorial.webp"
 views: 0
 likes: 0
 ---

@@ -3,7 +3,7 @@ title: "Ruszajcie, Rycerze Jedwabnych Dróg i Zapomnianych Achillów: Omlet z Wo
 description: "Czy Chiny proklamują nowe śniadanie dyplomatyczne z Europą, czy tylko mieszają stare jaja? Prześmiewcze spojrzenie na Wojnę Handlową i jak to się ma do kieszeni pana Kowalskiego."
 tags: ["geopolityka"]
 pubDate: "2025-07-30"
-heroImage: "/blog-images/2025-07-30-ruszajcie-rycerze-jedwabnych-drg-i-zapomnianych-achillw-omlet-z-wojn-handlow-w-tle.png"
+heroImage: "/blog-images/2025-07-30-jedwabne-drogi-editorial.webp"
 views: 0
 likes: 0
 ---
