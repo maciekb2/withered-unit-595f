@@ -15,6 +15,7 @@ const posts = (await getCollection('blog')).sort((a, b) => {
 
 const [featuredPost, ...restPosts] = posts;
 const latestYear = featuredPost?.data.pubDate.getFullYear();
+const filters = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((a, b) => a.localeCompare(b, 'pl'));
 ---
 
 <!doctype html>
@@ -97,6 +98,43 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 				outline: none;
 				border-color: var(--gold-accent);
 				box-shadow: 0 0 0 4px rgba(203, 161, 53, 0.18);
+			}
+
+			.topic-filters {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+				margin-top: 1rem;
+			}
+
+			.topic-filter,
+			.clear-search {
+				min-height: 36px;
+				padding: 0.42rem 0.65rem;
+				border: 1px solid rgba(224, 202, 118, 0.25);
+				border-radius: 999px;
+				background: rgba(3, 29, 22, 0.52);
+				color: rgba(241, 238, 229, 0.78);
+				font: inherit;
+				font-size: 0.82rem;
+				font-weight: 700;
+				line-height: 1;
+				cursor: pointer;
+			}
+
+			.topic-filter:hover,
+			.topic-filter[aria-pressed="true"],
+			.clear-search:hover {
+				border-color: var(--gold-accent);
+				background: rgba(217, 181, 62, 0.16);
+				color: var(--ivory);
+			}
+
+			.clear-search {
+				justify-self: start;
+				border-color: transparent;
+				background: transparent;
+				color: rgba(241, 238, 229, 0.64);
 			}
 
 			.blog-count {
@@ -265,11 +303,9 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 				padding: 1rem;
 			}
 
-			.title { color: var(--ivory); }
-
 			.title {
 				margin: 0;
-				color: rgb(var(--black));
+				color: var(--ivory);
 				font-size: clamp(1.15rem, 2.1vw, 1.42rem);
 				line-height: 1.12;
 			}
@@ -326,6 +362,26 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 					grid-template-rows: 190px 1fr;
 				}
 			}
+
+			/* One reading path: search, choose a theme, then scan uniform cards. */
+			.blog-intro { align-items: center; }
+			.blog-tools { align-content: start; }
+			.featured-link { grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr); }
+			.layout { grid-template-columns: minmax(0, 1fr) 264px; gap: 1rem; }
+			.post-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
+			.post-card a { border-radius: 12px; }
+			.featured-link, .blog-tools { border-radius: 12px; }
+			.post-card-body { gap: 0.72rem; padding: 1.05rem; }
+			.post-meta { margin: 0; color: rgba(241, 238, 229, 0.58); }
+			.post-meta .marker { color: var(--gold-accent); }
+			.post-tag { color: var(--gold-accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+			.empty-results { border-radius: 12px; }
+			@media (max-width: 1080px) { .layout { grid-template-columns: 1fr; } }
+			@media (max-width: 760px) {
+				.featured-link { grid-template-columns: 1fr; }
+				.featured-media { min-height: 0; }
+				.topic-filters { max-height: 92px; overflow: auto; padding-right: 0.25rem; }
+			}
                 </style>
 	</head>
 	<body data-page-section="archive">
@@ -338,6 +394,12 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 						Porty, wybory, rakiety, surowce i publiczne miny. Wyszukaj temat,
 						zanim kolejny nagłówek ogłosi, że wszystko zaczęło się dziś rano.
 					</p>
+					<div class="topic-filters" aria-label="Filtruj według tematu">
+						<button class="topic-filter" type="button" data-topic-filter="" aria-pressed="true">Wszystkie</button>
+						{filters.map((filter) => (
+							<button class="topic-filter" type="button" data-topic-filter={filter} aria-pressed="false">{filter.replaceAll('-', ' ')}</button>
+						))}
+					</div>
 				</div>
 				<div class="blog-tools">
 					<label for="blog-search">
@@ -353,6 +415,7 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 					<p class="blog-count" data-blog-count>
 						{posts.length} wpisów{latestYear ? `, najnowszy z ${latestYear}` : ''}
 					</p>
+					<button class="clear-search" type="button" data-clear-search hidden>Wyczyść filtry</button>
 				</div>
 			</section>
 
@@ -361,7 +424,8 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 					class="featured"
 					aria-label="Najnowszy wpis"
 					data-search-card
-					data-search={`${featuredPost.data.title} ${featuredPost.data.description}`.toLowerCase()}
+					data-search={`${featuredPost.data.title} ${featuredPost.data.description} ${featuredPost.data.tags.join(' ')}`.toLowerCase()}
+					data-tags={featuredPost.data.tags.join('|')}
 				>
 					<a class="featured-link" href={`/blog/${featuredPost.id}/`}>
 						<div class="featured-media">
@@ -372,6 +436,7 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 						<div class="featured-body">
 							<p class="post-meta">
 								<span class="marker">Ostatnia depesza</span>
+								<span class="post-tag">{featuredPost.data.tags[0]}</span>
 								<span><FormattedDate date={featuredPost.data.pubDate} /></span>
 							</p>
 							<h2 class="featured-title">{featuredPost.data.title}</h2>
@@ -389,7 +454,8 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 								<li
 									class="post-card"
 									data-search-card
-									data-search={`${post.data.title} ${post.data.description}`.toLowerCase()}
+									data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLowerCase()}
+									data-tags={post.data.tags.join('|')}
 								>
 									<a href={`/blog/${post.id}/`}>
 										{post.data.heroImage && (
@@ -399,6 +465,7 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 										)}
 										<div class="post-card-body">
 											<p class="post-meta">
+												<span class="post-tag">{post.data.tags[0]}</span>
 												<span><FormattedDate date={post.data.pubDate} /></span>
 											</p>
 											<h3 class="title">{post.data.title}</h3>
@@ -423,7 +490,10 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 			const cards = Array.from(document.querySelectorAll('[data-search-card]'));
 			const count = document.querySelector('[data-blog-count]');
 			const empty = document.querySelector('[data-empty-results]');
+			const clear = document.querySelector('[data-clear-search]');
+			const filterButtons = Array.from(document.querySelectorAll('[data-topic-filter]'));
 			const total = cards.length;
+			let activeTopic = '';
 			let searchTrackTimer = 0;
 			let lastTrackedSearch = '';
 
@@ -433,15 +503,17 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 					: '';
 				let visible = 0;
 				cards.forEach((card) => {
-					const matches = !query || card.dataset.search?.includes(query);
+					const matchesQuery = !query || card.dataset.search?.includes(query);
+					const matchesTopic = !activeTopic || card.dataset.tags?.split('|').includes(activeTopic);
+					const matches = matchesQuery && matchesTopic;
 					card.hidden = !matches;
 					if (matches) visible += 1;
 				});
 				if (count) {
-					const visibleTotal = query ? visible : total;
-					count.textContent = `${visibleTotal} ${visibleTotal === 1 ? 'wpis' : 'wpisów'}${query ? ' pasuje do filtra' : ''}`;
+					count.textContent = `${visible} ${visible === 1 ? 'wpis' : 'wpisów'}${query || activeTopic ? ' pasuje do filtrów' : ''}`;
 				}
-				if (empty) empty.classList.toggle('is-visible', query.length > 0 && visible === 0);
+				if (empty) empty.classList.toggle('is-visible', (query.length > 0 || activeTopic) && visible === 0);
+				if (clear instanceof HTMLButtonElement) clear.hidden = !query && !activeTopic;
 				window.clearTimeout(searchTrackTimer);
 				if (query.length >= 2 && query !== lastTrackedSearch) {
 					searchTrackTimer = window.setTimeout(() => {
@@ -455,6 +527,17 @@ const latestYear = featuredPost?.data.pubDate.getFullYear();
 			}
 
 			search?.addEventListener('input', updateFilter);
+			filterButtons.forEach((button) => button.addEventListener('click', () => {
+				activeTopic = button.dataset.topicFilter || '';
+				filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+				updateFilter();
+			}));
+			clear?.addEventListener('click', () => {
+				if (search instanceof HTMLInputElement) search.value = '';
+				activeTopic = '';
+				filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.topicFilter === '')));
+				updateFilter();
+			});
                </script>
        </body>
 </html>

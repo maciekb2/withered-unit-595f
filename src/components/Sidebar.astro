@@ -16,8 +16,9 @@ const newest = [...posts]
 ---
 
 <aside class="sidebar">
+  <p class="sidebar-kicker">Na skróty</p>
   <section>
-    <h3>Top 5 wyświetleń</h3>
+    <h3>Najczęściej czytane</h3>
     <ul id="most-viewed-list">
       {mostViewed.map((post) => (
         <li data-slug={post.id} data-views={post.data.views}>
@@ -27,8 +28,8 @@ const newest = [...posts]
       ))}
     </ul>
   </section>
-  <section>
-    <h3>Najwięcej polubień</h3>
+  <details>
+    <summary>Najwięcej polubień</summary>
     <ul id="most-liked-list">
       {mostLiked.map((post) => (
         <li data-slug={post.id} data-likes={post.data.likes}>
@@ -37,9 +38,9 @@ const newest = [...posts]
         </li>
       ))}
     </ul>
-  </section>
-  <section>
-    <h3>Najnowsze artykuły</h3>
+  </details>
+  <details>
+    <summary>Najnowsze artykuły</summary>
     <ul>
       {newest.map((post) => (
         <li>
@@ -48,7 +49,7 @@ const newest = [...posts]
         </li>
       ))}
     </ul>
-  </section>
+  </details>
 </aside>
 <script type="module">
   const list = document.getElementById('most-viewed-list');
@@ -95,16 +96,16 @@ const newest = [...posts]
 
 <style>
   .sidebar {
-    padding: 1em;
+    padding: 1.1rem;
     color: var(--ivory);
     background: rgba(7, 43, 33, 0.78);
     border: 1px solid rgba(224, 202, 118, 0.2);
-    border-radius: 0;
-    width: 280px;
+    border-radius: 12px;
+    width: auto;
     box-shadow: 0 14px 34px rgba(2, 20, 15, 0.22);
   }
   h3 {
-    margin-top: 0;
+    margin: 0 0 0.85rem;
     color: var(--gold-accent);
     font-family: 'Archivo Variable', sans-serif;
   }
@@ -113,14 +114,38 @@ const newest = [...posts]
     padding-left: 0;
   }
   li {
-    margin-bottom: 0.5em;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    margin-bottom: 0.72rem;
+    font-size: 0.86rem;
+    line-height: 1.35;
   }
   a {
     color: rgba(241, 238, 229, 0.82);
     text-decoration: none;
   }
   .count {
-    margin-left: 0.5em;
     color: var(--gold-accent);
   }
+  .sidebar-kicker {
+    margin: 0 0 0.4rem;
+    color: var(--gold-accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  details {
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(224, 202, 118, 0.16);
+  }
+  summary {
+    color: rgba(241, 238, 229, 0.84);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+  details ul { margin: 0.85rem 0 0; }
+  time { color: rgba(241, 238, 229, 0.56); font-size: 0.78rem; }
 </style>
