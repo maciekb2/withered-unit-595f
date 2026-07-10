@@ -4,7 +4,7 @@ description: "Wojna Iranu może przewrotnie poprawiać pozycję Kijowa: Kreml tr
 sourceUrl: "https://www.bbc.com/news/articles/cgjp7vpee03o?at_medium=RSS&at_campaign=rss"
 tags: ["geopolityka"]
 pubDate: "2026-05-04"
-heroImage: "/blog-images/2026-05-04-teheran-odciga-dym-kijw-bliej-rozejmu.png"
+heroImage: "/blog-images/2026-05-04-teheran-dym-editorial.webp"
 views: 0
 likes: 0
 ---

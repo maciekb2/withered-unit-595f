@@ -4,7 +4,7 @@ description: "Po cyfrowych awariach państwo powinno przestać modlić się do r
 sourceUrl: "https://www.bbc.com/news/articles/cy0294829ndo?at_medium=RSS&at_campaign=rss"
 tags: ["technologia-i-cyber"]
 pubDate: "2026-05-04"
-heroImage: "/blog-images/2026-05-04-polska-flaga-na-kablu-cyberpoar-po-awariach.png"
+heroImage: "/blog-images/2026-05-04-polska-kabel-editorial.webp"
 views: 0
 likes: 0
 ---
