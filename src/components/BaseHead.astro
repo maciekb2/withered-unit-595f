@@ -146,7 +146,7 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
     button.type = 'button';
     button.className = 'cookie-consent-manage';
     button.dataset.cookieConsentManage = 'true';
-    button.textContent = 'Prywatność';
+    button.textContent = 'Ustawienia cookies';
     button.addEventListener('click', showBanner);
     document.body.appendChild(button);
   }
@@ -160,21 +160,21 @@ const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
     banner.setAttribute('aria-label', 'Ustawienia prywatności');
     banner.innerHTML = `
       <div class="cookie-consent__copy">
-        <strong>Ustawienia prywatności</strong>
-        <p>Używamy niezbędnych mechanizmów do działania strony. Analitykę GA4 włączymy tylko po Twojej zgodzie.</p>
-        <a href="/privacy">Polityka prywatności</a>
+        <strong>Cookies i prywatność</strong>
+        <p>Niezbędne technologie pomagają stronie działać i chronić formularze. Google Analytics włączymy wyłącznie, jeśli wyrazisz zgodę.</p>
+        <a href="/privacy">Zobacz politykę prywatności i cookies</a>
       </div>
       <div class="cookie-consent__actions"></div>
     `;
 
     const actions = banner.querySelector('.cookie-consent__actions');
     actions.append(
-      createButton('Tylko niezbędne', 'secondary', () => {
+      createButton('Odrzuć analitykę', 'secondary', () => {
         saveConsent(false);
         hideBanner();
         showManageButton();
       }),
-      createButton('Zgadzam się na analitykę', 'primary', () => {
+      createButton('Akceptuję analitykę', 'primary', () => {
         saveConsent(true);
         hideBanner();
         showManageButton();

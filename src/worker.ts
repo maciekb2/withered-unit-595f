@@ -43,6 +43,8 @@ const LIKE_LIMITS = {
   ipSlugMax: 3,
 } as const;
 
+const CONTACT_MESSAGE_RETENTION_SECONDS = 365 * 24 * 60 * 60;
+
 function jsonResponse(data: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -141,7 +143,9 @@ async function handleContact(request: Request, env: Env, sessionId: string) {
       }),
     });
 
-    await env.pseudointelekt_contact_form.put(`msg-${Date.now()}`, JSON.stringify(payload));
+    await env.pseudointelekt_contact_form.put(`msg-${Date.now()}`, JSON.stringify(payload), {
+      expirationTtl: CONTACT_MESSAGE_RETENTION_SECONDS,
+    });
 
     logEvent({ type: 'contact-complete', name, email });
     return new Response('OK', { status: 200 });

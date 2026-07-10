@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { CONTACT_EMAIL } from '../consts';
 ---
 
 <!doctype html>
@@ -12,44 +13,63 @@ import Footer from '../components/Footer.astro';
 	<body data-page-section="privacy">
 		<Header />
 		<main>
-			<h1>Polityka prywatności</h1>
+			<h1>Polityka prywatności i cookies</h1>
+			<p>Ostatnia aktualizacja: 10 lipca 2026 r.</p>
+
+			<h2>Administrator i kontakt</h2>
 			<p>
-				Ta strona zbiera tylko te dane, które są potrzebne do działania podstawowych funkcji:
-				formularza kontaktowego, statystyk wpisów i zabezpieczeń po stronie Cloudflare.
+				Administratorem danych osobowych jest Maciej Brzeźny, właściciel serwisu pseudointelekt.pl.
+				W sprawach związanych z danymi osobowymi skontaktujesz się pod adresem
+				<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+			</p>
+
+			<h2>Jakie dane i po co przetwarzamy</h2>
+			<ul>
+				<li><strong>Formularz kontaktowy:</strong> imię lub podpis, adres e-mail i treść wiadomości — aby odpowiedzieć na wiadomość i prowadzić korespondencję. Podstawą jest prawnie uzasadniony interes administratora polegający na komunikacji z osobą, która sama inicjuje kontakt (art. 6 ust. 1 lit. f RODO).</li>
+				<li><strong>Bezpieczeństwo i działanie serwisu:</strong> techniczne identyfikatory sesji, ograniczenia liczby wysyłanych formularzy oraz informacje techniczne przekazywane przez infrastrukturę sieciową — aby zapobiegać nadużyciom i zapewnić działanie serwisu. Podstawa: prawnie uzasadniony interes w zakresie bezpieczeństwa (art. 6 ust. 1 lit. f RODO).</li>
+				<li><strong>Analityka:</strong> po akceptacji analityki Google Analytics 4 może przetwarzać dane o korzystaniu z serwisu, w tym odsłony, źródło wejścia i informacje techniczne o przeglądarce lub urządzeniu. Podstawa: zgoda (art. 6 ust. 1 lit. a RODO).</li>
+			</ul>
+			<p>Nie wykorzystujemy danych do reklam spersonalizowanych ani nie sprzedajemy danych osobowych.</p>
+
+			<h2>Odbiorcy danych i transfery</h2>
+			<p>
+				Dane mogą być przetwarzane przez dostawców infrastruktury i narzędzi używanych przez serwis:
+				Cloudflare (hosting, ochrona i przechowywanie techniczne), Google (Analytics 4 — wyłącznie po zgodzie)
+				i Slack (powiadomienie o nowej wiadomości z formularza). Dostawcy ci mogą przetwarzać dane poza
+				Europejskim Obszarem Gospodarczym. W takim przypadku stosowane są mechanizmy przewidziane przez
+				RODO, w tym odpowiednie zabezpieczenia kontraktowe dostawców.
+			</p>
+
+			<h2>Jak długo przechowujemy dane</h2>
+			<ul>
+				<li>Wiadomości z formularza są przechowywane w serwisie maksymalnie przez 12 miesięcy od ich wysłania.</li>
+				<li>Techniczny identyfikator sesji jest plikiem sesyjnym i wygasa po zakończeniu sesji przeglądarki.</li>
+				<li>Klucze ograniczające nadużycia są przechowywane przez 10 minut lub 1 godzinę — zależnie od rodzaju limitu.</li>
+				<li>Wybór dotyczący analityki pozostaje w pamięci lokalnej przeglądarki do jego zmiany albo wyczyszczenia danych przeglądarki.</li>
+			</ul>
+
+			<h2>Cookies i ustawienia</h2>
+			<p>
+				Serwis używa niezbędnego pliku sesyjnego <code>sid</code> (ochrona formularza i ograniczanie nadużyć)
+				oraz zapisu ustawień prywatności w pamięci lokalnej przeglądarki. Te mechanizmy są potrzebne do działania
+				serwisu i nie służą reklamie.
 			</p>
 			<p>
-				Jeśli korzystasz z formularza kontaktowego, przetwarzane są dane wpisane w formularzu:
-				imię lub podpis, adres email i treść wiadomości. Służą wyłącznie do obsługi korespondencji.
+				Google Analytics 4 uruchamia się wyłącznie po kliknięciu „Akceptuję analitykę”. Odmowa nie ogranicza
+				dostępu do treści serwisu. Zgodę możesz wycofać w dowolnym czasie przez przycisk „Ustawienia cookies”,
+				który jest dostępny na stronie po zapisaniu wyboru.
 			</p>
+
+			<h2>Twoje prawa</h2>
 			<p>
-				Nie sprzedaję danych, nie buduję profili reklamowych i nie dokładam tu zbędnej biurokracji.
-				Jeśli chcesz dopytać o dane, napisz przez formularz kontaktowy.
+				Masz prawo żądać dostępu do danych, ich sprostowania, usunięcia, ograniczenia przetwarzania,
+				przeniesienia danych oraz — w przypadkach przewidzianych prawem — wnieść sprzeciw wobec przetwarzania.
+				Zgodę na analitykę możesz wycofać w każdej chwili; nie wpływa to na zgodność z prawem przetwarzania
+				przed jej wycofaniem. Masz także prawo złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.
 			</p>
-			<h2>Cookies i analityka</h2>
-			<p>
-				Strona korzysta z niezbędnych mechanizmów technicznych, takich jak zabezpieczenia Cloudflare,
-				liczniki odsłon wpisów i ustawienia zgody zapisane w przeglądarce. Są potrzebne do działania
-				serwisu i nie służą profilowaniu reklamowemu.
-			</p>
-			<p>
-				Strona ma skonfigurowaną analitykę Google Analytics 4 dla domeny pseudointelekt.pl. Skrypt GA4
-				ładuje się dopiero po Twojej zgodzie w banerze cookies. Domyślnie zgoda na analitykę,
-				personalizację reklam i dane reklamowe jest ustawiona jako odmowa zgodnie z Google Consent Mode v2.
-				Po wyrażeniu zgody Google Analytics 4 może mierzyć podstawowe statystyki korzystania ze strony,
-				takie jak odsłony, aktywni użytkownicy, ścieżki wejścia i orientacyjne informacje techniczne
-				o przeglądarce lub urządzeniu. Nie używam tych danych do reklam ani sprzedaży danych.
-			</p>
-			<p>
-				Zgodę możesz zmienić w dowolnym momencie przyciskiem zarządzania cookies widocznym na stronie.
-				Cofnięcie zgody zatrzymuje dalsze ładowanie analityki w tej przeglądarce. Możesz też usunąć
-				zapisane ustawienia cookies i localStorage w ustawieniach swojej przeglądarki.
-			</p>
-			<p>
-				Strona jest również podpięta do Google Search Console. To narzędzie pokazuje zagregowane dane
-				o widoczności strony w wynikach wyszukiwania Google, na przykład zapytania, kliknięcia,
-				wyświetlenia i status indeksowania. Search Console nie służy do śledzenia pojedynczych
-				użytkowników na stronie.
-			</p>
+
+			<h2>Automatyczne decyzje</h2>
+			<p>Nie podejmujemy wobec użytkowników decyzji wywołujących skutki prawne lub podobnie istotne wyłącznie w sposób zautomatyzowany.</p>
 		</main>
 		<Footer />
 	</body>

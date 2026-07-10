@@ -13,6 +13,6 @@ export function getSessionInfo(request: Request): SessionInfo {
 }
 
 export function appendSessionCookie(response: Response, sessionId: string): void {
-  const cookie = `sid=${sessionId}; Path=/; HttpOnly; SameSite=Lax`;
+  const cookie = `sid=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`;
   response.headers.append('Set-Cookie', cookie);
 }

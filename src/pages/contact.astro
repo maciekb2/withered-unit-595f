@@ -277,6 +277,19 @@ import { CONTACT_EMAIL } from '../consts';
         margin-top: 0.2rem;
       }
 
+      .privacy-note {
+        flex: 1 1 100%;
+        margin: 0;
+        color: rgba(var(--gray-dark), 0.72);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .privacy-note a {
+        color: inherit;
+        font-weight: 700;
+      }
+
       button {
         position: relative;
         display: inline-flex;
@@ -504,7 +517,7 @@ import { CONTACT_EMAIL } from '../consts';
               </li>
               <li>
                 <span class="note-mark">2</span>
-                <span>Formularz zapisuje wiadomość po stronie serwisu i nie publikuje jej na stronie.</span>
+                <span>Wiadomość służy wyłącznie obsłudze korespondencji i nie jest publikowana na stronie.</span>
               </li>
               <li>
                 <span class="note-mark">3</span>
@@ -533,6 +546,7 @@ import { CONTACT_EMAIL } from '../consts';
               </label>
               <div class="submit-row">
                 <button type="submit" data-submit-label>Wyślij wiadomość</button>
+                <p class="privacy-note">Wysyłając formularz, potwierdzasz, że zapoznałeś(-aś) się z <a href="/privacy">polityką prywatności</a>. Dane wykorzystamy do obsługi Twojej wiadomości.</p>
                 <p id="status" class="status" role="status" aria-live="polite">Czekam na treść wiadomości.</p>
               </div>
             </form>
