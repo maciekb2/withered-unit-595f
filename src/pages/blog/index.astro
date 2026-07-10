@@ -372,6 +372,7 @@ const filters = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sor
 			.post-card a { border-radius: 12px; }
 			.featured-link, .blog-tools { border-radius: 12px; }
 			.post-card-body { gap: 0.72rem; padding: 1.05rem; }
+			.post-card-body { background: rgba(5, 37, 29, 0.96); }
 			.post-meta { margin: 0; color: rgba(241, 238, 229, 0.58); }
 			.post-meta .marker { color: var(--gold-accent); }
 			.post-tag { color: var(--gold-accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -485,7 +486,6 @@ const filters = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sor
                 </main>
                <Footer />
                <script type="module">
-			document.body.dataset.pageSection = 'blog_archive';
 			const search = document.querySelector('#blog-search');
 			const cards = Array.from(document.querySelectorAll('[data-search-card]'));
 			const count = document.querySelector('[data-blog-count]');
