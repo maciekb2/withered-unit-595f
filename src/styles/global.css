@@ -115,6 +115,12 @@ textarea {
 input {
   font-size: 16px;
 }
+button,
+input,
+textarea,
+select {
+  border-radius: 0 !important;
+}
 table {
   width: 100%;
 }
