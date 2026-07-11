@@ -4,6 +4,7 @@ description: "Liczba ofiar bliźniaczych trzęsień ziemi w Wenezueli wzrosła d
 sourceUrl: "https://www.investing.com/news/world-news/death-toll-from-venezuela-quakes-rises-to-3811-4782825"
 pubDate: "2026-07-08"
 updatedDate: "2026-07-11"
+heroImage: "/blog-images/2026-07-08-wenezuela-trzesienie-odbudowa.png"
 tags: ["geopolityka", "gospodarka-i-energia"]
 views: 0
 likes: 0

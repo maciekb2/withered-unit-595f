@@ -4,6 +4,7 @@ description: "Wyniki TSMC i banków otwierają nowy sezon raportów, ale inwesto
 sourceUrl: "https://www.investing.com/news/economy-news/take-five-chips-banks-and-volatility-4785518"
 pubDate: "2026-07-10"
 updatedDate: "2026-07-11"
+heroImage: "/blog-images/2026-07-10-chipowy-rajd-rynek-ai.png"
 tags: ["technologia-i-cyber", "gospodarka-i-energia"]
 views: 0
 likes: 0

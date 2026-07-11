@@ -4,6 +4,7 @@ description: "Rosyjskie ataki zabiły cztery osoby, a Moskwa wstrzymała eksport
 sourceUrl: "https://apnews.com/article/83bcba8bb972ce248a805bc576a7322c"
 pubDate: "2026-07-08"
 updatedDate: "2026-07-11"
+heroImage: "/blog-images/2026-07-08-ukraina-obrona-powietrzna-paliwo.png"
 tags: ["geopolityka", "gospodarka-i-energia"]
 views: 0
 likes: 0

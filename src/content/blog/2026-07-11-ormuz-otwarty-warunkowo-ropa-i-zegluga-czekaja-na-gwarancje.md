@@ -4,6 +4,7 @@ description: "Waszyngton żąda od Iranu publicznego potwierdzenia bezpieczeńst
 sourceUrl: "https://apnews.com/article/533b52cf249314ba1d9b5f9a30b1ca43"
 pubDate: "2026-07-11"
 updatedDate: "2026-07-11"
+heroImage: "/blog-images/2026-07-11-ormuz-otwarty-warunkowo.png"
 tags: ["geopolityka", "gospodarka-i-energia"]
 views: 0
 likes: 0

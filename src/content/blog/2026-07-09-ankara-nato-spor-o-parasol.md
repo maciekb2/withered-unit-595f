@@ -4,6 +4,7 @@ description: "Po szczycie NATO w Ankarze europejscy sojusznicy mówią o jednoś
 sourceUrl: "https://www.investing.com/news/world-news/nato-weathers-another-trump-storm-but-braces-for-more-after-ankara-summit-4783318"
 pubDate: "2026-07-09"
 updatedDate: "2026-07-11"
+heroImage: "/blog-images/2026-07-09-ankara-nato-spor-o-parasol.png"
 tags: ["geopolityka", "europa-i-unia"]
 views: 0
 likes: 0
