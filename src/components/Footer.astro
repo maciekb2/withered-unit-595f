@@ -16,6 +16,7 @@ const today = new Date();
                         <a href="/about">O mnie</a>
                         <a href="/contact">Kontakt</a>
                         <a href="/privacy">Prywatność</a>
+                        <button type="button" data-cookie-consent-open>Ustawienia cookies</button>
                 </nav>
         </div>
         <div class="footer-bottom">
@@ -89,8 +90,27 @@ const today = new Date();
                 text-transform: uppercase;
         }
 
+        nav button {
+                min-height: 40px;
+                display: inline-flex;
+                align-items: center;
+                padding: 0;
+                border: 0;
+                background: transparent;
+                color: rgba(240, 234, 213, 0.68);
+                font: inherit;
+                font-family: "Archivo Variable", "Atkinson", sans-serif;
+                font-size: 0.66rem;
+                font-weight: 620;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                cursor: pointer;
+        }
+
         nav a:hover,
-        nav a:focus-visible {
+        nav a:focus-visible,
+        nav button:hover,
+        nav button:focus-visible {
                 color: #dfbd4c;
                 outline: none;
         }
