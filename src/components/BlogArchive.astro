@@ -1,0 +1,126 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import Pagination from './Pagination.astro';
+
+type Post = CollectionEntry<'blog'>;
+interface Props { posts: Post[]; page: number; perPage: number; }
+const { posts, page, perPage } = Astro.props as Props;
+const [featuredPost, ...archivePosts] = posts;
+const totalPages = Math.max(1, Math.ceil(archivePosts.length / perPage));
+const currentPage = Math.min(Math.max(page, 1), totalPages);
+const pagePosts = archivePosts.slice((currentPage - 1) * perPage, currentPage * perPage);
+const filters = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((a, b) => a.localeCompare(b, 'pl'));
+const latestYear = featuredPost?.data.pubDate.getFullYear();
+const records = posts.map((post) => ({
+  id: post.id, title: post.data.title, description: post.data.description, tags: post.data.tags,
+  image: post.data.heroImage, date: post.data.pubDate.toISOString(),
+}));
+const hrefForPage = (target: number) => target === 1 ? '/blog/' : `/blog/${target}/`;
+---
+
+<main class="blog-page">
+  <section class="blog-intro" aria-labelledby="blog-title">
+    <div class="blog-intro__copy">
+      <p class="kicker">Archiwum analiz</p>
+      <h1 id="blog-title">Kartoteka interesów</h1>
+      <p>Materiały o decyzjach, które zostają po nagłówkach: w portach, budżetach, sieciach i relacjach między państwami.</p>
+      <div class="topic-filters" aria-label="Filtruj według tematu">
+        <button class="topic-filter" type="button" data-topic-filter="" aria-pressed="true">Wszystkie</button>
+        {filters.map((filter) => <button class="topic-filter" type="button" data-topic-filter={filter} aria-pressed="false">{filter.replaceAll('-', ' ')}</button>)}
+      </div>
+    </div>
+    <div class="blog-tools">
+      <label for="blog-search">Szukaj w całym archiwum
+        <input id="blog-search" class="blog-search" type="search" placeholder="Tytuł, temat lub zagadnienie" autocomplete="off" />
+      </label>
+      <p class="blog-count" data-blog-count>{posts.length} materiałów{latestYear ? ` · archiwum ${latestYear}` : ''}</p>
+      <button class="clear-search" type="button" data-clear-search hidden>Wyczyść wyszukiwanie</button>
+    </div>
+  </section>
+
+  <div data-default-archive>
+    {currentPage === 1 && featuredPost && (
+      <section class="featured" aria-label="Najnowszy materiał">
+        <a class="featured-link" href={`/blog/${featuredPost.id}/`}>
+          <div class="featured-media">{featuredPost.data.heroImage && <img width="960" height="540" src={featuredPost.data.heroImage} alt="" loading="eager" />}</div>
+          <div class="featured-body"><p class="post-meta"><span class="marker">Najnowsza analiza</span><span>{featuredPost.data.tags[0]}</span><span><FormattedDate date={featuredPost.data.pubDate} /></span></p><h2>{featuredPost.data.title}</h2><p>{featuredPost.data.description}</p></div>
+        </a>
+      </section>
+    )}
+    <section aria-label={`Archiwum, strona ${currentPage}`}>
+      <ul class="post-list">
+        {pagePosts.map((post) => <li class="post-card"><a href={`/blog/${post.id}/`}><div class="post-card-media">{post.data.heroImage && <img width="720" height="480" src={post.data.heroImage} alt="" loading="lazy" />}</div><div class="post-card-body"><p class="post-meta"><span>{post.data.tags[0]}</span><span><FormattedDate date={post.data.pubDate} /></span></p><h2>{post.data.title}</h2><p>{post.data.description}</p></div></a></li>)}
+      </ul>
+      <Pagination currentPage={currentPage} totalPages={totalPages} hrefForPage={hrefForPage} label="Strony archiwum" />
+    </section>
+  </div>
+
+  <section class="search-results" aria-live="polite" hidden data-search-results>
+    <header><p class="kicker">Wyniki archiwum</p><h2 data-results-title>Wyniki wyszukiwania</h2><p data-results-count></p></header>
+    <ul class="post-list" data-results-list></ul>
+    <nav class="pagination" aria-label="Strony wyników" data-results-pagination></nav>
+    <p class="empty-results" data-empty-results hidden>Nie znaleźliśmy materiałów dla tego zapytania. Spróbuj krótszej frazy lub innego tematu.</p>
+  </section>
+</main>
+
+<script define:vars={{ records, perPage }}>
+  const search = document.querySelector('#blog-search');
+  const filters = Array.from(document.querySelectorAll('[data-topic-filter]'));
+  const defaultArchive = document.querySelector('[data-default-archive]');
+  const results = document.querySelector('[data-search-results]');
+  const list = document.querySelector('[data-results-list]');
+  const pagination = document.querySelector('[data-results-pagination]');
+  const count = document.querySelector('[data-results-count]');
+  const empty = document.querySelector('[data-empty-results]');
+  const clear = document.querySelector('[data-clear-search]');
+  const normalCount = document.querySelector('[data-blog-count]');
+  let activeTopic = new URLSearchParams(location.search).get('temat') || '';
+  let resultPage = 1;
+  let timer = 0;
+  let lastQuery = '';
+  if (search instanceof HTMLInputElement) search.value = new URLSearchParams(location.search).get('q') || '';
+
+  function card(post) {
+    const item = document.createElement('li'); item.className = 'post-card';
+    const link = document.createElement('a'); link.href = `/blog/${post.id}/`;
+    const media = document.createElement('div'); media.className = 'post-card-media';
+    if (post.image) { const image = document.createElement('img'); image.src = post.image; image.alt = ''; image.loading = 'lazy'; media.append(image); }
+    const body = document.createElement('div'); body.className = 'post-card-body';
+    const meta = document.createElement('p'); meta.className = 'post-meta';
+    const tag = document.createElement('span'); tag.textContent = post.tags[0] || 'analiza';
+    const date = document.createElement('span'); date.textContent = new Intl.DateTimeFormat('pl-PL', { day:'2-digit', month:'long', year:'numeric' }).format(new Date(post.date));
+    meta.append(tag, date);
+    const title = document.createElement('h2'); title.textContent = post.title;
+    const description = document.createElement('p'); description.textContent = post.description;
+    body.append(meta, title, description); link.append(media, body); item.append(link); return item;
+  }
+  function setFilters() { filters.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.topicFilter === activeTopic))); }
+  function updateUrl(query) { const params = new URLSearchParams(); if (query) params.set('q', query); if (activeTopic) params.set('temat', activeTopic); history.replaceState({}, '', `${location.pathname}${params.size ? `?${params}` : ''}`); }
+  function render(targetPage = 1) {
+    const query = search instanceof HTMLInputElement ? search.value.trim().toLocaleLowerCase('pl-PL') : '';
+    const filtered = records.filter((post) => (!query || `${post.title} ${post.description} ${post.tags.join(' ')}`.toLocaleLowerCase('pl-PL').includes(query)) && (!activeTopic || post.tags.includes(activeTopic)));
+    const active = Boolean(query || activeTopic); resultPage = targetPage;
+    if (defaultArchive) defaultArchive.hidden = active;
+    if (results) results.hidden = !active;
+    if (clear instanceof HTMLButtonElement) clear.hidden = !active;
+    if (normalCount && !active) normalCount.textContent = `${records.length} materiałów · pełne archiwum`;
+    if (!active || !list || !pagination || !count || !empty) return;
+    const pages = Math.max(1, Math.ceil(filtered.length / perPage)); resultPage = Math.min(resultPage, pages);
+    list.replaceChildren(...filtered.slice((resultPage - 1) * perPage, resultPage * perPage).map(card));
+    count.textContent = `${filtered.length} ${filtered.length === 1 ? 'materiał' : 'materiałów'}${activeTopic ? ` · ${activeTopic.replaceAll('-', ' ')}` : ''}`;
+    empty.hidden = filtered.length !== 0;
+    pagination.replaceChildren();
+    if (pages > 1) for (let number = 1; number <= pages; number += 1) { const button = document.createElement('button'); button.type = 'button'; button.textContent = String(number); button.setAttribute('aria-label', `Strona wyników ${number}`); if (number === resultPage) button.setAttribute('aria-current', 'page'); button.addEventListener('click', () => render(number)); pagination.append(button); }
+    updateUrl(query); setFilters();
+    clearTimeout(timer); if (query.length >= 2 && query !== lastQuery) { timer = setTimeout(() => { lastQuery = query; window.pseudointelektTrack?.('blog_search', { query_length: query.length, result_count: filtered.length, topic: activeTopic || 'all', result_page: resultPage }); }, 500); }
+  }
+  filters.forEach((button) => button.addEventListener('click', () => { activeTopic = button.dataset.topicFilter || ''; render(); }));
+  search?.addEventListener('input', () => render());
+  clear?.addEventListener('click', () => { if (search instanceof HTMLInputElement) search.value = ''; activeTopic = ''; render(); });
+  setFilters(); if ((search instanceof HTMLInputElement && search.value) || activeTopic) render();
+</script>
+
+<style>
+  .blog-page{width:min(1180px,calc(100% - 2rem));max-width:none;padding:clamp(2rem,5vw,4.5rem) 0;color:var(--ivory)} .blog-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,380px);gap:clamp(1.5rem,5vw,4rem);align-items:end;padding-bottom:2rem;border-bottom:1px solid rgba(224,202,118,.2)} .kicker{margin:0 0 .65rem;color:var(--gold-accent);font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.blog-intro h1,.search-results h2{margin:0;color:var(--ivory);font-size:clamp(2.7rem,6vw,5.2rem);line-height:.94}.blog-intro__copy>p{max-width:57ch;margin:1rem 0 0;color:rgba(241,238,229,.74);line-height:1.55}.topic-filters{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.2rem}.topic-filter,.clear-search{min-height:2.2rem;padding:.4rem .68rem;border:1px solid rgba(224,202,118,.25);border-radius:999px;background:rgba(3,29,22,.45);color:rgba(241,238,229,.8);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}.topic-filter:hover,.topic-filter[aria-pressed=true],.clear-search:hover{border-color:var(--gold-accent);background:rgba(217,181,62,.16);color:var(--ivory)}.blog-tools{display:grid;gap:.75rem;padding:1rem;border:1px solid rgba(224,202,118,.22);border-radius:12px;background:rgba(7,43,33,.8)}.blog-tools label{display:grid;gap:.45rem;color:var(--gold-accent);font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.blog-search{min-height:48px;padding:.7rem .8rem;border:1px solid rgba(224,202,118,.3);border-radius:7px;background:rgba(3,29,22,.8);color:var(--ivory);font:inherit;text-transform:none}.blog-search:focus{outline:3px solid rgba(217,181,62,.26);border-color:var(--gold-accent)}.blog-count{margin:0;color:rgba(241,238,229,.65);font-size:.88rem}.clear-search{justify-self:start;border-color:transparent;background:transparent;color:rgba(241,238,229,.66)}.featured{margin:2rem 0}.featured-link{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);overflow:hidden;border:1px solid rgba(224,202,118,.22);border-radius:12px;color:inherit;background:rgba(7,43,33,.8);text-decoration:none}.featured-media{aspect-ratio:3/2;background:#0b3329}.featured-media img,.post-card-media img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.84) contrast(1.04)}.featured-body{display:grid;align-content:center;padding:clamp(1.25rem,3vw,2.25rem)}.post-meta{display:flex;flex-wrap:wrap;gap:.55rem;margin:0;color:var(--gold-accent);font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}.marker{padding:.2rem .45rem;border:1px solid rgba(224,202,118,.35);border-radius:999px}.featured h2{margin:.85rem 0;color:var(--ivory);font-size:clamp(1.8rem,3.5vw,3rem);line-height:1.05}.featured p:last-child,.post-card-body>p:last-child{margin:0;color:rgba(241,238,229,.72);font-size:.94rem;line-height:1.55}.post-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem;margin:0;padding:0;list-style:none}.post-card a{display:grid;height:100%;overflow:hidden;border:1px solid rgba(224,202,118,.18);border-radius:12px;color:inherit;background:rgba(7,43,33,.78);text-decoration:none}.post-card-media{aspect-ratio:3/2;background:#0b3329}.post-card-body{display:grid;align-content:start;gap:.72rem;padding:1.05rem;background:rgba(5,37,29,.97)}.post-card h2{margin:0;color:var(--ivory);font-size:clamp(1.15rem,2.1vw,1.42rem);line-height:1.12}.post-card a:hover,.post-card a:focus-visible,.featured-link:hover,.featured-link:focus-visible{border-color:var(--gold-accent);box-shadow:0 16px 34px rgba(0,0,0,.22);transform:translateY(-2px);outline:none}.search-results{padding-top:2rem}.search-results header{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}.search-results h2{font-size:clamp(2rem,4vw,3.5rem)}.search-results header>p:last-child{margin:0;color:rgba(241,238,229,.68);font-size:.9rem}.empty-results{padding:1rem;border:1px dashed rgba(224,202,118,.35);color:rgba(241,238,229,.75)}[data-results-pagination]{justify-content:center}.pagination button{display:grid;place-items:center;min-width:2.25rem;min-height:2.25rem;padding:.25rem;border:1px solid rgba(224,202,118,.18);background:transparent;color:rgba(241,238,229,.75);font:inherit;cursor:pointer}.pagination button[aria-current=page],.pagination button:hover{color:#072b21;border-color:var(--gold-accent);background:var(--gold-accent)}@media(max-width:880px){.blog-intro,.featured-link{grid-template-columns:1fr}.blog-tools{max-width:none}.featured-media{max-height:390px}}@media(max-width:620px){.blog-page{width:min(100% - 1rem,1180px);padding-top:1.3rem}.post-list{grid-template-columns:1fr}.topic-filters{max-height:112px;overflow:auto}.search-results header{display:grid;align-items:start}}
+</style>

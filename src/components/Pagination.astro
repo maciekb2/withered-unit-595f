@@ -1,0 +1,37 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  hrefForPage: (page: number) => string;
+  label?: string;
+}
+
+const { currentPage, totalPages, hrefForPage, label = 'Paginacja' } = Astro.props as Props;
+const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+---
+
+{totalPages > 1 && (
+  <nav class="pagination" aria-label={label}>
+    {currentPage > 1 ? <a rel="prev" href={hrefForPage(currentPage - 1)}>← Nowsze</a> : <span aria-hidden="true">← Nowsze</span>}
+    <ol>
+      {pages.map((page) => (
+        <li>
+          <a href={hrefForPage(page)} aria-current={page === currentPage ? 'page' : undefined}>{page}</a>
+        </li>
+      ))}
+    </ol>
+    {currentPage < totalPages ? <a rel="next" href={hrefForPage(currentPage + 1)}>Starsze →</a> : <span aria-hidden="true">Starsze →</span>}
+  </nav>
+)}
+
+<style>
+  .pagination { display:flex; align-items:center; justify-content:space-between; gap:.75rem; margin:2rem 0 0; padding-top:1.15rem; border-top:1px solid rgba(224,202,118,.2); font-size:.88rem; }
+  .pagination > a, .pagination > span { min-width:5.8rem; color:var(--gold-accent); font-weight:700; text-decoration:none; }
+  .pagination > span { color:rgba(241,238,229,.35); }
+  .pagination > a:last-child, .pagination > span:last-child { text-align:right; }
+  ol { display:flex; flex-wrap:wrap; justify-content:center; gap:.35rem; margin:0; padding:0; list-style:none; }
+  li { margin:0; }
+  li a { display:grid; place-items:center; min-width:2.25rem; min-height:2.25rem; padding:.25rem; color:rgba(241,238,229,.72); border:1px solid rgba(224,202,118,.18); text-decoration:none; }
+  li a:hover, li a:focus-visible, li a[aria-current="page"] { color:#072b21; border-color:var(--gold-accent); background:var(--gold-accent); outline:none; }
+  @media (max-width:540px) { .pagination { gap:.45rem; font-size:.76rem; } .pagination > a, .pagination > span { min-width:auto; } li a { min-width:1.9rem; min-height:1.9rem; } }
+</style>

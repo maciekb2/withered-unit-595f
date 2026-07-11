@@ -6,6 +6,8 @@ export type TopicDefinition = {
   slug: string;
   name: string;
   description: string;
+  lens: string;
+  context: string;
   keywords: string[];
 };
 
@@ -18,6 +20,8 @@ export const TOPICS: TopicDefinition[] = [
     slug: 'geopolityka',
     name: 'Geopolityka',
     description: 'Teksty o państwach, sojuszach, granicach i interesach, które rządzą komunikatami dnia.',
+    lens: 'Granice, sojusze i infrastruktura, która decyduje o realnym zasięgu państw.',
+    context: 'Śledzimy tu decyzje państw i bloków politycznych przez ich wykonanie: dostęp do szlaków, zdolność do działania i cenę utrzymania wpływu.',
     keywords: [
       'geopolityka',
       'sojusz',
@@ -39,6 +43,8 @@ export const TOPICS: TopicDefinition[] = [
     slug: 'technologia-i-cyber',
     name: 'Technologia i cyber',
     description: 'Cyfrowe awarie, algorytmy, chipy i infrastruktura, czyli polityka tam, gdzie kończy się wygodny interfejs.',
+    lens: 'Technologia jako infrastruktura władzy, a nie wyłącznie kolejna aplikacja.',
+    context: 'Ten dział dotyczy systemów, których zwykle nie widać do chwili awarii: sieci, chipów, algorytmów i zależności dostawców.',
     keywords: [
       'cyber',
       'algorytm',
@@ -58,6 +64,8 @@ export const TOPICS: TopicDefinition[] = [
     slug: 'europa-i-unia',
     name: 'Europa i Unia',
     description: 'Unijne deklaracje, europejskie spory i rachunki, które zwykle wracają w najmniej wygodnym momencie.',
+    lens: 'Europejskie kompromisy, ich koszt i granice wspólnego działania.',
+    context: 'Czytamy europejską politykę przez wdrożenie: co ustalono, kto finansuje zmianę i gdzie kończy się deklarowana wspólnota interesów.',
     keywords: [
       'unia',
       'ue',
@@ -76,6 +84,8 @@ export const TOPICS: TopicDefinition[] = [
     slug: 'gospodarka-i-energia',
     name: 'Gospodarka i energia',
     description: 'Ropa, energia, kredyty, taryfy i inne narzędzia, którymi wielka polityka udaje arkusz kalkulacyjny.',
+    lens: 'Energia, pieniądz i handel jako najtrwalsze narzędzia polityki.',
+    context: 'W tym dossier decyzje polityczne spotykają rachunek: ceny energii, przepływy kapitału, taryfy oraz koszty ponoszone poza salą konferencyjną.',
     keywords: [
       'energia',
       'ropa',
@@ -96,6 +106,8 @@ export const TOPICS: TopicDefinition[] = [
     slug: 'polityka-i-media',
     name: 'Polityka i media',
     description: 'Spektakle, narracje, celebryci, wybory i wszystkie chwile, w których kamera zaczyna pisać program.',
+    lens: 'Narracje, kampanie i medialne skróty, które zmieniają odbiór decyzji.',
+    context: 'Przyglądamy się temu, jak obraz wydarzenia wpływa na jego polityczny skutek: kto ustawia temat, co znika z kadru i komu służy skrót.',
     keywords: [
       'polityka',
       'media',

@@ -248,21 +248,21 @@ const latestPost = posts[0];
       <section class="topics-hero" aria-labelledby="topics-title">
         <div class="topics-hero__inner">
           <div>
-            <p class="kicker">Mapa tekstów</p>
-            <h1 id="topics-title">Czytaj według tematu</h1>
+            <p class="kicker">Dossiers redakcyjne</p>
+            <h1 id="topics-title">Tematy, do których warto wracać</h1>
             <p>
-              Chronologia jest dobra na depesze. Tutaj ważniejsze są powracające napięcia:
-              interesy państw, technologia, europejskie rachunki, energia i polityczne widowiska.
+              Zamiast porządku dat — pięć stałych perspektyw. Każda zbiera materiały,
+              które opisują ten sam problem z kolejnych stron.
             </p>
           </div>
           <div class="topics-stats" aria-label="Statystyki tematów">
             <div>
               <strong>{posts.length}</strong>
-              <span>wpisów w archiwum</span>
+              <span>materiały w archiwum</span>
             </div>
             <div>
               <strong>{topics.length}</strong>
-              <span>aktywnych ścieżek</span>
+              <span>obszarów analizy</span>
             </div>
           </div>
         </div>
@@ -277,10 +277,10 @@ const latestPost = posts[0];
                 <h2>{topic.name}</h2>
                 <span class="topic-card__count">{topic.posts.length} wpisów</span>
               </div>
-              <p>{topic.description}</p>
+              <p>{topic.lens}</p>
               {latest && (
                 <span class="topic-card__latest">
-                  <span>Ostatnio</span>
+                  <span>Najnowszy materiał</span>
                   <strong>{latest.data.title}</strong>
                   <small><FormattedDate date={latest.data.pubDate} /></small>
                 </span>
@@ -292,7 +292,7 @@ const latestPost = posts[0];
 
       {latestPost && (
         <p class="latest-strip">
-          Najnowszy tekst: <a href={`/blog/${latestPost.id}/`}>{latestPost.data.title}</a>
+          Najnowsza analiza: <a href={`/blog/${latestPost.id}/`}>{latestPost.data.title}</a>
         </p>
       )}
     </main>

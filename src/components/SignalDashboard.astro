@@ -41,12 +41,12 @@ const {
     <div class="dashboard-shell">
         <header class="dashboard-header">
             <div>
-                <p class="section-code">PANEL / 04</p>
-                <h2 id="signal-title">Sygnały warte sprawdzenia</h2>
+                <p class="section-code">BIEŻĄCE ANALIZY</p>
+                <h2 id="signal-title">Co warto przeczytać przed kolejnym nagłówkiem</h2>
             </div>
             <p>
-                Nie streszczamy hałasu dnia. Szukamy decyzji, kosztów i zależności,
-                które zostają po konferencji — zwykle dłużej niż jej cytaty.
+                Zbieramy teksty o decyzjach, ich wykonaniu i kosztach — czyli o tym,
+                co zwykle znika, gdy wydarzenie trzeba streścić w jednym zdaniu.
             </p>
         </header>
 
@@ -62,11 +62,11 @@ const {
                     )}
                     <span class="featured-shade" aria-hidden="true"></span>
                     <div class="featured-status">
-                        <span><i></i> OSTATNIA DEPESZA</span>
+                        <span><i></i> NAJNOWSZY MATERIAŁ</span>
                         <time>{featured.dateLabel}</time>
                     </div>
                     <div class="featured-copy">
-                        <p>Najświeższy materiał / wersja robocza rzeczywistości</p>
+                        <p>Najnowsza analiza redakcji</p>
                         <h3>{featured.title}</h3>
                         <span class="featured-description">{featured.description}</span>
                         <span class="featured-link">Przeczytaj analizę <b aria-hidden="true">↗</b></span>
@@ -74,36 +74,36 @@ const {
                 </a>
             )}
 
-            <aside class="status-console" aria-label="Stan serwisu">
+            <aside class="status-console" aria-label="Archiwum redakcji">
                 <div class="console-head">
-                    <span>STATUS REDAKCJI</span>
-                    <span class="console-ok">WERYFIKUJEMY</span>
+                    <span>ARCHIWUM REDAKCJI</span>
+                    <span class="console-ok">AKTUALIZOWANE</span>
                 </div>
                 <dl class="console-metrics">
                     <div>
-                        <dt>Archiwum</dt>
+                        <dt>Analizy</dt>
                         <dd>{String(articleCount).padStart(2, '0')}</dd>
-                        <dd class="metric-note">opublikowanych tekstów</dd>
+                        <dd class="metric-note">opublikowane materiały</dd>
                     </div>
                     <div>
                         <dt>Ostatnia publikacja</dt>
                         <dd class="metric-date">{lastPublishedLabel || '—'}</dd>
-                        <dd class="metric-note">czas lokalny: Warszawa</dd>
+                        <dd class="metric-note">data publikacji</dd>
                     </div>
                 </dl>
                 <div class="console-scope">
-                    <span>OBSZAR ODCZYTU</span>
+                    <span>OBSZARY ANALIZY</span>
                     <div class="scope-grid" aria-hidden="true">
                         <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                     </div>
-                    <strong>PORTY / BUDŻETY / MÓWNICE / GRANICE</strong>
+                    <strong>PAŃSTWA / GOSPODARKA / TECHNOLOGIA / MEDIA</strong>
                 </div>
             </aside>
 
             <div class="topic-console">
                 <div class="console-head">
-                    <span>TROPY</span>
-                    <a href="/tematy/">PEŁNA MAPA →</a>
+                    <span>TEMATY</span>
+                    <a href="/tematy/">WSZYSTKIE DOSSIERS →</a>
                 </div>
                 <ol>
                     {topics.map((topic, index) => (
@@ -123,8 +123,8 @@ const {
 
             <div class="headline-console">
                 <div class="console-head">
-                    <span>NOTATKI NA MARGINESIE</span>
-                    <span>UTC+02</span>
+                    <span>OSTATNIE PUBLIKACJE</span>
+                    <span>ARCHIWUM</span>
                 </div>
                 <ol>
                     {headlines.slice(0, 4).map((headline, index) => (

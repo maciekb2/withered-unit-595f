@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../../components/BaseHead.astro';
+import Footer from '../../../components/Footer.astro';
+import Header from '../../../components/Header.astro';
+import TopicDossier from '../../../components/TopicDossier.astro';
+import { buildTopicIndex, sortPostsByDate } from '../../../utils/topics';
+const perPage = 20;
+export async function getStaticPaths() { const topics = buildTopicIndex(sortPostsByDate(await getCollection('blog'))); return topics.flatMap((topic) => Array.from({ length: Math.max(0, Math.ceil(topic.posts.length / 20) - 1) }, (_, index) => ({ params: { slug: topic.slug, page: String(index + 2) }, props: { topic } }))); }
+const { topic } = Astro.props; const page = Number(Astro.params.page);
+---
+<!doctype html><html lang="pl"><head><BaseHead title={`${topic.name} — strona ${page} | Pseudointelekt`} description={`${topic.description} Strona ${page} materiałów.`} /></head><body data-page-section="topic"><Header /><TopicDossier topic={topic} page={page} perPage={perPage} /><Footer /></body></html>

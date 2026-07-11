@@ -38,25 +38,25 @@ const latestArticle = liveHeadlines[0];
         <GeoScene />
 
         <div class="cinema-topline" aria-hidden="true">
-            <span>PSEUDO//INTEL</span>
-            <span class="topline-center">REJESTR ZALEŻNOŚCI</span>
-            <span><i></i> NASŁUCH AKTYWNY</span>
+            <span>PSEUDOINTELEKT</span>
+            <span class="topline-center">ANALIZY INTERESÓW</span>
+            <span>POLITYKA · GOSPODARKA · TECHNOLOGIA</span>
         </div>
 
         <div class="hero-panel">
             <div class="hero-copy">
-                <p class="eyebrow"><span></span> Analiza interesów / bez dekoracji</p>
+                <p class="eyebrow"><span></span> Analizy decyzji i ich konsekwencji</p>
                 <h1 id="hero-title">
-                    <span>Interesy świata.</span>
-                    <strong>Bez pudru.</strong>
+                    <span>Świat nie zaczyna się</span>
+                    <strong>od komunikatu.</strong>
                 </h1>
                 <p class="hero-lede">
-                    Polityka zaczyna się nie przy mównicy, lecz w porcie, budżecie i magazynie.
-                    Czytamy decyzje, ich koszt oraz to, co komunikat wygodnie przemilcza.
+                    Piszemy o tym, co uruchamiają decyzje: w portach, budżetach,
+                    łańcuchach dostaw i relacjach między państwami.
                 </p>
                 <div class="hero-actions">
                     <a class="hero-cta hero-cta-primary" href="#aktualny-sygnal" data-story-entry>
-                        <span>Zobacz obraz sytuacji</span>
+                            <span>Przejdź do bieżących analiz</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 5v14M6 13l6 6 6-6"></path>
                         </svg>
@@ -67,49 +67,49 @@ const latestArticle = liveHeadlines[0];
                             href={latestArticle.href}
                             data-track-home-article="hero"
                         >
-                            Przeczytaj ostatnią depeszę
+                            Przeczytaj najnowszą analizę
                         </a>
                     )}
                 </div>
-                <dl class="hero-metrics" aria-label="Stan redakcji">
+                <dl class="hero-metrics" aria-label="Archiwum redakcji">
                     <div>
-                        <dt>Materiały</dt>
-                        <dd>{String(articleCount).padStart(2, '0')} tekstów</dd>
+                        <dt>Archiwum</dt>
+                        <dd>{String(articleCount).padStart(2, '0')} analiz</dd>
                     </div>
                     {lastPublishedLabel && (
                         <div>
-                        <dt>Ostatnia publikacja</dt>
+                        <dt>Ostatni materiał</dt>
                             <dd>{lastPublishedLabel}</dd>
                         </div>
                     )}
                     <div>
-                        <dt>Metoda</dt>
-                        <dd>Fakty przed retoryką</dd>
+                        <dt>Punkt wyjścia</dt>
+                        <dd>Decyzja, koszt, wykonanie</dd>
                     </div>
                 </dl>
             </div>
         </div>
 
-        <div class="story-layer" aria-label="Briefing Pseudointelektu">
+        <div class="story-layer" aria-label="Jak czytamy wydarzenia">
             <article class="story-chapter" data-chapter="1">
-                <p class="chapter-index">01 / LOGISTYKA</p>
-                <h2>Najpierw trasa.<br />Potem sojusz.</h2>
+                <p class="chapter-index">01 / INFRASTRUKTURA</p>
+                <h2>Szlak bywa ważniejszy<br />niż deklaracja.</h2>
                 <p>
                     Port, kabel, rurociąg i termin dostawy mówią o trwałości układu
                     więcej niż wspólne zdjęcie po szczycie.
                 </p>
             </article>
             <article class="story-chapter" data-chapter="2">
-                <p class="chapter-index">02 / NARRACJE</p>
-                <h2>Komunikat kończy konferencję.<br />Decyzja zaczyna koszt.</h2>
+                <p class="chapter-index">02 / DECYZJE</p>
+                <h2>Komunikat opisuje ruch.<br />Koszt go sprawdza.</h2>
                 <p>
                     Oddzielamy ruch od jego opisu. Pierwszy przesuwa pieniądze, ludzi i ryzyko;
                     drugi ma dobrze brzmieć w wieczornym serwisie.
                 </p>
             </article>
             <article class="story-chapter" data-chapter="3">
-                <p class="chapter-index">03 / ABSURD</p>
-                <h2>Doktryna brzmi wznośle.<br />Faktura — wiążąco.</h2>
+                <p class="chapter-index">03 / WERYFIKACJA</p>
+                <h2>Między doktryną<br />a wykonaniem jest rachunek.</h2>
                 <p>
                     Ironia jest narzędziem kontroli jakości, gdy doktryna zderza się z ceną paliwa,
                     kalendarzem wyborczym albo zwykłym wykonaniem decyzji.
@@ -117,18 +117,18 @@ const latestArticle = liveHeadlines[0];
             </article>
         </div>
 
-        <aside class="telemetry" aria-label="Telemetria serwisu">
+        <aside class="telemetry" aria-label="Jak pracuje redakcja">
             <div class="telemetry-head">
-                <span>TELEMETRIA</span>
-                <span class="telemetry-live">LIVE</span>
+                <span>JAK PRACUJEMY</span>
+                <span class="telemetry-live">METODA</span>
             </div>
             <div class="telemetry-wave" aria-hidden="true">
                 <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
             <dl>
-                <div><dt>Materiał</dt><dd>Depesze / dokumenty</dd></div>
-                <div><dt>Tryb odczytu</dt><dd>Fakty przed narracją</dd></div>
-                <div><dt>Status wniosków</dt><dd>Podlegają weryfikacji</dd></div>
+                <div><dt>Źródła</dt><dd>Dokumenty, dane, decyzje</dd></div>
+                <div><dt>Perspektywa</dt><dd>Interes, koszt, wykonanie</dd></div>
+                <div><dt>Wniosek</dt><dd>Otwarty na sprawdzenie</dd></div>
             </dl>
         </aside>
 
@@ -139,7 +139,7 @@ const latestArticle = liveHeadlines[0];
         </div>
 
         <div class="scroll-cue" aria-hidden="true">
-            <span>Przewiń: od mapy do rachunku</span>
+            <span>Przewiń, aby poznać sposób czytania</span>
             <i></i>
         </div>
     </div>

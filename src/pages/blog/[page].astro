@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import BlogArchive from '../../components/BlogArchive.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+
+const perPage = 20;
+const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.id.localeCompare(a.id));
+const totalPages = Math.ceil((posts.length - 1) / perPage);
+export async function getStaticPaths() {
+  const allPosts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.id.localeCompare(a.id));
+  const pages = Math.ceil((allPosts.length - 1) / 20);
+  return Array.from({ length: Math.max(0, pages - 1) }, (_, index) => ({ params: { page: String(index + 2) } }));
+}
+const page = Number(Astro.params.page);
+---
+<!doctype html><html lang="pl"><head><BaseHead title={`Archiwum analiz — strona ${page} | Pseudointelekt`} description={`Starsze analizy Pseudointelektu — strona ${page} archiwum.`} /></head><body data-page-section="archive"><Header /><BlogArchive posts={posts} page={page} perPage={perPage} /><Footer /></body></html>
