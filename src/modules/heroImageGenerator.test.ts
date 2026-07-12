@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateHeroImage } from './heroImageGenerator.js';
 
-test('generateHeroImage uses low-cost GPT Image model without DALL-E style parameter', async () => {
+test('generateHeroImage uses GPT Image 2 without DALL-E style parameter', async () => {
   const original = globalThis.fetch;
   let body: any;
   globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -17,19 +17,37 @@ test('generateHeroImage uses low-cost GPT Image model without DALL-E style param
     const image = await generateHeroImage({
       apiKey: 'k',
       prompt: 'prompt',
-      model: 'gpt-image-1-mini',
+      model: 'gpt-image-2',
       quality: 'low',
       style: 'vivid',
     });
 
     assert.equal(image.toString(), 'image');
-    assert.equal(body.model, 'gpt-image-1-mini');
+    assert.equal(body.model, 'gpt-image-2');
     assert.equal(body.quality, 'low');
     assert.equal(body.style, undefined);
     assert.equal(body.response_format, undefined);
     assert.match(body.prompt, /Situation Room/);
     assert.match(body.prompt, /bez tekstu, liter, cyfr, logo/);
     assert.match(body.prompt, /bez ludzi i twarzy/);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test('generateHeroImage defaults to the current GPT Image model', async () => {
+  const original = globalThis.fetch;
+  let body: any;
+  globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    body = JSON.parse(String(init?.body));
+    return new Response(
+      JSON.stringify({ data: [{ b64_json: Buffer.from('image').toString('base64') }] }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+  }) as typeof fetch;
+  try {
+    await generateHeroImage({ apiKey: 'k', prompt: 'prompt' });
+    assert.equal(body.model, 'gpt-image-2');
   } finally {
     globalThis.fetch = original;
   }
@@ -50,7 +68,7 @@ test('generateHeroImage does not duplicate the house style lock', async () => {
     await generateHeroImage({
       apiKey: 'k',
       prompt: 'prompt\n\nSTALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO:\n- existing',
-      model: 'gpt-image-1-mini',
+      model: 'gpt-image-2',
     });
 
     assert.equal(body.prompt.match(/STALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO/g)?.length, 1);

@@ -35,7 +35,7 @@ export interface GenerateHeroOptions {
 export async function generateHeroImage({
   apiKey,
   prompt,
-  model = 'gpt-image-1-mini',
+  model = 'gpt-image-2',
   size = '1536x1024',
   style = 'natural',
   quality = 'medium',

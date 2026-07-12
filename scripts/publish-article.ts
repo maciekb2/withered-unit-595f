@@ -31,7 +31,7 @@ async function main() {
     recentTitles: recent,
     baseTopic,
     leadSourceUrl,
-    imageModel: process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini',
+    imageModel: process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
     imageSize: (process.env.OPENAI_IMAGE_SIZE as any) || '1536x1024',
     imageStyle: (process.env.OPENAI_IMAGE_STYLE as any) || 'natural',
     imageQuality: (process.env.OPENAI_IMAGE_QUALITY as any) || 'medium',
