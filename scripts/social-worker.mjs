@@ -221,7 +221,13 @@ async function processOne() {
 async function main() {
   await mkdir(mediaRoot,{recursive:true});
   console.log(JSON.stringify({type:'social-worker-start',enabled,dryRun,intervalMs}));
-  if (!enabled) return;
+  if (!enabled) {
+    await new Promise(resolve => {
+      process.once('SIGTERM', resolve);
+      process.once('SIGINT', resolve);
+    });
+    return;
+  }
   do { while (await processOne()) await sleep(1000); if (process.env.SOCIAL_WORKER_RUN_ONCE === 'true') break; await sleep(intervalMs); } while (true);
   await pool.end();
 }
