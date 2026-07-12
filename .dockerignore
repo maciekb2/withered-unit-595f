@@ -1,0 +1,12 @@
+.git
+.github
+.astro
+.wrangler
+.playwright-cli
+dist
+node_modules
+npm-debug.log*
+deploy/selfhosted/.env
+deploy/selfhosted/backups
+*.tar
+*.tar.gz

@@ -51,3 +51,11 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Improve the article page reading chrome: metadata bar, like/view controls, spacing, and article JSON-LD/BreadcrumbList details.
 - [x] Normalize legacy article bodies and block repeated titles, leads, source preambles, and duplicate paragraphs in future publications.
 - [ ] Upgrade the generation dashboard quality panel so it visualizes `quality-check` warnings and errors as a checklist.
+
+## Social distribution
+
+- [x] Persist compact, verified social source packages independently from article publication.
+- [x] Add a resumable PostgreSQL-backed social worker with local-model scoring/copy and FFmpeg rendering.
+- [x] Produce Buffer drafts for Instagram Reels/posts and YouTube Shorts with durable media URLs and UTM attribution.
+- [ ] Connect production Buffer channel IDs, add an approved music library and disable dry-run after the first controlled draft review.
+- [ ] Add carousel rendering after the first 12 posts provide enough performance data.

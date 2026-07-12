@@ -24,6 +24,7 @@ import { proofread } from '../pipeline/proofread';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
+import { buildSocialSource } from '../social/types';
 
 export interface GenerateAndPublishResult {
   article: FinalJson;
@@ -586,6 +587,29 @@ export async function generateAndPublish(
     setStage('github-publish');
     send('📦 Publikuję na GitHubie...');
     const prUrl = await publishArticleToGitHub({ env, article, heroImage });
+
+    const socialEnv = env as Env & { SOCIAL_QUEUE_URL?: string; GENERATOR_PRIVATE_TOKEN?: string };
+    const socialQueueUrl = socialEnv.SOCIAL_QUEUE_URL;
+    if (socialQueueUrl && socialEnv.GENERATOR_PRIVATE_TOKEN) {
+      setStage('social-enqueue');
+      try {
+        const source = buildSocialSource(article, slugify(article.title));
+        const response = await fetch(socialQueueUrl, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-generator-private-token': socialEnv.GENERATOR_PRIVATE_TOKEN,
+          },
+          body: JSON.stringify(source),
+          signal: AbortSignal.timeout(10_000),
+        });
+        if (!response.ok) throw new Error(`social queue returned HTTP ${response.status}`);
+        send('social-enqueue-complete', { socialSlug: source.slug });
+      } catch (socialError) {
+        logError(socialError, { type: 'social-enqueue-error', title: article.title });
+        send('social-enqueue-deferred', { error: socialError instanceof Error ? socialError.message : String(socialError) });
+      }
+    }
 
     const snippet = article.content.slice(0, 300);
     setStage('success-slack');

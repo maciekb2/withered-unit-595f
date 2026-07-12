@@ -23,6 +23,8 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    volumes:
+      - social-media:/data/social:ro
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]
@@ -38,6 +40,7 @@ services:
       PORT: 3001
       DATABASE_URL: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
       JETSON_GATEWAY_URL: ${JETSON_GATEWAY_URL:?JETSON_GATEWAY_URL must be set}
+      SOCIAL_QUEUE_URL: http://app:3000/api/social/enqueue
     expose:
       - "3001"
     depends_on:
@@ -65,6 +68,34 @@ services:
     depends_on:
       generator:
         condition: service_started
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [app]
+
+  social-worker:
+    image: pseudointelekt-app
+    command: ["node", "./scripts/social-worker.mjs"]
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
+      SOCIAL_MEDIA_DIR: /data/social
+      SOCIAL_MUSIC_DIR: /data/music
+      PUBLIC_SITE_URL: https://pseudointelekt.pl
+      SOCIAL_WORKER_ENABLED: ${SOCIAL_WORKER_ENABLED:-true}
+      SOCIAL_BUFFER_DRY_RUN: ${SOCIAL_BUFFER_DRY_RUN:-true}
+      SOCIAL_WORKER_INTERVAL_MS: ${SOCIAL_WORKER_INTERVAL_MS:-900000}
+      SOCIAL_LLM_MODEL: ${SOCIAL_LLM_MODEL:-qwen3:30b}
+      JETSON_GATEWAY_URL: ${JETSON_GATEWAY_URL:?JETSON_GATEWAY_URL must be set}
+    volumes:
+      - social-media:/data/social
+      - ${SOCIAL_MUSIC_DIR_HOST:-/opt/pseudointelekt/music}:/data/music:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
     read_only: true
     tmpfs: [/tmp]
@@ -130,6 +161,7 @@ services:
 
 volumes:
   postgres-data:
+  social-media:
 
 networks:
   app:
