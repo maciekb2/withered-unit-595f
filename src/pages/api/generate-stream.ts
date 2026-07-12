@@ -22,7 +22,8 @@ export const GET: APIRoute = async ({ request, url }) => {
   initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
   const session = sessionId(request);
   const initialTopic = url.searchParams.get('topic')?.trim() || '';
-  const promptPromise = initialTopic ? undefined : waitForTopic(session);
+  const interactive = url.searchParams.get('interactive') === '1';
+  const promptPromise = initialTopic || !interactive ? undefined : waitForTopic(session);
   void generateAndPublish(
     env,
     controller,
