@@ -12,6 +12,8 @@ test('social worker commits public assets before Buffer and checkpoints every dr
   assert.ok(persist >= 0 && assetCommit > persist && drafts > assetCommit && statusTransaction > drafts);
 
   const draftsBody = source.slice(source.indexOf('async function createDrafts('), source.indexOf('async function notifyRunIfReady('));
-  assert.ok(draftsBody.indexOf('await bufferDraft(') < draftsBody.indexOf('INSERT INTO social_publications'));
+  assert.ok(draftsBody.indexOf('await bufferSaveDraft(') < draftsBody.indexOf('INSERT INTO social_publications'));
   assert.equal(draftsBody.includes("client.query('BEGIN')"), false);
+  assert.match(source, /existingId \? 'editPost' : 'createPost'/u);
+  assert.match(source, /\?v=\$\{checksum\.slice\(0, 12\)\}/u);
 });
