@@ -41,6 +41,7 @@
     sceneRoots.forEach(async (sceneRoot) => {
         const canvas = sceneRoot.querySelector<HTMLCanvasElement>('[data-geo-canvas]');
         const cinema = sceneRoot.closest<HTMLElement>('[data-scroll-cinema]');
+        const progressLabel = cinema?.querySelector<HTMLElement>('.progress-label');
 
         if (!canvas || !cinema) return;
 
@@ -109,6 +110,8 @@
             Float32BufferAttribute,
             FogExp2,
             Group,
+            Line,
+            LineBasicMaterial,
             MathUtils,
             Mesh,
             MeshBasicMaterial,
@@ -184,6 +187,30 @@
         const wire = new Mesh(globeGeometry, wireMaterial);
         wire.scale.setScalar(1.006);
         world.add(wire);
+
+        const continentMaterial = new LineBasicMaterial({
+            color: 0xd8cfaa,
+            transparent: true,
+            opacity: 0.58,
+            depthWrite: false,
+        });
+        const continentPaths = [
+            [[36, -10], [44, -9], [50, 0], [58, 5], [71, 25], [68, 50], [60, 70], [72, 100], [60, 140], [48, 150], [36, 130], [22, 120], [10, 105], [22, 90], [8, 77], [25, 60], [35, 45], [42, 30], [36, 15], [36, -10]],
+            [[35, -17], [37, 10], [31, 32], [12, 44], [-12, 40], [-35, 18], [-30, 5], [-5, -15], [15, -17], [35, -17]],
+            [[15, -84], [25, -98], [48, -125], [62, -140], [72, -112], [67, -80], [52, -55], [45, -66], [30, -80], [15, -84]],
+            [[12, -81], [5, -77], [-10, -78], [-25, -70], [-55, -68], [-50, -52], [-25, -42], [-5, -50], [12, -61], [12, -81]],
+            [[-11, 113], [-20, 115], [-35, 116], [-39, 145], [-26, 153], [-12, 142], [-11, 113]],
+            [[60, -48], [70, -55], [82, -42], [76, -20], [64, -40], [60, -48]],
+        ] as const;
+        const continentGeometries = continentPaths.map((path) => {
+            const geometry = new BufferGeometry().setFromPoints(
+                path.map(([lat, lon]) => latLonToVector(lat, lon, 1.475)),
+            );
+            const outline = new Line(geometry, continentMaterial);
+            outline.renderOrder = 3;
+            world.add(outline);
+            return geometry;
+        });
 
         const atmosphere = new Mesh(
             new SphereGeometry(1.58, 48, 48),
@@ -352,14 +379,17 @@
             scrollProgress = clamp01(-rect.top / scrollable);
             cinema.style.setProperty('--story-progress', scrollProgress.toFixed(4));
 
-            const chapter = scrollProgress < 0.18
+            const chapter = scrollProgress < 0.14
                 ? 0
-                : scrollProgress < 0.43
+                : scrollProgress < 0.32
                     ? 1
-                    : scrollProgress < 0.69
+                    : scrollProgress < 0.50
                         ? 2
-                        : 3;
+                        : scrollProgress < 0.68
+                            ? 3
+                            : 4;
             cinema.dataset.activeChapter = String(chapter);
+            if (progressLabel) progressLabel.textContent = `SCROLL / 0${chapter}`;
 
             const trackWindow = window as TrackWindow;
             if (scrollProgress > 0.12 && !storyStarted) {
@@ -387,8 +417,8 @@
             world.rotation.z = -0.04 + scrollProgress * 0.12;
 
             const storyScale = 1 + Math.sin(scrollProgress * Math.PI) * 0.08;
-            world.scale.setScalar(mobile ? storyScale * 0.84 : storyScale);
-            camera.position.z = 5.8 - scrollProgress * 0.42;
+            world.scale.setScalar(mobile ? storyScale * 0.9 : storyScale * 1.08);
+            camera.position.z = (mobile ? 5.45 : 5.15) - scrollProgress * 0.38;
             camera.position.x = scrollProgress > 0.68 ? -0.14 : 0;
 
             const signalStrength = 0.14 + clamp01((scrollProgress - 0.1) * 2.8) * 0.68;
@@ -411,6 +441,7 @@
             stars.rotation.x = scrollProgress * 0.04;
 
             renderer.render(scene, camera);
+            requestRender();
         };
 
         const requestRender = () => {
@@ -459,8 +490,10 @@
             nodeGeometry.dispose();
             pulseGeometry.dispose();
             starGeometry.dispose();
+            continentGeometries.forEach((geometry) => geometry.dispose());
             globeMaterial.dispose();
             wireMaterial.dispose();
+            continentMaterial.dispose();
             signalMaterial.dispose();
             coolSignalMaterial.dispose();
         }, { once: true });
