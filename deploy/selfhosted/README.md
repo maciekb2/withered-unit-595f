@@ -4,7 +4,9 @@ This stack is the production target on `mbprod.s.sn`. Cloudflare remains the
 public edge through a Tunnel; the application and PostgreSQL run locally.
 
 The tunnel token and `.env` file are host-managed secrets and must never be
-committed. Ollama is reached only over the DC network at `10.2.11.72:11434`.
+committed. Ollama is reached through the authenticated Helpdesk Model Gateway
+at `10.2.11.58:8110`, which is the approved network path to Jetson1
+(`10.2.11.72:11434`).
 
 The current Worker deployment remains the rollback target until the PostgreSQL
 data migration and all API routes have been verified on the Node runtime.

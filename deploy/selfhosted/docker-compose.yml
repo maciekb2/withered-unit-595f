@@ -11,7 +11,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3000
       DATABASE_URL: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
-      JETSON_GATEWAY_URL: http://10.2.11.72:11434
+      JETSON_GATEWAY_URL: ${JETSON_GATEWAY_URL:?JETSON_GATEWAY_URL must be set}
     expose:
       - "3000"
     depends_on:
