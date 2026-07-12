@@ -15,7 +15,8 @@ tar -xzf "$TMP/source.tgz" -C "$TMP/source" --strip-components=1
 
 rsync -a --delete \
   --exclude 'deploy/selfhosted/.env' \
-  --exclude 'deploy/selfhosted/secrets/' \
+  --exclude 'deploy/selfhosted/secrets' \
+  --exclude 'deploy/selfhosted/secrets/***' \
   --exclude 'migration/' \
   --exclude 'node_modules/' \
   --exclude 'dist/' \
