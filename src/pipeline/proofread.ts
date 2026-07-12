@@ -45,6 +45,16 @@ export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens, pr
     logEvent({ type: 'proofread-complete' });
     return { edited: json, messages, raw: text };
   } catch (err) {
+    if (provider?.type === 'jetson' && provider.fallback === 'openai') {
+      logEvent({ type: 'proofread-fallback', from: 'jetson', to: 'openai' });
+      return proofread({
+        apiKey,
+        edited,
+        model: provider.fallbackModel || 'gpt-5',
+        maxTokens,
+        provider: { type: 'openai' },
+      });
+    }
     logError(err, { type: 'proofread-error', raw: text });
     (err as any).prompt = userPrompt;
     (err as any).messages = messages;
