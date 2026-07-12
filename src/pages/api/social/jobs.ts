@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getPool, json } from '../../../server/postgres';
 import { isPrivateGeneratorRequest } from '../../../server/generatorAuth';
+import { resolveSocialJobAction } from '../../../social/jobAction';
 
 export const prerender = false;
 
@@ -19,11 +20,11 @@ export const POST: APIRoute = async ({ request }) => {
   if (!await isPrivateGeneratorRequest(request)) return json({ error: 'Forbidden' }, 403);
   const body = await request.json().catch(() => ({})) as { id?: string; action?: string };
   if (!body.id || !/^[0-9a-f-]{36}$/i.test(body.id)) return json({ error: 'Invalid id' }, 400);
-  const status = body.action === 'skip' ? 'skipped' : body.action === 'retry' || body.action === 'regenerate' ? 'ready' : null;
-  if (!status) return json({ error: 'Unsupported action' }, 400);
+  const action = resolveSocialJobAction(body.action);
+  if (!action) return json({ error: 'Unsupported action' }, 400);
   const result = await getPool().query(
-    `UPDATE social_jobs SET status=$2, attempts=CASE WHEN $2='eligible' THEN 0 ELSE attempts END, locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1 RETURNING id,status`,
-    [body.id,status],
+    `UPDATE social_jobs SET status=$2, attempts=CASE WHEN $3 THEN 0 ELSE attempts END, locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1 RETURNING id,status,attempts`,
+    [body.id,action.status,action.resetAttempts],
   );
   return result.rows[0] ? json(result.rows[0]) : json({ error: 'Not found' }, 404);
 };
