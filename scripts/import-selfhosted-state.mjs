@@ -15,6 +15,16 @@ try {
       ON CONFLICT (kind, slug) DO UPDATE SET value = GREATEST(engagement_counters.value, EXCLUDED.value), updated_at = now()`,
       [row.kind, row.slug, Number(row.value) || 0, row.created_at, row.updated_at]);
   }
+  for (const [kind, values] of [['view', state.kv?.views || {}], ['like', state.kv?.likes || {}]]) {
+    const prefix = `${kind}-`;
+    for (const [key, rawValue] of Object.entries(values)) {
+      if (!key.startsWith(prefix)) continue;
+      await client.query(`INSERT INTO engagement_counters (kind, slug, value)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (kind, slug) DO UPDATE SET value = GREATEST(engagement_counters.value, EXCLUDED.value), updated_at = now()`,
+        [kind, key.slice(prefix.length), Number.parseInt(String(rawValue), 10) || 0]);
+    }
+  }
   for (const row of state.likeSessions || []) {
     await client.query('INSERT INTO engagement_like_sessions (slug, session_id, created_at) VALUES ($1, $2, COALESCE($3, now())) ON CONFLICT DO NOTHING', [row.slug, row.session_id, row.created_at]);
   }
