@@ -617,7 +617,9 @@ function labelState(state) {
 function sendLog(event, details = {}) {
   fetch('/api/client-log', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // text/plain is CORS-safelisted; Cloudflare Access can then pass the
+    // same-origin audit request without an OPTIONS redirect.
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
     body: JSON.stringify({ event, ...details }),
     credentials: 'include',
     keepalive: true,
