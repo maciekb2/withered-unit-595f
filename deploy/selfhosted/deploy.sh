@@ -17,6 +17,8 @@ rsync -a --delete \
   --exclude 'deploy/selfhosted/.env' \
   --exclude 'deploy/selfhosted/secrets' \
   --exclude 'deploy/selfhosted/secrets/***' \
+  --exclude 'secrets' \
+  --exclude 'secrets/***' \
   --exclude 'migration/' \
   --exclude 'node_modules/' \
   --exclude 'dist/' \
