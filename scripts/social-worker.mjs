@@ -7,6 +7,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { buildYouTubeDraftText } from './social-copy.mjs';
 import { ensureSocialOutro } from './social-outro.mjs';
+import { buildSocialMotionFilter, socialBodyDuration } from './social-motion.mjs';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 });
@@ -145,11 +146,11 @@ async function render(job, pkg) {
   if (!musicFiles.length) throw new Error('approved music library is empty');
   const musicIndex = createHash('sha256').update(job.slug).digest().readUInt32BE(0) % musicFiles.length;
   const music = musicFiles[musicIndex];
-  const duration = pkg.scenes.length * 5;
-  const drawScenes = sceneFiles.map((file, i) => `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(file)}':fontcolor=0xf4f0df:fontsize=52:line_spacing=16:x=70:y=1120:box=1:boxcolor=0x031712dd:boxborderw=30:enable='between(t,${i * 5},${(i + 1) * 5})'`).join(',');
+  const duration = socialBodyDuration(pkg.scenes.length);
+  const motionFilter = buildSocialMotionFilter(sceneFiles, ffText);
   const reel = path.join(dir, 'short.mp4');
   const body = path.join(dir, 'short-body.mp4');
-  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-t',String(duration),'-vf',`scale=960:960:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:180:0x031712,drawbox=x=0:y=950:w=iw:h=970:color=0x031712ee:t=fill,${drawScenes},drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=70:y=80`,'-af',`afade=t=in:st=0:d=1,afade=t=out:st=${duration - 2}:d=2,loudnorm=I=-18:TP=-2:LRA=7`,'-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-r','30','-video_track_timescale','90000','-c:a','aac','-b:a','128k','-ar','48000','-movflags','+faststart','-shortest',body]);
+  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-t',String(duration),'-vf',motionFilter,'-af',`afade=t=in:st=0:d=0.6,afade=t=out:st=${duration - 1.2}:d=1.2,loudnorm=I=-18:TP=-2:LRA=7`,'-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-r','30','-video_track_timescale','90000','-c:a','aac','-b:a','128k','-ar','48000','-movflags','+faststart','-shortest',body]);
   const outro = await ensureSocialOutro({ mediaRoot, run });
   const concatFile = path.join(dir, 'concat.txt');
   await writeFile(concatFile, `file '${ffText(body)}'\nfile '${ffText(outro)}'\n`, 'utf8');
