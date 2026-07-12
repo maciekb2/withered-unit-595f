@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
       COALESCE(json_agg(json_build_object('channel',p.channel,'status',p.status,'draftId',p.buffer_draft_id))
         FILTER (WHERE p.id IS NOT NULL),'[]') publications
       FROM social_jobs j LEFT JOIN social_publications p ON p.job_id=j.id
-      WHERE j.updated_at >= now()-interval '60 days'
+      WHERE j.updated_at >= now()-interval '60 days' AND j.status IN ('review','queued','published')
       GROUP BY j.id ORDER BY j.updated_at DESC LIMIT 80`),
     pool.query(`SELECT p.channel,p.variant_key,s.window_hours,s.provider,s.metrics,s.normalized_score,s.measured_at
       FROM social_metric_snapshots s JOIN social_publications p ON p.id=s.publication_id

@@ -27,5 +27,5 @@ rsync -a --delete \
 
 cd "$ROOT"
 COMPOSE_BAKE=false docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env build app
-docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env up -d app generator scheduler social-worker
+docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env up -d app generator scheduler social-worker social-metrics
 docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env ps

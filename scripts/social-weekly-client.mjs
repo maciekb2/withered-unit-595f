@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 const [command, ...args] = process.argv.slice(2);
 const base = (process.env.SOCIAL_ADMIN_BASE_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
+const origin = new URL(base).origin;
 const token = process.env.GENERATOR_PRIVATE_TOKEN;
 if (!token) throw new Error('GENERATOR_PRIVATE_TOKEN is required');
 
@@ -15,7 +16,7 @@ async function stdin() {
 async function request(path, init = {}) {
   const response = await fetch(`${base}${path}`, {
     ...init,
-    headers: { 'x-generator-private-token': token, ...(init.headers || {}) },
+    headers: { origin, 'x-generator-private-token': token, ...(init.headers || {}) },
     signal: AbortSignal.timeout(120_000),
   });
   const text = await response.text();
