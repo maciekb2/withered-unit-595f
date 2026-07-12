@@ -5,13 +5,13 @@ import { retryFetch } from '../utils/retryFetch';
 const PSEUDOINTELEKT_HERO_STYLE_LOCK = `
 
 STALE INSTRUKCJE STYLU PSEUDOINTELEKT HERO:
-- kontynuuj styl wczesnych ilustracji DALL-E 3 vivid: satyryczna, redakcyjna ilustracja geopolityczna, nie fotografia i nie render 3D;
-- komiksowo-publicystyczny charakter, jeden wyrazny motyw i maksymalnie trzy czytelne elementy;
-- zywe nasycone kolory, wysoki kontrast, subtelna faktura druku, ostre kontury i plakatowa energia komentarza politycznego;
-- dynamiczny, kwadratowy kadr 1:1, glowny motyw bezpiecznie w centrum i czytelny po przycieciu oraz w miniaturze;
-- preferuj przedmioty, architekture, mapy, emblematy i uproszczone sylwetki zamiast realistycznych ludzi;
-- bez tekstu, liter, cyfr, logo, znakow wodnych, podpisow, UI, ramek i przypadkowych ikon;
-- bez fotorealizmu, renderu 3D, realistycznych ludzkich twarzy, portretow konkretnych osob i stereotypowego przedstawiania narodowosci lub grup spolecznych.
+- czysty Situation Room magazine collage, satyryczna ilustracja geopolityczna, jedna precyzyjna metafora z dwoch lub trzech konkretnych przedmiotow;
+- elegancki, lekko zabawny kolaż redakcyjny, bez ludzi i twarzy, z wyraznym punktem skupienia;
+- paleta: gleboka lesna zielen, teal, ciepla kosc sloniowa i przygaszone zloto; czerwień tylko jako oszczedny akcent;
+- landscape 3:2, kontrolowana pusta przestrzen, ostre wycinankowe ksztalty, delikatnie przestrzenne powierzchnie i subtelna faktura druku;
+- preferuj przedmioty, mapy, architekture, dokumenty, instrumenty i emblematy; obraz ma byc czytelny po przycieciu do miniatury;
+- bez tekstu, liter, cyfr, logo, znakow wodnych, UI, ramek i czytelnych napisow;
+- bez fotorealizmu, sceny filmowej, stock-photo look, neonowych gradientow, wizualnego halasu, przypadkowych ikon, ludzi i stereotypowego przedstawiania narodowosci lub grup spolecznych.
 `.trim();
 
 export interface GenerateHeroOptions {
