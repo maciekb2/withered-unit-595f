@@ -15,12 +15,15 @@
 </div>
 
 <script>
+    import { mesh as topologyMesh } from 'topojson-client';
+    import type { Topology } from 'topojson-specification';
     import type {
         Mesh as ThreeMesh,
         MeshBasicMaterial as ThreeMeshBasicMaterial,
         QuadraticBezierCurve3 as ThreeQuadraticBezierCurve3,
         WebGLRenderer as ThreeWebGLRenderer,
     } from 'three';
+    import landTopology from 'world-atlas/land-110m.json';
 
     type NetworkInformation = {
         saveData?: boolean;
@@ -35,6 +38,10 @@
     };
 
     const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+    const smoothstep = (edgeStart: number, edgeEnd: number, value: number) => {
+        const progress = clamp01((value - edgeStart) / (edgeEnd - edgeStart));
+        return progress * progress * (3 - 2 * progress);
+    };
 
     const sceneRoots = document.querySelectorAll<HTMLElement>('[data-geo-scene]');
 
@@ -191,21 +198,41 @@
         const continentMaterial = new LineBasicMaterial({
             color: 0xd8cfaa,
             transparent: true,
-            opacity: 0.58,
+            opacity: 0.72,
+            depthTest: true,
             depthWrite: false,
         });
-        const continentPaths = [
-            [[36, -10], [44, -9], [50, 0], [58, 5], [71, 25], [68, 50], [60, 70], [72, 100], [60, 140], [48, 150], [36, 130], [22, 120], [10, 105], [22, 90], [8, 77], [25, 60], [35, 45], [42, 30], [36, 15], [36, -10]],
-            [[35, -17], [37, 10], [31, 32], [12, 44], [-12, 40], [-35, 18], [-30, 5], [-5, -15], [15, -17], [35, -17]],
-            [[15, -84], [25, -98], [48, -125], [62, -140], [72, -112], [67, -80], [52, -55], [45, -66], [30, -80], [15, -84]],
-            [[12, -81], [5, -77], [-10, -78], [-25, -70], [-55, -68], [-50, -52], [-25, -42], [-5, -50], [12, -61], [12, -81]],
-            [[-11, 113], [-20, 115], [-35, 116], [-39, 145], [-26, 153], [-12, 142], [-11, 113]],
-            [[60, -48], [70, -55], [82, -42], [76, -20], [64, -40], [60, -48]],
-        ] as const;
-        const continentGeometries = continentPaths.map((path) => {
-            const geometry = new BufferGeometry().setFromPoints(
-                path.map(([lat, lon]) => latLonToVector(lat, lon, 1.475)),
-            );
+
+        // Natural Earth 1:110m coastline. Interpolated points are normalized to
+        // one radius so long segments follow the sphere instead of cutting through it.
+        const topology = landTopology as unknown as Topology;
+        const coastline = topologyMesh(topology, topology.objects.land);
+        const coastlineRadius = 1.462;
+        const maxSegmentAngle = MathUtils.degToRad(2.25);
+        const continentGeometries = coastline.coordinates.map((path) => {
+            const surfacePoints: InstanceType<typeof Vector3>[] = [];
+
+            path.forEach(([longitude, latitude], index) => {
+                const next = path[index + 1];
+                const start = latLonToVector(latitude, longitude, 1);
+                if (!next) {
+                    surfacePoints.push(start.multiplyScalar(coastlineRadius));
+                    return;
+                }
+
+                const end = latLonToVector(next[1], next[0], 1);
+                const segments = Math.max(1, Math.ceil(start.angleTo(end) / maxSegmentAngle));
+                for (let segment = 0; segment < segments; segment += 1) {
+                    surfacePoints.push(
+                        start.clone()
+                            .lerp(end, segment / segments)
+                            .normalize()
+                            .multiplyScalar(coastlineRadius),
+                    );
+                }
+            });
+
+            const geometry = new BufferGeometry().setFromPoints(surfacePoints);
             const outline = new Line(geometry, continentMaterial);
             outline.renderOrder = 3;
             world.add(outline);
@@ -419,7 +446,8 @@
             const storyScale = 1 + Math.sin(scrollProgress * Math.PI) * 0.08;
             world.scale.setScalar(mobile ? storyScale * 0.9 : storyScale * 1.08);
             camera.position.z = (mobile ? 5.45 : 5.15) - scrollProgress * 0.38;
-            camera.position.x = scrollProgress > 0.68 ? -0.14 : 0;
+            const finalChapterBlend = smoothstep(0.6, 0.76, scrollProgress);
+            camera.position.x = MathUtils.lerp(0, -0.14, finalChapterBlend);
 
             const signalStrength = 0.14 + clamp01((scrollProgress - 0.1) * 2.8) * 0.68;
             arcMeshes.forEach((arc, index) => {

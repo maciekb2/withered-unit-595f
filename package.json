@@ -26,12 +26,15 @@
     "node-html-parser": "^7.1.0",
     "pg": "^8.16.3",
     "three": "^0.185.1",
-    "typescript": "5.9.3"
+    "topojson-client": "^3.1.0",
+    "typescript": "5.9.3",
+    "world-atlas": "^2.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260611.1",
     "@types/pg": "^8.15.5",
     "@types/three": "^0.185.1",
+    "@types/topojson-client": "^3.1.5",
     "wrangler": "^4.100.0"
   },
   "scripts": {
