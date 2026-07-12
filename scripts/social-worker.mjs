@@ -71,11 +71,33 @@ function validatePackage(pkg, source) {
 
 async function writePackage(source, score) {
   const prompt = `Jesteś redaktorem social media marki Pseudointelekt. Ton: chłodny, inteligentny, ironiczny i konkretny. Ironia dotyczy instytucji, decyzji i narracji, nigdy cech osobistych. Nie dodawaj żadnych nowych faktów, liczb, nazw ani interpretacji spoza materiału. Krótkie naturalne zdania po polsku, bez korpomowy i bez fraz AI. Zwróć wyłącznie JSON: {"hook":"20-130 znaków","instagramCaption":"do 600 znaków z CTA","youtubeTitle":"do 100 znaków","youtubeDescription":"do 800 znaków z CTA","scenes":["5 lub 6 plansz, każda 8-115 znaków"],"hashtags":["maksymalnie 5 hashtagów"]}. Ostatnia scena zawiera wezwanie do przeczytania tekstu na pseudointelekt.pl.\nMATERIAŁ:\n${JSON.stringify(source)}`;
-  const pkg = safeJson(await jetson(prompt));
-  pkg.score = score;
-  pkg.template = 'situation-room-v1';
+  let feedback = '';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const parsed = safeJson(await jetson(`${prompt}${feedback}`));
+      const pkg = parsed.socialPackage || parsed.package || parsed;
+      pkg.score = score;
+      pkg.template = 'situation-room-v1';
+      const errors = validatePackage(pkg, source);
+      if (!errors.length) return pkg;
+      feedback = `\nPOPRZEDNI WYNIK BYŁ BŁĘDNY: ${errors.join(', ')}. Zwróć wszystkie wymagane pola dokładnie raz.`;
+    } catch (error) {
+      feedback = `\nPOPRZEDNI WYNIK NIE BYŁ POPRAWNYM JSON: ${error instanceof Error ? error.message.slice(0, 180) : 'unknown error'}. Zwróć tylko obiekt JSON.`;
+    }
+  }
+  const hashtags = (source.tags || []).slice(0, 4).map(tag => `#${tag.toLocaleLowerCase('pl').replace(/[^\p{L}\p{N}_]/gu, '')}`).filter(tag => tag.length > 1);
+  const pkg = {
+    score,
+    hook: source.title.slice(0, 130),
+    instagramCaption: `${source.lead.slice(0, 470)} Więcej na pseudointelekt.pl.`,
+    youtubeTitle: source.title.slice(0, 100),
+    youtubeDescription: `${source.lead.slice(0, 650)} Więcej na pseudointelekt.pl.`,
+    scenes: [source.title, source.lead, ...source.summaryPoints.slice(0, 3), 'Cała analiza na pseudointelekt.pl.'].map(value => value.slice(0, 115)).slice(0, 6),
+    hashtags: hashtags.slice(0, 5),
+    template: 'situation-room-v1',
+  };
   const errors = validatePackage(pkg, source);
-  if (errors.length) throw new Error(`social package rejected: ${errors.join(', ')}`);
+  if (errors.length) throw new Error(`deterministic social fallback rejected: ${errors.join(', ')}`);
   return pkg;
 }
 
@@ -193,7 +215,7 @@ async function processOne() {
   try {
     const page = await fetch(job.source.articleUrl, { method:'HEAD', signal:AbortSignal.timeout(15000) });
     if (!page.ok) { await pool.query(`UPDATE social_jobs SET status='waiting_article',locked_at=NULL,last_error=$2,updated_at=now() WHERE id=$1`,[job.id,`article HTTP ${page.status}`]); return true; }
-    const score = job.status === 'eligible' && job.package?.score
+    const score = job.package?.score
       ? job.package.score
       : await scoreSource(job.source);
     if (score.total < 6) { await pool.query(`UPDATE social_jobs SET status='skipped',score=$2,package=$3::jsonb,locked_at=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify({score})]); return true; }
