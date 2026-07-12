@@ -8,5 +8,6 @@ node_modules
 npm-debug.log*
 deploy/selfhosted/.env
 deploy/selfhosted/backups
+music
 *.tar
 *.tar.gz
