@@ -15,4 +15,4 @@ export async function getStaticPaths() {
 }
 const page = Number(Astro.params.page);
 ---
-<!doctype html><html lang="pl"><head><BaseHead title={`Archiwum analiz — strona ${page} | Pseudointelekt`} description={`Starsze analizy Pseudointelektu — strona ${page} archiwum.`} /></head><body data-page-section="archive"><Header /><BlogArchive posts={posts} page={page} perPage={perPage} /><Footer /></body></html>
+<!doctype html><html lang="pl"><head><BaseHead title={`Archiwum analiz — strona ${page} | Pseudointelekt`} description={`Starsze analizy Pseudointelektu — strona ${page} archiwum.`} prevUrl={page === 2 ? '/blog/' : `/blog/${page - 1}/`} nextUrl={page < totalPages ? `/blog/${page + 1}/` : undefined} /><script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `Archiwum analiz — strona ${page}`, url: new URL(`/blog/${page}/`, Astro.site).toString(), inLanguage: 'pl-PL' })} /></head><body data-page-section="archive"><Header /><BlogArchive posts={posts} page={page} perPage={perPage} /><Footer /></body></html>

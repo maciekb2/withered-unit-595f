@@ -7,5 +7,6 @@ import TopicDossier from '../../components/TopicDossier.astro';
 import { buildTopicIndex, sortPostsByDate } from '../../utils/topics';
 export async function getStaticPaths() { const topics = buildTopicIndex(sortPostsByDate(await getCollection('blog'))); return topics.map((topic) => ({ params: { slug: topic.slug }, props: { topic } })); }
 const { topic } = Astro.props;
+const topicJsonLd = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${topic.name} | Pseudointelekt`, description: topic.description, url: new URL(`/tematy/${topic.slug}/`, Astro.site).toString(), inLanguage: 'pl-PL', mainEntity: { '@type': 'ItemList', numberOfItems: topic.posts.length, itemListElement: topic.posts.slice(0, 20).map((post, index) => ({ '@type': 'ListItem', position: index + 1, url: new URL(`/blog/${post.id}/`, Astro.site).toString(), name: post.data.title })) } };
 ---
-<!doctype html><html lang="pl"><head><BaseHead title={`${topic.name} | Pseudointelekt`} description={topic.description} /></head><body data-page-section="topic"><Header /><TopicDossier topic={topic} page={1} perPage={20} /><Footer /></body></html>
+<!doctype html><html lang="pl"><head><BaseHead title={`${topic.name} | Pseudointelekt`} description={topic.description} nextUrl={topic.posts.length > 20 ? `/tematy/${topic.slug}/2/` : undefined} /><script type="application/ld+json" set:html={JSON.stringify(topicJsonLd)} /></head><body data-page-section="topic"><Header /><TopicDossier topic={topic} page={1} perPage={20} /><Footer /></body></html>

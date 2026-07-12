@@ -2,28 +2,52 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
-import { GA4_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, SITE_KEYWORDS } from '../consts';
+import { GA4_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, SITE_KEYWORDS, SITE_TITLE } from '../consts';
 
 interface Props {
 	title: string;
 	description: string;
 	image?: string;
 	type?: 'website' | 'article';
+	prevUrl?: string;
+	nextUrl?: string;
+	noindex?: boolean;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = '/pseudointelekt_logo_tekstura.svg', type = 'website' } = Astro.props;
+const { title, description, image = '/pseudointelekt_logo_tekstura.svg', type = 'website', prevUrl, nextUrl, noindex = false } = Astro.props;
 const imageURL = new URL(image, Astro.site);
 const hasGoogleVerification = Boolean(GOOGLE_SITE_VERIFICATION);
+const siteUrl = new URL('/', Astro.site).toString();
+const organizationJsonLd = {
+  '@type': 'Organization',
+  '@id': `${siteUrl}#organization`,
+  name: 'Pseudointelekt',
+  url: siteUrl,
+  logo: new URL('/pseudointelekt_logo_tekstura.svg', Astro.site).toString(),
+  email: 'info@pseudointelekt.pl',
+};
 const websiteJsonLd = type === 'website'
   ? {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: 'Pseudointelekt',
-      url: new URL('/', Astro.site).toString(),
-      inLanguage: 'pl-PL',
-      description,
+      '@graph': [
+        organizationJsonLd,
+        {
+          '@type': 'WebSite',
+          '@id': `${siteUrl}#website`,
+          name: 'Pseudointelekt',
+          url: siteUrl,
+          inLanguage: 'pl-PL',
+          description,
+          publisher: { '@id': `${siteUrl}#organization` },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${siteUrl}blog/?q={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+        },
+      ],
     }
   : undefined;
 ---
@@ -33,7 +57,8 @@ const websiteJsonLd = type === 'website'
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon_P1.svg" />
 <meta name="generator" content={Astro.generator} />
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
+<meta name="theme-color" content="#061d18" />
 
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
@@ -41,6 +66,8 @@ const websiteJsonLd = type === 'website'
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
+{prevUrl && <link rel="prev" href={new URL(prevUrl, Astro.site)} />}
+{nextUrl && <link rel="next" href={new URL(nextUrl, Astro.site)} />}
 <link rel="alternate" type="application/rss+xml" title="Pseudointelekt — RSS" href="/rss.xml" />
 
 <!-- Primary Meta Tags -->
@@ -54,17 +81,20 @@ const websiteJsonLd = type === 'website'
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
 <meta property="og:locale" content="pl_PL" />
+<meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageURL} />
+<meta property="og:image:alt" content={title} />
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={imageURL} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={Astro.url} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageURL} />
+<meta name="twitter:image:alt" content={title} />
 
 {websiteJsonLd && <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />}
 

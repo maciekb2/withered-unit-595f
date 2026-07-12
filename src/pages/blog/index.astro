@@ -6,5 +6,24 @@ import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 
 const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.id.localeCompare(a.id));
+const pagePosts = posts.slice(0, 20);
+const archiveJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Blog geopolityczny — analizy i komentarze | Pseudointelekt',
+  description: 'Analizy geopolityki, gospodarki, technologii i mediów.',
+  url: new URL('/blog/', Astro.site).toString(),
+  inLanguage: 'pl-PL',
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: pagePosts.length,
+    itemListElement: pagePosts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: new URL(`/blog/${post.id}/`, Astro.site).toString(),
+      name: post.data.title,
+    })),
+  },
+};
 ---
-<!doctype html><html lang="pl"><head><BaseHead title="Blog geopolityczny — analizy i komentarze | Pseudointelekt" description="Analizy geopolityki, gospodarki, technologii i mediów. Sprawdzamy decyzje, interesy oraz koszty, które zostają po nagłówkach." /></head><body data-page-section="archive"><Header /><BlogArchive posts={posts} page={1} perPage={20} /><Footer /></body></html>
+<!doctype html><html lang="pl"><head><BaseHead title="Blog geopolityczny — analizy i komentarze | Pseudointelekt" description="Analizy geopolityki, gospodarki, technologii i mediów. Sprawdzamy decyzje, interesy oraz koszty, które zostają po nagłówkach." nextUrl={posts.length > 20 ? '/blog/2/' : undefined} /><script type="application/ld+json" set:html={JSON.stringify(archiveJsonLd)} /></head><body data-page-section="archive"><Header /><BlogArchive posts={posts} page={1} perPage={20} /><Footer /></body></html>
