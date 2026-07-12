@@ -264,7 +264,7 @@ export async function generateAndPublish(
           outlineRes = await generateOutline({
             apiKey: env.OPENAI_API_KEY,
             baseTopic,
-            model: outlineModel,
+            model: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
             provider: fallbackProvider,
             maxTokens: 2600,
             topicContext: contextPack,
