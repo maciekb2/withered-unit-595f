@@ -57,5 +57,8 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Persist compact, verified social source packages independently from article publication.
 - [x] Add a resumable PostgreSQL-backed social worker with local-model scoring/copy and FFmpeg rendering.
 - [x] Produce Buffer drafts for Instagram Reels/posts and YouTube Shorts with durable media URLs and UTM attribution.
-- [ ] Connect production Buffer channel IDs, add an approved music library and disable dry-run after the first controlled draft review.
+- [x] Connect production Buffer channel IDs and add an approved music library.
+- [x] Add a Codex-led explicit weekly run with 2 current articles, 1 evergreen article, inspected master images and Buffer drafts.
+- [x] Add Buffer metric snapshots at 24h, 72h, 7d and 28d for the editorial feedback loop.
+- [ ] Add direct YouTube Analytics and GA4 adapters after the first 12 comparable posts.
 - [ ] Add carousel rendering after the first 12 posts provide enough performance data.

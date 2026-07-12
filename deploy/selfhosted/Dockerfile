@@ -14,6 +14,8 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-scheduler.mjs
 COPY --from=build /app/scripts/social-worker.mjs ./scripts/social-worker.mjs
+COPY --from=build /app/scripts/social-weekly-client.mjs ./scripts/social-weekly-client.mjs
+COPY --from=build /app/scripts/social-metrics-sync.mjs ./scripts/social-metrics-sync.mjs
 USER node
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]

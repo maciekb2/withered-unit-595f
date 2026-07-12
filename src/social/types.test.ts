@@ -16,6 +16,7 @@ test('buildSocialSource creates a compact, sourced package for the social worker
     sourceUrl: 'https://example.com/source',
   }, 'europa-komunikat-i-rachunek', '2026-07-12T10:00:00.000Z');
   assert.equal(source.articleUrl, 'https://pseudointelekt.pl/blog/2026-07-12-europa-komunikat-i-rachunek/');
+  assert.equal(source.slug, '2026-07-12-europa-komunikat-i-rachunek');
   assert.equal(source.heroUrl, 'https://pseudointelekt.pl/blog-images/2026-07-12-europa-komunikat-i-rachunek.png');
   assert.equal(source.summaryPoints.length, 3);
   assert.deepEqual(validateSocialSource(source), []);

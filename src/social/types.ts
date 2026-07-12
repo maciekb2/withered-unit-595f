@@ -30,26 +30,31 @@ export interface SocialPackage {
   youtubeDescription: string;
   scenes: string[];
   hashtags: string[];
-  template: 'situation-room-v1';
+  staticPost?: boolean;
+  imagePrompt: string;
+  contentKind: 'current' | 'evergreen';
+  experiment: string;
+  template: 'situation-room-v2';
 }
 
 const clean = (value: string) => value.replace(/\s+/g, ' ').replace(/[*_`#>]/g, '').trim();
 
 export function buildSocialSource(article: FinalJson, slug: string, publishedAt = new Date().toISOString()): SocialSource {
-  const articleUrl = `https://pseudointelekt.pl/blog/${publishedAt.slice(0, 10)}-${slug}/`;
+  const articleId = `${publishedAt.slice(0, 10)}-${slug}`;
+  const articleUrl = `https://pseudointelekt.pl/blog/${articleId}/`;
   const paragraphs = article.content
     .split(/\n{2,}/)
     .map(clean)
     .filter(value => value.length >= 80 && !/^https?:\/\//.test(value));
   const summaryPoints = paragraphs.slice(0, 5).map(value => value.slice(0, 320));
   return {
-    slug,
+    slug: articleId,
     title: clean(article.title),
     lead: clean(article.description),
     summaryPoints,
     punchline: summaryPoints.at(-1) || clean(article.description),
     tags: (article.tags || []).slice(0, 6),
-    heroUrl: `https://pseudointelekt.pl/blog-images/${publishedAt.slice(0, 10)}-${slug}.png`,
+    heroUrl: `https://pseudointelekt.pl/blog-images/${articleId}.png`,
     articleUrl,
     sourceUrl: article.sourceUrl,
     publishedAt,

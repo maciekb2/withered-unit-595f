@@ -131,8 +131,8 @@ function wrapText(value, width = 28) {
 async function render(job, pkg) {
   const dir = path.join(mediaRoot, job.id);
   await mkdir(dir, { recursive: true });
-  const hero = path.join(dir, 'hero.png');
-  await download(job.source.heroUrl, hero);
+  const hero = job.master_image_path;
+  if (!hero || !path.resolve(hero).startsWith(mediaRoot + path.sep)) throw new Error('weekly master image is missing or outside media root');
   const sceneFiles = [];
   for (let i = 0; i < pkg.scenes.length; i++) {
     const file = path.join(dir, `scene-${i}.txt`);
@@ -144,13 +144,13 @@ async function render(job, pkg) {
   const musicIndex = createHash('sha256').update(job.slug).digest().readUInt32BE(0) % musicFiles.length;
   const music = musicFiles[musicIndex];
   const duration = pkg.scenes.length * 5;
-  const drawScenes = sceneFiles.map((file, i) => `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(file)}':fontcolor=0xf4f0df:fontsize=58:line_spacing=16:x=70:y=(h-text_h)/2:box=1:boxcolor=0x031712cc:boxborderw=30:enable='between(t,${i * 5},${(i + 1) * 5})'`).join(',');
+  const drawScenes = sceneFiles.map((file, i) => `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(file)}':fontcolor=0xf4f0df:fontsize=52:line_spacing=16:x=70:y=1120:box=1:boxcolor=0x031712dd:boxborderw=30:enable='between(t,${i * 5},${(i + 1) * 5})'`).join(',');
   const reel = path.join(dir, 'short.mp4');
-  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-t',String(duration),'-vf',`scale=1200:1920:force_original_aspect_ratio=increase,crop=1080:1920,zoompan=z='min(zoom+0.00035,1.08)':d=${duration * 30}:s=1080x1920:fps=30,drawbox=x=0:y=0:w=iw:h=ih:color=0x03171255:t=fill,${drawScenes},drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=70:y=80`,'-af',`afade=t=in:st=0:d=1,afade=t=out:st=${duration - 2}:d=2,loudnorm=I=-18:TP=-2:LRA=7`,'-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart','-shortest',reel]);
+  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-t',String(duration),'-vf',`scale=960:960:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:180:0x031712,drawbox=x=0:y=950:w=iw:h=970:color=0x031712ee:t=fill,${drawScenes},drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=70:y=80`,'-af',`afade=t=in:st=0:d=1,afade=t=out:st=${duration - 2}:d=2,loudnorm=I=-18:TP=-2:LRA=7`,'-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart','-shortest',reel]);
   const post = path.join(dir, 'instagram-post.png');
   const hookFile = path.join(dir, 'hook.txt');
   await writeFile(hookFile, wrapText(pkg.hook, 30), 'utf8');
-  await run('ffmpeg', ['-y','-i',hero,'-vf',`scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,drawbox=x=0:y=0:w=iw:h=ih:color=0x03171299:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(hookFile)}':fontcolor=0xf4f0df:fontsize=54:line_spacing=14:x=64:y=(h-text_h)/2:box=1:boxcolor=0x031712aa:boxborderw=28,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=64:y=72`,'-frames:v','1',post]);
+  await run('ffmpeg', ['-y','-i',hero,'-vf',`scale=960:760:force_original_aspect_ratio=decrease,pad=1080:1350:(ow-iw)/2:120:0x031712,drawbox=x=0:y=820:w=iw:h=530:color=0x031712ee:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(hookFile)}':fontcolor=0xf4f0df:fontsize=48:line_spacing=14:x=64:y=900:box=1:boxcolor=0x031712cc:boxborderw=24,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=64:y=54`,'-frames:v','1',post]);
   return { reel, post };
 }
 
@@ -180,16 +180,18 @@ async function bufferDraft(channelId, text, mediaUrl, mediaType, channel, youtub
 }
 
 async function createDrafts(client, job, pkg, urls) {
-  const utm = channel => `${job.source.articleUrl}?utm_source=${channel}&utm_medium=social&utm_campaign=article_social&utm_content=${job.source.slug}-situation-room-v1`;
+  const utm = channel => `${job.source.articleUrl}?utm_source=${channel}&utm_medium=social&utm_campaign=article_social&utm_content=${job.source.slug}-${job.variant_key || 'weekly'}-situation-room-v2`;
   const specs = [
     ['instagram_reel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${pkg.hashtags.join(' ')}\n${utm('instagram')}`,urls.reel,'video'],
-    ['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${pkg.hashtags.join(' ')}\n${utm('instagram')}`,urls.post,'image'],
     ['youtube_short',process.env.BUFFER_YOUTUBE_CHANNEL_ID,`${pkg.youtubeTitle}\n\n${pkg.youtubeDescription}\n${utm('youtube')}`,urls.reel,'video'],
   ];
+  if (pkg.staticPost) specs.push(['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${pkg.hashtags.join(' ')}\n${utm('instagram')}`,urls.post,'image']);
   for (const [channel,channelId,text,url,type] of specs) {
     if (!channelId && !dryRun) continue;
+    const existing = await client.query('SELECT buffer_draft_id FROM social_publications WHERE job_id=$1 AND channel=$2', [job.id, channel]);
+    if (existing.rows[0]?.buffer_draft_id) continue;
     const id = await bufferDraft(channelId,text,url,type,channel,pkg.youtubeTitle);
-    await client.query(`INSERT INTO social_publications(job_id,channel,buffer_draft_id,status) VALUES($1,$2,$3,'draft') ON CONFLICT(job_id,channel) DO UPDATE SET buffer_draft_id=EXCLUDED.buffer_draft_id,status='draft',updated_at=now()`, [job.id,channel,id]);
+    await client.query(`INSERT INTO social_publications(job_id,channel,buffer_draft_id,status,variant_key) VALUES($1,$2,$3,'draft',$4) ON CONFLICT(job_id,channel) DO UPDATE SET buffer_draft_id=EXCLUDED.buffer_draft_id,status='draft',variant_key=EXCLUDED.variant_key,updated_at=now()`, [job.id,channel,id,job.variant_key]);
   }
 }
 
@@ -198,10 +200,9 @@ async function acquire() {
   try {
     await client.query('BEGIN');
     const result = await client.query(`SELECT * FROM social_jobs
-      WHERE status IN ('waiting_article','eligible','failed') AND attempts < $1
+      WHERE (status='ready' OR (status='failed' AND run_id IS NOT NULL)) AND attempts < $1
         AND (locked_at IS NULL OR locked_at < now()-interval '30 minutes')
-        AND (status <> 'eligible' OR (SELECT count(*) FROM social_jobs WHERE status IN ('review','queued','published') AND updated_at >= date_trunc('week',now())) < 3)
-      ORDER BY CASE status WHEN 'waiting_article' THEN 0 WHEN 'failed' THEN 1 ELSE 2 END, score DESC NULLS LAST, created_at
+      ORDER BY CASE status WHEN 'failed' THEN 0 ELSE 1 END, created_at
       LIMIT 1 FOR UPDATE SKIP LOCKED`, [maxAttempts]);
     const job = result.rows[0];
     if (!job) { await client.query('COMMIT'); return null; }
@@ -215,17 +216,9 @@ async function processOne() {
   const job = await acquire();
   if (!job) return false;
   try {
-    const page = await fetch(job.source.articleUrl, { method:'HEAD', signal:AbortSignal.timeout(15000) });
-    if (!page.ok) { await pool.query(`UPDATE social_jobs SET status='waiting_article',locked_at=NULL,last_error=$2,updated_at=now() WHERE id=$1`,[job.id,`article HTTP ${page.status}`]); return true; }
-    const score = job.package?.score
-      ? job.package.score
-      : await scoreSource(job.source);
-    if (score.total < 6) { await pool.query(`UPDATE social_jobs SET status='skipped',score=$2,package=$3::jsonb,locked_at=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify({score})]); return true; }
-    if (job.status === 'waiting_article') {
-      await pool.query(`UPDATE social_jobs SET status='eligible',score=$2,package=$3::jsonb,locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify({score})]);
-      return true;
-    }
-    const pkg = await writePackage(job.source, score);
+    const pkg = job.package;
+    if (!pkg?.score) throw new Error('Codex social package is missing');
+    const score = pkg.score;
     const assets = await render(job,pkg);
     const client = await pool.connect();
     try {
@@ -233,6 +226,9 @@ async function processOne() {
       const urls = { reel: await persistAsset(client,job.id,'reel',assets.reel), post: await persistAsset(client,job.id,'instagram_post',assets.post) };
       await createDrafts(client,job,pkg,urls);
       await client.query(`UPDATE social_jobs SET status='review',score=$2,package=$3::jsonb,locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify(pkg)]);
+      await client.query(`UPDATE social_runs SET status=CASE WHEN NOT EXISTS(
+        SELECT 1 FROM social_jobs WHERE run_id=$1 AND status NOT IN ('review','published','queued')
+      ) THEN 'review' ELSE 'processing' END,updated_at=now() WHERE id=$1`, [job.run_id]);
       await client.query('COMMIT');
     } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
     console.log(JSON.stringify({type:'social-job-complete',jobId:job.id,slug:job.slug,score:score.total,dryRun}));

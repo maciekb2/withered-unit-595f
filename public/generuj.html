@@ -406,10 +406,20 @@ pre {
   font-size: 0.92rem;
 }
 
+.social-panel { margin-top: 1rem; }
+.social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding: 1rem; }
+.social-list { display: grid; gap: 0.55rem; }
+.social-item { padding: 0.8rem; border: 1px solid var(--line); background: rgba(248, 246, 241, 0.78); }
+.social-item strong { display: block; color: var(--charcoal); margin-bottom: 0.3rem; }
+.social-item small { color: rgba(28, 61, 90, 0.68); }
+.social-item .actions { justify-content: flex-start; margin-top: 0.6rem; }
+.social-item button { min-height: 2rem; padding: 0.35rem 0.65rem; font-size: 0.78rem; }
+
 @media (max-width: 940px) {
   .topbar,
   .dashboard,
-  .content-grid {
+  .content-grid,
+  .social-grid {
     grid-template-columns: 1fr;
   }
   .topbar { display: grid; }
@@ -513,6 +523,28 @@ pre {
       </div>
     </section>
   </div>
+
+  <section class="card social-panel" id="social-panel">
+    <div class="card-header">
+      <div>
+        <p class="eyebrow">Dystrybucja / tydzień</p>
+        <h2>Social media</h2>
+      </div>
+      <button id="social-refresh" class="button secondary" type="button">Odśwież</button>
+    </div>
+    <div class="social-grid">
+      <div>
+        <h2>Kandydaci</h2>
+        <p class="empty">Cotygodniowy Codex wybiera 2 aktualne materiały i 1 evergreen.</p>
+        <div id="social-candidates" class="social-list"></div>
+      </div>
+      <div>
+        <h2>Ostatnie paczki</h2>
+        <p class="empty" id="social-summary">Ładowanie stanu kolejki...</p>
+        <div id="social-jobs" class="social-list"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -549,6 +581,10 @@ const modelData = document.getElementById('model-data');
 const eventCounter = document.getElementById('event-counter');
 const currentStageLabel = document.getElementById('current-stage-label');
 const timelineEl = document.getElementById('timeline');
+const socialCandidates = document.getElementById('social-candidates');
+const socialJobs = document.getElementById('social-jobs');
+const socialSummary = document.getElementById('social-summary');
+const socialRefresh = document.getElementById('social-refresh');
 let topicForm;
 let eventCount = 0;
 let currentStage = 'start';
@@ -558,6 +594,53 @@ const stageStates = Object.fromEntries(STAGES.map(stage => [stage.id, 'pending']
 
 renderTimeline();
 startStream();
+loadSocial();
+
+socialRefresh.addEventListener('click', loadSocial);
+
+async function loadSocial() {
+  socialRefresh.disabled = true;
+  try {
+    const [contextResponse, jobsResponse] = await Promise.all([
+      fetch('/api/social/context', { credentials: 'include' }),
+      fetch('/api/social/jobs', { credentials: 'include' }),
+    ]);
+    if (!contextResponse.ok || !jobsResponse.ok) throw new Error('Nie udało się pobrać kolejki');
+    const context = await contextResponse.json();
+    const jobs = await jobsResponse.json();
+    socialCandidates.innerHTML = context.candidates.slice(0, 12).map(candidate => `
+      <article class="social-item">
+        <strong>${escapeHtml(candidate.source.title)}</strong>
+        <small>${escapeHtml(candidate.source.publishedAt || '')} · ${escapeHtml((candidate.source.tags || []).join(' / '))}</small>
+      </article>`).join('') || '<p class="empty">Brak kandydatów. Pojawią się po publikacji nowych artykułów.</p>';
+    socialJobs.innerHTML = jobs.jobs.slice(0, 12).map(job => `
+      <article class="social-item">
+        <strong>${escapeHtml(job.slug)}</strong>
+        <small>${escapeHtml(job.status)}${job.score !== null ? ` · wynik ${job.score}/10` : ''}</small>
+        ${['failed','ready'].includes(job.status) ? `<div class="actions"><button type="button" data-social-action="retry" data-job-id="${job.id}">Ponów</button><button type="button" class="button secondary" data-social-action="skip" data-job-id="${job.id}">Pomiń</button></div>` : ''}
+      </article>`).join('') || '<p class="empty">Brak przygotowanych paczek.</p>';
+    socialSummary.textContent = `${context.candidates.length} kandydatów · ${jobs.jobs.length} zadań w historii`;
+    socialJobs.querySelectorAll('[data-social-action]').forEach(button => button.addEventListener('click', runSocialAction));
+  } catch (error) {
+    socialSummary.textContent = error?.message || 'Nie udało się pobrać danych social.';
+  } finally {
+    socialRefresh.disabled = false;
+  }
+}
+
+async function runSocialAction(event) {
+  const button = event.currentTarget;
+  button.disabled = true;
+  await fetch('/api/social/jobs', {
+    method: 'POST', credentials: 'include', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id: button.dataset.jobId, action: button.dataset.socialAction }),
+  });
+  await loadSocial();
+}
+
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[char]);
+}
 
 function normalizeStage(stage) {
   if (!stage) return currentStage;

@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS social_jobs (
   slug TEXT NOT NULL UNIQUE,
   source JSONB NOT NULL,
   package JSONB,
-  status TEXT NOT NULL DEFAULT 'waiting_article' CHECK (status IN ('waiting_article','eligible','generating','review','queued','published','failed','skipped')),
+  status TEXT NOT NULL DEFAULT 'candidate' CHECK (status IN ('candidate','selected','ready','generating','review','queued','published','failed','skipped','waiting_article','eligible')),
   score SMALLINT,
   attempts SMALLINT NOT NULL DEFAULT 0,
   scheduled_for TIMESTAMPTZ,

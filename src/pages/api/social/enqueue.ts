@@ -13,8 +13,8 @@ export const POST: APIRoute = async ({ request }) => {
     const errors = validateSocialSource(source);
     if (errors.length) return json({ error: 'Invalid social source', details: errors }, 400);
     const result = await getPool().query<{ id: string; status: string }>(
-      `INSERT INTO social_jobs (slug, source)
-       VALUES ($1, $2::jsonb)
+      `INSERT INTO social_jobs (slug, source, status)
+       VALUES ($1, $2::jsonb, 'candidate')
        ON CONFLICT (slug) DO UPDATE SET source = EXCLUDED.source, updated_at = now()
        RETURNING id, status`,
       [source.slug, JSON.stringify(source)],

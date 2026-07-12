@@ -17,13 +17,18 @@ test('social validation accepts concise sourced copy', () => {
     instagramCaption: 'Deklaracja jest wspólna. Wykonanie nadal podróżuje osobno.',
     youtubeTitle: 'Jedność kończy się przy harmonogramie', youtubeDescription: 'Krótko o cenie wspólnej deklaracji.',
     scenes: ['Najpierw pojawiła się wspólna deklaracja.','Cel zapisano bez większych sporów.','Harmonogram pozostał już sprawą krajową.','Tak samo rozdzielono koszty wykonania.','Jedność najlepiej wyglądała w komunikacie.','Cała analiza na pseudointelekt.pl.'],
-    hashtags: ['#geopolityka','#europa'], template: 'situation-room-v1',
+    hashtags: ['#geopolityka','#europa'],
+    staticPost: true,
+    imagePrompt: 'Editorial illustration with a brass compass beside a folded trade map and a sealed cable spool, restrained magazine collage, no text, no logos.',
+    contentKind: 'current',
+    experiment: 'konkretny koszt w pierwszym zdaniu',
+    template: 'situation-room-v2',
   }, source);
   assert.deepEqual(errors, []);
 });
 
 test('social validation rejects generic filler and invented numbers', () => {
-  const pkg: any = { hook: 'W dzisiejszym świecie wszystko zmienia się bardzo szybko.', instagramCaption: 'Warto zauważyć 99 procent.', youtubeTitle: 'Test', youtubeDescription: '', scenes: ['x'], hashtags: [], score: {}, template: 'situation-room-v1' };
+  const pkg: any = { hook: 'W dzisiejszym świecie wszystko zmienia się bardzo szybko.', instagramCaption: 'Warto zauważyć 99 procent.', youtubeTitle: 'Test', youtubeDescription: '', scenes: ['x'], hashtags: [], score: {}, template: 'situation-room-v2' };
   const errors = validateSocialPackage(pkg, source);
   assert.ok(errors.includes('contains banned generic phrasing'));
   assert.ok(errors.includes('contains a number absent from source'));

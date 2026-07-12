@@ -17,6 +17,10 @@ export function validateSocialPackage(pkg: SocialPackage, source: SocialSource):
   if (pkg.scenes.some(scene => scene.length < 8 || scene.length > 115)) errors.push('invalid scene length');
   if (pkg.hashtags.length > 5 || pkg.hashtags.some(tag => !/^#[\p{L}\p{N}_]+$/u.test(tag))) errors.push('invalid hashtags');
   if (pkg.youtubeTitle.length > 100) errors.push('youtube title too long');
+  if (!pkg.imagePrompt || pkg.imagePrompt.length < 80 || pkg.imagePrompt.length > 1800) errors.push('invalid image prompt');
+  if (!['current', 'evergreen'].includes(pkg.contentKind)) errors.push('invalid content kind');
+  if (!pkg.experiment || pkg.experiment.length > 120) errors.push('invalid experiment');
+  if (pkg.template !== 'situation-room-v2') errors.push('invalid template');
   const numbers = all.match(/\b\d+(?:[.,]\d+)?%?\b/g) || [];
   const sourceText = norm([source.title, source.lead, ...source.summaryPoints].join(' '));
   if (numbers.some(number => !sourceText.includes(number))) errors.push('contains a number absent from source');
