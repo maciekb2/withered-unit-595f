@@ -20,6 +20,7 @@ rsync -a --delete \
   --exclude 'secrets' \
   --exclude 'secrets/***' \
   --exclude 'migration/' \
+  --exclude 'music/' \
   --exclude 'node_modules/' \
   --exclude 'dist/' \
   "$TMP/source/" "$ROOT/"
