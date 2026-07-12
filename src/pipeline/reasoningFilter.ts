@@ -17,7 +17,7 @@ export function stripModelReasoning(text: string, expectedHeading?: string): str
     const at = value.lastIndexOf(marker);
     if (at >= 0 && at < value.length - marker.length) { value = value.slice(at + marker.length).trim(); break; }
   }
-  const planning = /(?:^|\n)(?:The style guide says:|Need to |Let's |Wait,|First, I |Now, check|I need to )/i;
+  const planning = /(?:^|\n)(?:The style guide says:|Need to |Let's |Wait,|First, I |Now, check|I need to |Each paragraph |For the financing |Check the style guide|The cost shifting|So the irony|Also, avoid|But since |Maybe mention|Let's think)/i;
   if (planning.test(value) && value.indexOf('\n\n') >= 0) {
     const kept = value.split(/\n\s*\n/).filter(p => !planning.test(p.trim()));
     if (kept.length >= 2) value = kept.join('\n\n').trim();
