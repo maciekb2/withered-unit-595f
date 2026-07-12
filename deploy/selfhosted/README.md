@@ -9,8 +9,9 @@ committed. Ollama is reached only over the DC network at `10.2.11.72:11434`.
 The current Worker deployment remains the rollback target until the PostgreSQL
 data migration and all API routes have been verified on the Node runtime.
 
-This first scaffold deliberately does not switch production traffic: the Node
-build currently exposes the public Astro pages and `/api/health`, while the
-Worker remains the authoritative API for counters, contact, audit logging and
-generation. The next cutover step is to port those routes to the PostgreSQL
-repository before enabling the Tunnel for `pseudointelekt.pl`.
+The Node build now exposes the public Astro pages, PostgreSQL-backed engagement
+and contact endpoints, and a private `/api/generate-stream` route. Set
+`GENERATOR_PRIVATE_TOKEN` through Vault for the interim private route; the
+production Tunnel should only expose that route after its VPN/private ingress
+policy is configured. The Worker remains the rollback target until data parity
+and the live Jetson benchmark are complete.

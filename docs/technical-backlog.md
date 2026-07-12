@@ -35,7 +35,8 @@ This backlog captures the repository review findings from April 2026. Items are 
 
 - [x] Add a separate Astro Node build target and production Docker Compose scaffold for `mbprod`.
 - [x] Add the PostgreSQL schema foundation for counters, likes, contacts and audit logs.
-- [ ] Port Worker API handlers and D1/KV repositories to PostgreSQL before switching public traffic.
+- [x] Port public counters, likes, contact and client-log API handlers and D1/KV repositories to PostgreSQL.
+- [x] Add a private Node `/api/generate-stream` route that reuses the validated generation pipeline and can call Jetson directly.
 - [ ] Export/import D1/KV data and verify parity with the self-hosted database.
 - [ ] Configure the production Tunnel and private/VPN-only generator ingress.
 
