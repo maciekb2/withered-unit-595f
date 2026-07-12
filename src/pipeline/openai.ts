@@ -111,7 +111,10 @@ export async function chat(
         messages: finalMessages,
         max_completion_tokens,
         model: provider.model || model,
-        response_format,
+        // The native gateway does not understand OpenAI's nested
+        // json_schema response_format. The prompt carries the JSON contract;
+        // leaving the native `format` field unset avoids empty responses on
+        // the current qwen3 gateway.
         response_style,
       });
     } catch (err) {
@@ -161,7 +164,6 @@ export async function chat(
         messages: finalMessages,
         max_completion_tokens,
         model: provider.model || model,
-        response_format,
         response_style,
       });
     } catch (err) {
@@ -576,7 +578,11 @@ async function chatJetson(
       headers,
       body: JSON.stringify({
         model,
-        messages,
+        // Helpdesk Model Gateway exposes Ollama's native `/api/generate`
+        // contract, which accepts a single prompt rather than Chat Completions
+        // messages. Preserve roles explicitly so system guardrails remain in
+        // the local-model request.
+        prompt: messages.map(message => `[${message.role}]\n${message.content}`).join('\n\n'),
         max_completion_tokens,
         options: {
           num_predict: max_completion_tokens,

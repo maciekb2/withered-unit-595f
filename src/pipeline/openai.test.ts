@@ -40,7 +40,9 @@ test('chat sends Jetson requests with bearer token and thinking disabled', async
     assert.equal(capturedHeaders.get('x-openclaw-disable-thinking'), 'true');
     assert.equal(capturedBody.model, 'qwen3:4b');
     assert.equal(capturedBody.options.num_predict, 100);
-    assert.deepEqual(capturedBody.messages, [{ role: 'user', content: 'Napisz lead' }]);
+    assert.match(capturedBody.prompt, /\[user\]/);
+    assert.match(capturedBody.prompt, /Napisz lead/);
+    assert.equal(capturedBody.messages, undefined);
   } finally {
     globalThis.fetch = original;
   }
@@ -240,6 +242,42 @@ test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config w
     accessClientId: undefined,
     accessClientSecret: undefined,
   });
+});
+
+test('Jetson gateway maps Chat messages to the native prompt contract', async () => {
+  const original = globalThis.fetch;
+  let requestBody: any;
+  globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+    requestBody = JSON.parse(String(init?.body));
+    return new Response(JSON.stringify({ response: '{"ok":true}' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }) as typeof fetch;
+  try {
+    const result = await chat('unused', {
+      messages: [{ role: 'user', content: 'Zwróć JSON.' }],
+      max_completion_tokens: 100,
+      model: 'qwen3:30b',
+      response_format: { type: 'json_schema', json_schema: { name: 'x', schema: {} } },
+      provider: {
+        type: 'jetson',
+        gatewayUrl: 'https://jetson.example.test',
+        token: 'secret',
+        model: 'qwen3:30b',
+        timeoutMs: 5000,
+        disableThinking: true,
+        fallback: 'none',
+      },
+    });
+    assert.equal(result, '{"ok":true}');
+    assert.match(requestBody.prompt, /\[user\]/);
+    assert.match(requestBody.prompt, /Zwróć JSON/);
+    assert.equal(requestBody.format, undefined);
+    assert.equal(requestBody.response_format, undefined);
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 test('textGenerationProviderFromEnv reads Cloudflare Workers AI config', () => {
