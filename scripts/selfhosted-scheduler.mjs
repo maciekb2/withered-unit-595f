@@ -54,6 +54,10 @@ async function runOnce() {
 
 async function loop() {
   if (!enabled) console.log('[scheduler] disabled by SCHEDULER_ENABLED=false');
+  if (process.env.SCHEDULER_RUN_NOW === 'true') {
+    await runOnce();
+    if (process.env.SCHEDULER_EXIT_AFTER_RUN === 'true') return;
+  }
   while (!stopped) {
     const delay = nextRunDelay();
     console.log(JSON.stringify({ type: 'scheduler-next-run', delayMs: delay, runHour: hour, runMinute: minute, timeZone }));
