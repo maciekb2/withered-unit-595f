@@ -7,6 +7,7 @@ const banned = [
 ];
 
 const norm = (value: string) => value.toLocaleLowerCase('pl').replace(/\s+/g, ' ').trim();
+const withoutUrls = (value: string) => value.replace(/https?:\/\/\S+/giu, ' ');
 
 export function validateSocialPackage(pkg: SocialPackage, source: SocialSource): string[] {
   const errors: string[] = [];
@@ -21,7 +22,9 @@ export function validateSocialPackage(pkg: SocialPackage, source: SocialSource):
   if (!['current', 'evergreen'].includes(pkg.contentKind)) errors.push('invalid content kind');
   if (!pkg.experiment || pkg.experiment.length > 120) errors.push('invalid experiment');
   if (pkg.template !== 'situation-room-v2') errors.push('invalid template');
-  const numbers = all.match(/\b\d+(?:[.,]\d+)?%?\b/g) || [];
+  // Canonical article URLs commonly contain publication dates and numeric slugs.
+  // They are trusted navigation metadata, not editorial claims.
+  const numbers = withoutUrls(all).match(/\b\d+(?:[.,]\d+)?%?\b/g) || [];
   const sourceText = norm([source.title, source.lead, ...source.summaryPoints].join(' '));
   if (numbers.some(number => !sourceText.includes(number))) errors.push('contains a number absent from source');
   return errors;

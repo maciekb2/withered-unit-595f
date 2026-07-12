@@ -33,3 +33,18 @@ test('social validation rejects generic filler and invented numbers', () => {
   assert.ok(errors.includes('contains banned generic phrasing'));
   assert.ok(errors.includes('contains a number absent from source'));
 });
+
+test('social validation ignores numbers inside a canonical article URL', () => {
+  const pkg: any = {
+    score: { topicality: 2, recognizability: 1, ironyPotential: 2, clarity: 2, hookStrength: 2, total: 9 },
+    hook: 'Wspólny komunikat, osobne harmonogramy i bardzo narodowe rachunki.',
+    instagramCaption: 'Deklaracja jest wspólna. Wykonanie nadal podróżuje osobno.',
+    youtubeTitle: 'Jedność kończy się przy harmonogramie',
+    youtubeDescription: 'Pełna analiza: https://pseudointelekt.pl/blog/2026-07-12-test-815/',
+    scenes: ['Najpierw pojawiła się wspólna deklaracja.','Cel zapisano bez większych sporów.','Harmonogram pozostał już sprawą krajową.','Tak samo rozdzielono koszty wykonania.','Jedność najlepiej wyglądała w komunikacie.','Cała analiza na pseudointelekt.pl.'],
+    hashtags: ['#geopolityka'], staticPost: false,
+    imagePrompt: 'Editorial illustration with a brass compass beside a folded trade map and a sealed cable spool, restrained magazine collage, no text, no logos.',
+    contentKind: 'current', experiment: 'kanoniczny link w opisie', template: 'situation-room-v2',
+  };
+  assert.deepEqual(validateSocialPackage(pkg, source), []);
+});
