@@ -41,11 +41,16 @@ switch (command) {
     const [runId, jobId, mime = 'image/png'] = args;
     if (!runId || !jobId) throw new Error('upload requires runId and jobId');
     const bytes = await stdin();
-    const form = new FormData();
-    form.set('runId', runId);
-    form.set('jobId', jobId);
-    form.set('file', new File([bytes], `${jobId}.${mime.split('/')[1] || 'png'}`, { type: mime }));
-    await request('/api/social/upload', { method: 'POST', body: form });
+    await request('/api/social/upload', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/octet-stream',
+        'x-social-run-id': runId,
+        'x-social-job-id': jobId,
+        'x-social-image-type': mime,
+      },
+      body: bytes,
+    });
     break;
   }
   case 'finalize':
