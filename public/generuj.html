@@ -271,6 +271,15 @@ button:disabled {
   color: var(--royal-green);
 }
 
+.step.skipped {
+  opacity: 0.62;
+}
+
+.step.skipped .step-marker {
+  border-style: dashed;
+  color: var(--muted-blue);
+}
+
 .step.failed {
   border-color: rgba(152, 36, 36, 0.5);
   background: rgba(152, 36, 36, 0.08);
@@ -510,14 +519,20 @@ pre {
 const STAGES = [
   { id: 'recent-titles', title: 'Ostatnie tytuły', meta: 'GitHub: unikanie powtórek' },
   { id: 'hot-topics', title: 'Gorące tematy', meta: 'Źródła i kontekst dnia' },
-  { id: 'suggest-topic', title: 'Propozycje tematów', meta: 'Ręczny wybór operatora' },
+  { id: 'suggest-topic', title: 'Wybór tematu', meta: 'Propozycje modelu albo temat własny' },
   { id: 'outline', title: 'Konspekt', meta: 'Struktura i guardraile' },
   { id: 'write', title: 'Treść artykułu', meta: 'One-shot albo sekcje' },
-  { id: 'content-validation', title: 'Walidacja', meta: 'Źródła, TODO i spójność' },
-  { id: 'repair', title: 'Naprawa', meta: 'Tylko gdy walidacja wymaga poprawek' },
+  { id: 'content-validation', title: 'Walidacja treści', meta: 'Źródła, TODO i spójność' },
+  { id: 'repair', title: 'Naprawa treści', meta: 'Tylko gdy walidacja wymaga poprawek' },
+  { id: 'language-check', title: 'Język polski', meta: 'Wykrywanie i korekta języka' },
+  { id: 'quality-check', title: 'Kontrola jakości', meta: 'Długość, powtórzenia i struktura' },
+  { id: 'quality-repair', title: 'Rozbudowa i naprawa', meta: 'Tylko gdy jakość nie spełnia celu' },
+  { id: 'editorial-review', title: 'Recenzja redakcyjna', meta: 'Ocena przed korektą' },
+  { id: 'proofread', title: 'Korekta', meta: 'Uruchamiana, gdy recenzent zgłosi uwagi' },
+  { id: 'local-final-edit', title: 'Ostatnia korekta', meta: 'Opcjonalna korekta lokalnym modelem' },
   { id: 'hero-image', title: 'Obraz', meta: 'OpenAI image model + styl strony' },
-  { id: 'github-publish', title: 'Publikacja', meta: 'Branch, pliki i PR' },
-  { id: 'success-slack', title: 'Slack i zakończenie', meta: 'Powiadomienie i link do PR' },
+  { id: 'github-publish', title: 'PR na GitHubie', meta: 'Branch, pliki i pull request' },
+  { id: 'success-slack', title: 'Powiadomienie', meta: 'Slack i link do PR' },
 ];
 
 const timelineOrder = STAGES.map(stage => stage.id);
@@ -548,6 +563,7 @@ function normalizeStage(stage) {
   if (!stage) return currentStage;
   if (stage === 'sectioned-write') return 'write';
   if (stage.startsWith('repair-')) return 'repair';
+  if (stage.startsWith('quality-repair-')) return 'quality-repair';
   if (stage === 'auto-topic') return 'suggest-topic';
   return stage;
 }
@@ -564,7 +580,7 @@ function updateStage(stage, state = 'active') {
   currentStage = normalized;
   const activeIndex = timelineOrder.indexOf(normalized);
   timelineOrder.forEach((id, index) => {
-    if (index < activeIndex && stageStates[id] !== 'failed') stageStates[id] = 'done';
+    if (index < activeIndex && !['failed', 'skipped'].includes(stageStates[id])) stageStates[id] = 'done';
     if (index === activeIndex) stageStates[id] = state;
   });
   currentStageLabel.textContent = stage;
@@ -579,7 +595,7 @@ function renderTimeline() {
     row.className = `step ${state}`;
     row.dataset.stage = stage.id;
     row.innerHTML = `
-      <div class="step-marker">${state === 'done' ? '✓' : index + 1}</div>
+      <div class="step-marker">${state === 'done' ? '✓' : state === 'skipped' ? '–' : index + 1}</div>
       <div>
         <div class="step-title">${stage.title}</div>
         <div class="step-meta">${stage.meta}</div>
@@ -594,6 +610,7 @@ function labelState(state) {
   if (state === 'done') return 'gotowe';
   if (state === 'active') return 'teraz';
   if (state === 'failed') return 'błąd';
+  if (state === 'skipped') return 'pominięto';
   return 'czeka';
 }
 
@@ -684,6 +701,10 @@ function startStream(topic, sourceUrl = '') {
     }
     updateCounter();
     sendLog('sse-message', summarizeMessage(msg));
+    if (msg.stage === 'outline' && !topicForm && stageStates['suggest-topic'] === 'pending') {
+      stageStates['suggest-topic'] = 'skipped';
+      renderTimeline();
+    }
     if (msg.stage) updateStage(msg.stage);
     handleMessage(msg, es);
   };
