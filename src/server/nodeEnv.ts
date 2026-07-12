@@ -38,6 +38,7 @@ export function nodeGenerationEnv(): Env {
     ASSETS: undefined,
     AI: undefined,
     WORKER_ID: env.WORKER_ID || 'pseudointelekt-selfhosted',
+    RUNTIME_PLATFORM: 'node-selfhosted',
     OPENAI_API_KEY: env.OPENAI_API_KEY || '',
     GITHUB_TOKEN: env.GITHUB_TOKEN || '',
     GITHUB_REPO: env.GITHUB_REPO || 'maciekb2/withered-unit-595f',

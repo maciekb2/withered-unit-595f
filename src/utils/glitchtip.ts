@@ -32,7 +32,7 @@ export async function reportWorkerError(
     event_id: eventId,
     timestamp: new Date().toISOString(),
     platform: 'javascript',
-    logger: 'cloudflare-worker',
+    logger: env.RUNTIME_PLATFORM === 'node-selfhosted' ? 'pseudointelekt-node' : 'cloudflare-worker',
     level: 'error',
     environment: env.SENTRY_ENVIRONMENT || 'production',
     release: env.SENTRY_RELEASE || env.WORKER_ID || 'pseudointelekt-worker',
@@ -54,7 +54,7 @@ export async function reportWorkerError(
         }
       : undefined,
     tags: {
-      component: 'cloudflare-worker',
+      component: env.RUNTIME_PLATFORM === 'node-selfhosted' ? 'pseudointelekt-node' : 'cloudflare-worker',
       worker: env.WORKER_ID || 'pseudointelekt2137-blog',
       route: requestUrl?.pathname || context.transaction || 'scheduled',
       ...context.tags,

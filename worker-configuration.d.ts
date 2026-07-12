@@ -42,6 +42,7 @@ interface Env {
         SENTRY_ENVIRONMENT?: string;
         SENTRY_RELEASE?: string;
         SENTRY_TRACES_SAMPLE_RATE?: string;
+        RUNTIME_PLATFORM?: string;
         SENTRY_TEST_ENDPOINT?: string;
         SENTRY_TEST_TOKEN?: string;
         GLITCHTIP_SENTRY_TEST_ENDPOINT?: string;

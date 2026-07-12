@@ -5,6 +5,7 @@ import { sessionId, withSession } from '../../server/postgres';
 import { initLogger } from '../../utils/logger';
 import { waitForTopic, clearTopic } from '../../server/generationSessions';
 import { isPrivateGeneratorRequest } from '../../server/generatorAuth';
+import { reportWorkerError } from '../../utils/glitchtip';
 
 export const GET: APIRoute = async ({ request, url }) => {
   if (!isPrivateGeneratorRequest(request)) return new Response('Generator unavailable', { status: 403 });
@@ -34,6 +35,12 @@ export const GET: APIRoute = async ({ request, url }) => {
       initialSourceUrl: url.searchParams.get('sourceUrl')?.trim() || undefined,
     },
   ).catch(error => {
+    void reportWorkerError(env, error, {
+      request,
+      transaction: 'selfhosted article generation',
+      tags: { runtime: 'node-selfhosted', trigger: 'sse' },
+      extra: { sessionId: session },
+    }).catch(() => undefined);
     controller.enqueue(`data: ${JSON.stringify({ failed: true, error: error instanceof Error ? error.message : String(error) })}\n\n`);
     controller.close();
   }).finally(() => {
