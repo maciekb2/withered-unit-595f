@@ -73,6 +73,7 @@ function parseAudiences(value?: string): string[] {
 function isLocalDevelopmentRequest(request: Request): boolean {
   const url = new URL(request.url);
   return (
+    process.env.NODE_ENV !== 'production' &&
     ['localhost', '127.0.0.1', '::1'].includes(url.hostname) &&
     !request.headers.has('cf-ray')
   );
