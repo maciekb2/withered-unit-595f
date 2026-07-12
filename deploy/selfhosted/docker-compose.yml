@@ -96,11 +96,27 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      social-media-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     read_only: true
     tmpfs: [/tmp]
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+    networks: [app]
+
+  social-media-init:
+    image: pseudointelekt-app
+    user: "0:0"
+    command: ["sh", "-c", "mkdir -p /data/social && chown -R 1000:1000 /data/social"]
+    volumes:
+      - social-media:/data/social
+    restart: "no"
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE]
     networks: [app]
 
   migrate:
