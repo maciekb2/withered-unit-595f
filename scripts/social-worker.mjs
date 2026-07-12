@@ -139,8 +139,10 @@ async function render(job, pkg) {
     await writeFile(file, wrapText(pkg.scenes[i]), 'utf8');
     sceneFiles.push(file);
   }
-  const music = (await readdir(musicRoot)).filter(name => /\.(mp3|m4a|wav|ogg)$/i.test(name)).sort()[0];
-  if (!music) throw new Error('approved music library is empty');
+  const musicFiles = (await readdir(musicRoot)).filter(name => /\.(mp3|m4a|wav|ogg)$/i.test(name)).sort();
+  if (!musicFiles.length) throw new Error('approved music library is empty');
+  const musicIndex = createHash('sha256').update(job.slug).digest().readUInt32BE(0) % musicFiles.length;
+  const music = musicFiles[musicIndex];
   const duration = pkg.scenes.length * 5;
   const drawScenes = sceneFiles.map((file, i) => `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(file)}':fontcolor=0xf4f0df:fontsize=58:line_spacing=16:x=70:y=(h-text_h)/2:box=1:boxcolor=0x031712cc:boxborderw=30:enable='between(t,${i * 5},${(i + 1) * 5})'`).join(',');
   const reel = path.join(dir, 'short.mp4');
