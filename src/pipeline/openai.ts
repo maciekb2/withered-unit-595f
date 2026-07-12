@@ -581,6 +581,9 @@ async function chatJetson(
         options: {
           num_predict: max_completion_tokens,
         },
+        // Ollama's native switch is more reliable than gateway-specific
+        // headers for Qwen3; keep the header for older gateways below.
+        think: false,
         response_format,
         response_style,
         stream: false,
