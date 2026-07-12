@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
       headers: {
         'content-type': file.endsWith('.mp4') ? 'video/mp4' : 'image/png',
         'content-length': String(info.size),
-        'cache-control': 'public, max-age=86400, immutable',
+        'cache-control': 'private, no-store, max-age=0',
         'x-content-type-options': 'nosniff',
       },
     });
