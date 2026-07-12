@@ -15,8 +15,8 @@ services:
     expose:
       - "3000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
     read_only: true
     tmpfs:
@@ -24,6 +24,19 @@ services:
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]
+    networks: [app]
+
+  migrate:
+    image: postgres:16-alpine
+    environment:
+      DATABASE_URL: postgresql://pseudointelekt:$${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
+    volumes:
+      - ./migrations:/migrations:ro
+    entrypoint: ["/bin/sh", "/migrations/run.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
     networks: [app]
 
   postgres:
@@ -46,7 +59,7 @@ services:
     image: cloudflare/cloudflared:2026.6.0
     command: tunnel --no-autoupdate run --token $$(cat /run/secrets/tunnel-token)
     volumes:
-      - $${PSEUDOINTELEKT_TUNNEL_TOKEN_FILE:?PSEUDOINTELEKT_TUNNEL_TOKEN_FILE must be set}:/run/secrets/tunnel-token:ro
+      - ${PSEUDOINTELEKT_TUNNEL_TOKEN_FILE:?PSEUDOINTELEKT_TUNNEL_TOKEN_FILE must be set}:/run/secrets/tunnel-token:ro
     depends_on:
       app:
         condition: service_started
