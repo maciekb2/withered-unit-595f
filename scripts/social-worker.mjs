@@ -223,8 +223,10 @@ async function main() {
   console.log(JSON.stringify({type:'social-worker-start',enabled,dryRun,intervalMs}));
   if (!enabled) {
     await new Promise(resolve => {
-      process.once('SIGTERM', resolve);
-      process.once('SIGINT', resolve);
+      const timer = setInterval(() => undefined, 3600000);
+      const stop = () => { clearInterval(timer); resolve(); };
+      process.once('SIGTERM', stop);
+      process.once('SIGINT', stop);
     });
     return;
   }
