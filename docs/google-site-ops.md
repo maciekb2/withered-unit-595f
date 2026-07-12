@@ -10,10 +10,12 @@ export GOOGLE_OAUTH_CLIENT_JSON=/home/macie/skysysnet-growth-os/.secrets/google-
 export GOOGLE_OAUTH_TOKEN_JSON=/home/macie/skysysnet-growth-os/.secrets/google-token.json
 ```
 
-Token ma zakresy odczytu:
+Token użytkownika ma zakresy:
 
 - `https://www.googleapis.com/auth/webmasters.readonly`
 - `https://www.googleapis.com/auth/analytics.readonly`
+- `https://www.googleapis.com/auth/webmasters`
+- `https://www.googleapis.com/auth/analytics.edit`
 
 ## Audyt Pseudointelektu
 
@@ -43,8 +45,12 @@ webowy używa `G-WTSC0BFN20`.
 
 ## Zgłoszenie sitemap
 
+Sitemapę zgłaszamy pod adresem:
+
+`https://pseudointelekt.pl/sitemap-index.xml`
+
 Operacja wymaga zakresu zapisu `https://www.googleapis.com/auth/webmasters`.
-Jeśli obecny token odczytowy zwróci `ACCESS_TOKEN_SCOPE_INSUFFICIENT`, uruchom:
+Jeśli token zwróci `ACCESS_TOKEN_SCOPE_INSUFFICIENT`, uruchom:
 
 ```bash
 node ~/.codex/skills/google-site-ops/scripts/google-site-ops.mjs auth:url
