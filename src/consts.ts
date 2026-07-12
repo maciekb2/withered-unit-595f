@@ -4,9 +4,9 @@
 
 export const SITE_TITLE = "Pseudointelekt";
 export const SITE_DESCRIPTION =
-  "Pseudointelekt: geopolityka, polityka, gospodarka i media czytane przez interesy, decyzje oraz ich koszt — z analitycznym dystansem.";
+  "Pseudointelekt to wiadomości z dystansem: komentarz geopolityczny, polityka międzynarodowa, gospodarka i media czytane przez interesy, decyzje oraz ich koszt.";
 export const CONTACT_EMAIL = "info@pseudointelekt.pl";
 export const SITE_KEYWORDS =
-  "geopolityka, blog, komentarz, humor, polityka";
+  "Pseudointelekt, komentarz geopolityczny, analiza geopolityczna, wiadomości geopolityczne, polityka międzynarodowa, geopolityka gospodarcza, geopolityka energetyczna, wiedza o geopolityce";
 export const GA4_MEASUREMENT_ID = "G-WTSC0BFN20";
 export const GOOGLE_SITE_VERIFICATION = "";
