@@ -6,6 +6,12 @@ import { initLogger } from '../../utils/logger';
 import { waitForTopic, clearTopic } from '../../server/generationSessions';
 import { isPrivateGeneratorRequest } from '../../server/generatorAuth';
 import { reportWorkerError } from '../../utils/glitchtip';
+import { generationCorsHeaders, withGenerationCors } from '../../server/generationCors';
+
+export const OPTIONS: APIRoute = ({ request }) => new Response(null, {
+  status: 204,
+  headers: generationCorsHeaders(request),
+});
 
 export const GET: APIRoute = async ({ request, url }) => {
   if (!await isPrivateGeneratorRequest(request)) return new Response('Generator unavailable', { status: 403 });
@@ -47,7 +53,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     clearTopic(session);
   });
 
-  return withSession(new Response(stream.readable, {
+  return withSession(withGenerationCors(new Response(stream.readable, {
     headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' },
-  }), session);
+  }), request), session);
 };

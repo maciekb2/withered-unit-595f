@@ -1,5 +1,11 @@
 import type { APIRoute } from 'astro';
 import { getPool, json, sessionId } from '../../server/postgres';
+import { generationCorsHeaders, withGenerationCors } from '../../server/generationCors';
+
+export const OPTIONS: APIRoute = ({ request }) => new Response(null, {
+  status: 204,
+  headers: generationCorsHeaders(request),
+});
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -8,8 +14,8 @@ export const POST: APIRoute = async ({ request }) => {
       'INSERT INTO logs (worker_id, data) VALUES ($1, $2::jsonb)',
       [process.env.WORKER_ID || 'pseudointelekt-selfhosted', JSON.stringify({ type: 'client-log', sessionId: sessionId(request), ...payload })],
     );
-    return new Response('OK');
+    return withGenerationCors(new Response('OK'), request);
   } catch {
-    return json({ error: 'Bad Request' }, 400);
+    return withGenerationCors(json({ error: 'Bad Request' }, 400), request);
   }
 };

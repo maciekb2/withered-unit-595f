@@ -119,8 +119,7 @@ services:
   cloudflared:
     profiles: [edge]
     image: cloudflare/cloudflared:2026.6.0
-    entrypoint: ["/bin/sh", "-c"]
-    command: ["exec cloudflared tunnel --no-autoupdate run --token \"$$(cat /run/secrets/tunnel-token)\""]
+    command: ["tunnel", "--no-autoupdate", "run", "--token", "${PSEUDOINTELEKT_TUNNEL_TOKEN:?PSEUDOINTELEKT_TUNNEL_TOKEN must be set}"]
     volumes:
       - ${PSEUDOINTELEKT_TUNNEL_TOKEN_FILE:?PSEUDOINTELEKT_TUNNEL_TOKEN_FILE must be set}:/run/secrets/tunnel-token:ro
     depends_on:
