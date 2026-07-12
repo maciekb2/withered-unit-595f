@@ -17,6 +17,8 @@ interface Env {
         OPENAI_DRAFT_MODEL?: string;
         OPENAI_EDIT_MODEL?: string;
         OPENAI_REPAIR_MODEL?: string;
+        OPENAI_REVIEW_MODEL?: string;
+        OPENAI_PROOFREAD_MODEL?: string;
         OPENAI_IMAGE_MODEL?: string;
         OPENAI_IMAGE_SIZE?: string;
         OPENAI_IMAGE_STYLE: string;

@@ -1,14 +1,16 @@
 import { logEvent, logError } from '../utils/logger';
-import { chat, type ChatMessage } from './openai';
+import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import type { Edited } from './types';
+import { assertArticleDescription, cleanArticleDescription } from './description';
 
 export interface ProofreadOptions {
   apiKey: string;
   edited: Edited;
   model?: string;
   maxTokens?: number;
+  provider?: TextGenerationProvider;
 }
 
 export interface ProofreadResult {
@@ -17,7 +19,7 @@ export interface ProofreadResult {
   raw: string;
 }
 
-export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens }: ProofreadOptions): Promise<ProofreadResult> {
+export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens, provider }: ProofreadOptions): Promise<ProofreadResult> {
   const userPrompt = `Sprawdź gramatykę, stylistykę i naturalność poniższego artykułu po polsku. Usuń powtórzenia, przeredaguj zdania tak, aby brzmiały płynnie w całym tekście, nie zmieniając znaczenia ani faktów. Zachowaj wszystkie adresy URL w identycznej formie jak w oryginale i nie zastępuj ich opisami w stylu „link powyżej”. Każde zdanie zawierające liczby, daty lub wzmiankę o raporcie musi nadal mieć konkretny link http(s) w tym samym zdaniu. Nie dodawaj nowych danych ani źródeł. Zwróć JSON { markdown, title, description }.\n\nTytuł: ${edited.title}\nOpis: ${edited.description}\n\nArtykuł:\n${edited.markdown}`;
   logEvent({ type: 'proofread-start' });
   const messages: ChatMessage[] = [
@@ -30,15 +32,15 @@ export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens }: 
       messages,
       max_completion_tokens: maxTokens ?? 1000,
       model,
+      provider,
       response_style: 'full',
     });
     const json: Edited = extractJson<Edited>(text);
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }
-    if (/[#*_`]/.test(json.description)) {
-      throw new Error('Description contains markdown');
-    }
+    json.description = cleanArticleDescription(json.description);
+    assertArticleDescription(json.description);
     logEvent({ type: 'proofread-complete' });
     return { edited: json, messages, raw: text };
   } catch (err) {

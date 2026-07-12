@@ -19,6 +19,8 @@ import { repairEdited } from '../pipeline/repair';
 import { buildContextPack } from '../pipeline/contextPack';
 import { textGenerationProviderFromEnv, type TextGenerationProvider } from '../pipeline/openai';
 import { ensurePolishArticleLanguage } from '../pipeline/languageGuard';
+import { reviewArticle } from '../pipeline/review';
+import { proofread } from '../pipeline/proofread';
 import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
@@ -502,6 +504,43 @@ export async function generateAndPublish(
         warnings: quality.warnings,
         stats: quality.stats,
       });
+    }
+
+    setStage('editorial-review');
+    send('editorial-review-start');
+    const reviewRes = await reviewArticle({
+      apiKey: env.OPENAI_API_KEY,
+      article,
+      model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
+      provider: textProvider,
+      maxTokens: 1800,
+    });
+    send('editorial-review', { review: reviewRes.review });
+
+    if (!reviewRes.review.ok || reviewRes.review.issues.length > 0) {
+      setStage('proofread');
+      send('proofread-start', { issues: reviewRes.review.issues });
+      const proofreadRes = await proofread({
+        apiKey: env.OPENAI_API_KEY,
+        edited,
+        model: env.OPENAI_PROOFREAD_MODEL || env.OPENAI_EDIT_MODEL || repairModel,
+        provider: textProvider,
+        maxTokens: 5200,
+      });
+      edited = proofreadRes.edited;
+      article = formatFinal(edited);
+      article.sourceUrl = leadSourceUrl;
+      const postProofreadQuality = validateArticleQuality(article, outline);
+      send('proofread-complete', {
+        title: article.title,
+        words: postProofreadQuality.stats.words,
+        qualityOk: postProofreadQuality.ok,
+      });
+      if (!postProofreadQuality.ok) {
+        throw new Error(`Proofread reduced article quality: ${postProofreadQuality.errors.join('; ')}`);
+      }
+    } else {
+      send('proofread-skipped', { reason: 'review-ok' });
     }
 
     article.sourceUrl = leadSourceUrl;
