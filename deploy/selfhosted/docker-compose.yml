@@ -14,6 +14,8 @@ services:
       JETSON_GATEWAY_URL: ${JETSON_GATEWAY_URL:?JETSON_GATEWAY_URL must be set}
     expose:
       - "3000"
+    ports:
+      - "10.2.11.53:3000:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -97,6 +99,21 @@ services:
       timeout: 5s
       retries: 6
     restart: unless-stopped
+    networks: [app]
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.18.0
+    environment:
+      DATA_SOURCE_NAME: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt?sslmode=disable
+    ports:
+      - "10.2.11.53:9188:9187"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
     networks: [app]
 
   cloudflared:
