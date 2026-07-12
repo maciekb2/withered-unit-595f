@@ -37,6 +37,7 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add the PostgreSQL schema foundation for counters, likes, contacts and audit logs.
 - [x] Port public counters, likes, contact and client-log API handlers and D1/KV repositories to PostgreSQL.
 - [x] Add a private Node `/api/generate-stream` route that reuses the validated generation pipeline and can call Jetson directly.
+- [x] Add a long-running Docker scheduler that replaces the Worker cron and consumes the generation SSE stream.
 - [ ] Export/import D1/KV data and verify parity with the self-hosted database.
 - [ ] Configure the production Tunnel and private/VPN-only generator ingress.
 
