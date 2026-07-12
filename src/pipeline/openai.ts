@@ -1,6 +1,7 @@
 import { logEvent, logError } from '../utils/logger';
 import { createOpenAIRequestError } from '../utils/openaiErrors';
 import { retryFetch } from '../utils/retryFetch';
+import { stripModelReasoning } from './reasoningFilter';
 
 export interface ChatMessage {
   role: string;
@@ -622,27 +623,21 @@ async function chatJetson(
 }
 
 function extractJetsonText(data: any): string {
-  if (typeof data === 'string') return stripThinking(data);
+  if (typeof data === 'string') return stripModelReasoning(data);
   if (!data || typeof data !== 'object') return '';
 
-  if (typeof data.response === 'string') return stripThinking(data.response);
-  if (typeof data.text === 'string') return stripThinking(data.text);
-  if (typeof data.content === 'string') return stripThinking(data.content);
-  if (typeof data.output === 'string') return stripThinking(data.output);
-  if (typeof data.message?.content === 'string') return stripThinking(data.message.content);
+  if (typeof data.response === 'string') return stripModelReasoning(data.response);
+  if (typeof data.text === 'string') return stripModelReasoning(data.text);
+  if (typeof data.content === 'string') return stripModelReasoning(data.content);
+  if (typeof data.output === 'string') return stripModelReasoning(data.output);
+  if (typeof data.message?.content === 'string') return stripModelReasoning(data.message.content);
   if (Array.isArray(data.choices) && data.choices[0]) {
     const choice = data.choices[0];
-    if (typeof choice.text === 'string') return stripThinking(choice.text);
+    if (typeof choice.text === 'string') return stripModelReasoning(choice.text);
     if (typeof choice.message?.content === 'string') {
-      return stripThinking(choice.message.content);
+      return stripModelReasoning(choice.message.content);
     }
   }
 
   return '';
-}
-
-function stripThinking(text: string): string {
-  return text
-    .replace(/<think>[\s\S]*?<\/think>/gi, '')
-    .trim();
 }

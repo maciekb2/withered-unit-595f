@@ -5,6 +5,7 @@ import { guardrails } from './guardrails';
 import { scrubTodoClaims } from './scrubTodoClaims';
 import { extractJson } from '../utils/json';
 import { cleanArticleDescription } from './description';
+import { stripModelReasoning } from './reasoningFilter';
 
 export interface SectionedWriteOptions {
   apiKey: string;
@@ -76,13 +77,13 @@ export async function writeArticleSectioned({
     messages.push(...sectionMessages);
 
     try {
-      const sectionRaw = await chat(apiKey, {
+      const sectionRaw = stripModelReasoning(await chat(apiKey, {
         messages: sectionMessages,
         max_completion_tokens: maxTokensPerCall,
         model,
         provider,
         response_style: 'full',
-      });
+      }), section.h2);
       rawParts.push(sectionRaw);
       writtenSections.push({
         h2: section.h2,

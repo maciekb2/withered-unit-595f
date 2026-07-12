@@ -23,6 +23,7 @@ interface Env {
         OPENAI_IMAGE_SIZE?: string;
         OPENAI_IMAGE_STYLE: string;
         OPENAI_IMAGE_QUALITY: string;
+        LOCAL_FINAL_EDIT?: string;
         TEXT_GENERATION_PROVIDER?: string;
         TEXT_GENERATION_FALLBACK?: string;
         TEXT_GENERATION_FALLBACK_MODEL?: string;

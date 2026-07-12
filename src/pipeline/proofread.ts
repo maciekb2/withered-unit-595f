@@ -4,6 +4,7 @@ import { guardrails } from './guardrails';
 import { extractJson } from '../utils/json';
 import type { Edited } from './types';
 import { assertArticleDescription, cleanArticleDescription } from './description';
+import { stripEditedReasoning, stripModelReasoning } from './reasoningFilter';
 
 export interface ProofreadOptions {
   apiKey: string;
@@ -35,7 +36,7 @@ export async function proofread({ apiKey, edited, model = 'gpt-5', maxTokens, pr
       provider,
       response_style: 'full',
     });
-    const json: Edited = extractJson<Edited>(text);
+    const json: Edited = stripEditedReasoning(extractJson<Edited>(stripModelReasoning(text)));
     if (json.title.length > 100 || json.description.length > 200) {
       throw new Error('Title or description too long');
     }

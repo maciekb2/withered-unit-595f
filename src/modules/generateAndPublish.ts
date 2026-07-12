@@ -543,6 +543,30 @@ export async function generateAndPublish(
       send('proofread-skipped', { reason: 'review-ok' });
     }
 
+    if (env.LOCAL_FINAL_EDIT === 'true') {
+      setStage('local-final-edit');
+      send('local-final-edit-start');
+      const finalEdit = await proofread({
+        apiKey: env.OPENAI_API_KEY,
+        edited,
+        model: env.OPENAI_PROOFREAD_MODEL || repairModel,
+        provider: textProvider,
+        maxTokens: 5200,
+      });
+      edited = finalEdit.edited;
+      article = formatFinal(edited);
+      article.sourceUrl = leadSourceUrl;
+      const finalQuality = validateArticleQuality(article, outline);
+      send('local-final-edit-complete', {
+        qualityOk: finalQuality.ok,
+        words: finalQuality.stats.words,
+        errors: finalQuality.errors,
+      });
+      if (!finalQuality.ok) {
+        throw new Error(`Local final edit reduced article quality: ${finalQuality.errors.join('; ')}`);
+      }
+    }
+
     article.sourceUrl = leadSourceUrl;
 
     send(`✏️ Wygenerowano tytuł: ${article.title}`, { articleTitle: article.title });
