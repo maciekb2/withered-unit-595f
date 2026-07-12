@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { buildYouTubeDraftText } from './social-copy.mjs';
 import { ensureSocialOutro } from './social-outro.mjs';
-import { buildSocialMotionFilter, socialBodyDuration } from './social-motion.mjs';
+import { buildSocialMotionFilter, buildSocialSceneCopy, buildSocialWhooshFilter, socialBodyDuration } from './social-motion.mjs';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 });
@@ -137,20 +137,22 @@ async function render(job, pkg) {
   const hero = job.master_image_path;
   if (!hero || !path.resolve(hero).startsWith(mediaRoot + path.sep)) throw new Error('weekly master image is missing or outside media root');
   const sceneFiles = [];
-  for (let i = 0; i < pkg.scenes.length; i++) {
+  const renderScenes = buildSocialSceneCopy(pkg);
+  for (let i = 0; i < renderScenes.length; i++) {
     const file = path.join(dir, `scene-${i}.txt`);
-    await writeFile(file, wrapText(pkg.scenes[i]), 'utf8');
+    await writeFile(file, wrapText(renderScenes[i], 24), 'utf8');
     sceneFiles.push(file);
   }
   const musicFiles = (await readdir(musicRoot)).filter(name => /\.(mp3|m4a|wav|ogg)$/i.test(name)).sort();
   if (!musicFiles.length) throw new Error('approved music library is empty');
   const musicIndex = createHash('sha256').update(job.slug).digest().readUInt32BE(0) % musicFiles.length;
   const music = musicFiles[musicIndex];
-  const duration = socialBodyDuration(pkg.scenes.length);
+  const duration = socialBodyDuration(renderScenes.length);
   const motionFilter = buildSocialMotionFilter(sceneFiles, ffText);
+  const audioFilter = buildSocialWhooshFilter(renderScenes.length);
   const reel = path.join(dir, 'short.mp4');
   const body = path.join(dir, 'short-body.mp4');
-  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-t',String(duration),'-vf',motionFilter,'-af',`afade=t=in:st=0:d=0.6,afade=t=out:st=${duration - 1.2}:d=1.2,loudnorm=I=-18:TP=-2:LRA=7`,'-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-r','30','-video_track_timescale','90000','-c:a','aac','-b:a','128k','-ar','48000','-movflags','+faststart','-shortest',body]);
+  await run('ffmpeg', ['-y','-loop','1','-i',hero,'-stream_loop','-1','-i',path.join(musicRoot,music),'-f','lavfi','-i',`anoisesrc=color=pink:amplitude=0.8:sample_rate=48000:d=${duration}`,'-t',String(duration),'-vf',motionFilter,'-filter_complex',audioFilter,'-map','0:v:0','-map','[aout]','-c:v','libx264','-preset','medium','-crf','21','-pix_fmt','yuv420p','-r','30','-video_track_timescale','90000','-c:a','aac','-b:a','128k','-ar','48000','-movflags','+faststart','-shortest',body]);
   const outro = await ensureSocialOutro({ mediaRoot, run });
   const concatFile = path.join(dir, 'concat.txt');
   await writeFile(concatFile, `file '${ffText(body)}'\nfile '${ffText(outro)}'\n`, 'utf8');
