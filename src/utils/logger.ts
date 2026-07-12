@@ -20,9 +20,13 @@ function storeLog(entry: Record<string, unknown>): void {
   const promise = (async () => {
     if (!logsTableReady || logsTableDb !== db) {
       logsTableDb = db;
-      logsTableReady = db.exec(
-        'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)'
-      ).then(() => undefined);
+      // D1 accepts SQLite AUTOINCREMENT, while the self-hosted adapter is
+      // PostgreSQL. Keep the Worker schema intact but never issue invalid
+      // SQLite DDL against the production Postgres pool.
+      const ddl = process.env.RUNTIME_PLATFORM === 'node-selfhosted'
+        ? 'CREATE TABLE IF NOT EXISTS logs (id BIGSERIAL PRIMARY KEY, time TIMESTAMPTZ NOT NULL DEFAULT now(), worker_id TEXT NOT NULL, data JSONB NOT NULL)'
+        : 'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)';
+      logsTableReady = db.exec(ddl).then(() => undefined);
     }
     await logsTableReady;
     return db
