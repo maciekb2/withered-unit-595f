@@ -4,6 +4,7 @@ import { chat, type ChatMessage, type TextGenerationProvider } from './openai';
 import { guardrails } from './guardrails';
 import { assertArticleDescription, cleanArticleDescription, normalizeObviousPolishNames } from './description';
 import type { Edited } from './types';
+import { stripModelReasoning } from './reasoningFilter';
 
 export type LanguageIssueField = 'title' | 'description' | 'firstParagraph';
 
@@ -172,7 +173,7 @@ async function repairLanguage({
         },
       },
     });
-    const json = extractJson<LanguageRepairJson>(text);
+    const json = extractJson<LanguageRepairJson>(stripModelReasoning(text));
     const repaired = applyFirstParagraph(edited.markdown, sanitizeParagraph(json.firstParagraph));
     return normalizeEdited({
       title: json.title || edited.title,
@@ -180,6 +181,18 @@ async function repairLanguage({
       markdown: repaired,
     });
   } catch (err) {
+    if (provider?.type === 'jetson' && provider.fallback === 'openai') {
+      logEvent({ type: 'language-repair-fallback', from: 'jetson', to: 'openai', attempt });
+      return repairLanguage({
+        apiKey,
+        edited,
+        issues,
+        provider: { type: 'openai' },
+        model: provider.fallbackModel || 'gpt-5',
+        contextPack,
+        attempt,
+      });
+    }
     logError(err, { type: 'language-repair-error', attempt, raw: text, prompt: messages });
     (err as any).messages = messages;
     (err as any).raw = text;
