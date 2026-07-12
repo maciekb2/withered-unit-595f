@@ -17,3 +17,12 @@ and contact endpoints, and a private `/api/generate-stream` route. Set
 production Tunnel should only expose that route after its VPN/private ingress
 policy is configured. The Worker remains the rollback target until data parity
 and the live Jetson benchmark are complete.
+
+`deploy.sh` is the host-side deploy entrypoint used by GitHub Actions after a
+merge to `main`. It downloads the repository tarball, preserves the
+host-managed `.env` and secrets, rebuilds the app image, and recreates the app
+and scheduler containers.
+
+`cloudflared-ingress.example.yml` documents the required public and private
+hostnames. The generator hostname must be protected by Cloudflare Access or a
+private WARP/VPN route before it is published.

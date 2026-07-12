@@ -8,7 +8,7 @@ import { isPrivateGeneratorRequest } from '../../server/generatorAuth';
 import { reportWorkerError } from '../../utils/glitchtip';
 
 export const GET: APIRoute = async ({ request, url }) => {
-  if (!isPrivateGeneratorRequest(request)) return new Response('Generator unavailable', { status: 403 });
+  if (!await isPrivateGeneratorRequest(request)) return new Response('Generator unavailable', { status: 403 });
 
   const encoder = new TextEncoder();
   const stream = new TransformStream<Uint8Array, Uint8Array>();

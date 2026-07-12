@@ -1,0 +1,14 @@
+# Configure this ingress on the named Tunnel used for Pseudointelekt.
+# The generator hostname must also have a Cloudflare Access application or a
+# private WARP/VPN route. Do not expose it as an unrestricted public hostname.
+tunnel: pseudointelekt-mbprod
+credentials-file: /etc/cloudflared/pseudointelekt.json
+
+ingress:
+  - hostname: pseudointelekt.pl
+    service: http://app:3000
+  - hostname: www.pseudointelekt.pl
+    service: http://app:3000
+  - hostname: generator.pseudointelekt.pl
+    service: http://app:3000
+  - service: http_status:404

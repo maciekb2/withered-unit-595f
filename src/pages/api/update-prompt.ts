@@ -4,7 +4,7 @@ import { isPrivateGeneratorRequest } from '../../server/generatorAuth';
 import { sessionId } from '../../server/postgres';
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isPrivateGeneratorRequest(request)) return new Response('Forbidden', { status: 403 });
+  if (!await isPrivateGeneratorRequest(request)) return new Response('Forbidden', { status: 403 });
   const data = await request.json().catch(() => ({})) as { topic?: unknown };
   const topic = String(data.topic || '').trim();
   if (!topic) return new Response('Topic is required', { status: 400 });
