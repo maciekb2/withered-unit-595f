@@ -4,6 +4,7 @@ import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose';
 import type { JSONWebKeySet } from 'jose';
 import {
   isGenerationPath,
+  generationCorsHeaders,
   requireCloudflareAccess,
   setCloudflareAccessJwksForTesting,
 } from './accessAuth.js';
@@ -24,6 +25,20 @@ test('isGenerationPath matches only protected generation routes', () => {
   assert.equal(isGenerationPath('/api/get-prompt'), true);
   assert.equal(isGenerationPath('/api/contact'), false);
   assert.equal(isGenerationPath('/blog'), false);
+});
+
+test('generation CORS headers allow only the same origin with credentials', () => {
+  const sameOrigin = generationCorsHeaders(new Request('https://pseudointelekt.pl/api/client-log', {
+    headers: { Origin: 'https://pseudointelekt.pl' },
+  }));
+  assert.equal(sameOrigin.get('Access-Control-Allow-Origin'), 'https://pseudointelekt.pl');
+  assert.equal(sameOrigin.get('Access-Control-Allow-Credentials'), 'true');
+  assert.equal(sameOrigin.get('Access-Control-Allow-Methods'), 'GET, POST, OPTIONS');
+
+  const foreignOrigin = generationCorsHeaders(new Request('https://pseudointelekt.pl/api/client-log', {
+    headers: { Origin: 'https://attacker.example' },
+  }));
+  assert.equal(foreignOrigin.get('Access-Control-Allow-Origin'), null);
 });
 
 test('requireCloudflareAccess allows local development without Access config', async () => {

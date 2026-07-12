@@ -79,10 +79,33 @@ function isLocalDevelopmentRequest(request: Request): boolean {
   );
 }
 
-function forbidden(message = 'Forbidden'): Response {
+export function generationCorsHeaders(request: Request): Headers {
+  const headers = new Headers();
+  const origin = request.headers.get('Origin');
+  const requestOrigin = new URL(request.url).origin;
+  if (origin && origin !== requestOrigin) return headers;
+  headers.set('Access-Control-Allow-Origin', origin || requestOrigin);
+  headers.set('Access-Control-Allow-Credentials', 'true');
+  headers.set('Access-Control-Allow-Headers', 'Content-Type, CF-Access-JWT-Assertion');
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  headers.set('Access-Control-Max-Age', '600');
+  headers.set('Vary', 'Origin');
+  return headers;
+}
+
+export function withGenerationCors(response: Response, request: Request): Response {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of generationCorsHeaders(request)) headers.set(key, value);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function forbidden(request: Request, message = 'Forbidden'): Response {
   return new Response(message, {
     status: 403,
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    headers: new Headers({
+      'Content-Type': 'text/plain; charset=utf-8',
+      ...Object.fromEntries(generationCorsHeaders(request)),
+    }),
   });
 }
 
@@ -100,7 +123,7 @@ export async function requireCloudflareAccess(
   if (!issuer || audiences.length === 0) {
     logEvent({ type: 'access-auth-misconfigured' });
     return {
-      response: forbidden('Cloudflare Access is not configured for this endpoint'),
+      response: forbidden(request, 'Cloudflare Access is not configured for this endpoint'),
     };
   }
 
@@ -108,7 +131,7 @@ export async function requireCloudflareAccess(
   const serviceTokenClientId = request.headers.get('cf-access-client-id') || '';
   if (!token) {
     logEvent({ type: 'access-auth-missing-token' });
-    return { response: forbidden('Missing Cloudflare Access token') };
+    return { response: forbidden(request, 'Missing Cloudflare Access token') };
   }
 
   try {
@@ -138,7 +161,7 @@ export async function requireCloudflareAccess(
         type: 'access-auth-email-denied',
         email: email || 'unknown',
       });
-      return { response: forbidden() };
+      return { response: forbidden(request) };
     }
 
     const method: CloudflareAccessIdentity['method'] = email
@@ -166,6 +189,6 @@ export async function requireCloudflareAccess(
     return { identity };
   } catch (err) {
     logError(err, { type: 'access-auth-invalid-token' });
-    return { response: forbidden('Invalid Cloudflare Access token') };
+    return { response: forbidden(request, 'Invalid Cloudflare Access token') };
   }
 }

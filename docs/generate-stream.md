@@ -31,7 +31,9 @@ nowy `GET /api/generate-stream?topic=<wybrany temat>`.
 
 W katalogu `public/` dodano dashboard, który łączy się z powyższym strumieniem, pokazuje konfigurację uruchomienia, oś etapów, log streamu, wybór tematu, konspekt/walidację oraz prompt/odpowiedź modelu. Użytkownik wybiera temat spośród propozycji lub wpisuje własny i potwierdza przyciskiem.
 
-Dashboard uruchamia `EventSource` bezpośrednio na `/api/generate-stream`. Cloudflare Access musi chronić panel i API w jednej aplikacji Access, z destynacjami `/generuj`, `/generuj.html` oraz `/api/*`; wtedy sesja z logowania do panelu działa też dla streamu SSE i pomocniczych endpointów.
+Dashboard uruchamia `EventSource` bezpośrednio na `/api/generate-stream`. Cloudflare Access musi chronić panel i API (wspólna polityka operatora, destynacje `/generuj`, `/generuj.html`, `/api/generate-stream`, `/api/update-prompt`, `/api/get-prompt` i `/api/client-log`). Dla aplikacji API trzeba włączyć `options_preflight_bypass`, ponieważ panel wysyła logi JSON i przeglądarka może wykonać preflight `OPTIONS`.
+
+Worker odpowiada na preflight bez ujawniania danych, dodaje nagłówki CORS wyłącznie dla własnego originu i nie ponawia automatycznie przerwanego generowania. Ponowienie jest jawne, żeby zerwane połączenie nie uruchomiło drugiego artykułu.
 
 W trybie ręcznym pierwszy stream służy do pobrania propozycji tematów. Po wyborze dashboard otwiera nowy stream `GET /api/generate-stream?topic=...`. Dzięki temu wybór tematu nie zależy od współdzielonej pamięci między requestami Cloudflare Workers.
 

@@ -9,6 +9,7 @@ import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
 import {
   isGenerationPath,
+  generationCorsHeaders,
   requireCloudflareAccess,
   type CloudflareAccessIdentity,
 } from './utils/accessAuth';
@@ -281,6 +282,16 @@ function buildAccessAuditContext(
   };
 }
 
+function withGenerationCors(response: Response, request: Request): Response {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of generationCorsHeaders(request)) headers.set(key, value);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 const handler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
@@ -291,6 +302,12 @@ const handler = {
     }
     const url = new URL(request.url);
     try {
+      if (request.method === 'OPTIONS' && isGenerationPath(url.pathname)) {
+        return new Response(null, {
+          status: 204,
+          headers: generationCorsHeaders(request),
+        });
+      }
       let accessIdentity: CloudflareAccessIdentity | undefined;
       if (isGenerationPath(url.pathname)) {
         const authResult = await requireCloudflareAccess(request, env);
@@ -464,17 +481,22 @@ const handler = {
       if (session.isNew) {
         appendSessionCookie(response, session.id);
       }
-      return response;
+      return isGenerationPath(url.pathname)
+        ? withGenerationCors(response, request)
+        : response;
     } catch (err) {
       logError(err, { type: 'fetch-error', path: url.pathname });
       ctx.waitUntil(reportWorkerError(env, err, {
         request,
         extra: { type: 'fetch-error' },
       }));
-      return new Response(JSON.stringify({ message: 'Internal Server Error' }), {
+      const response = new Response(JSON.stringify({ message: 'Internal Server Error' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
+      return isGenerationPath(url.pathname)
+        ? withGenerationCors(response, request)
+        : response;
     }
   },
   scheduled: cron.scheduled,
