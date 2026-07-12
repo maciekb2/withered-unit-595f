@@ -37,7 +37,7 @@ async function jetson(prompt, maxTokens = 1400) {
     }),
     signal: AbortSignal.timeout(Number(process.env.SOCIAL_LLM_TIMEOUT_MS || 90000)),
   });
-  if (!response.ok) throw new Error(`Jetson returned HTTP ${response.status}`);
+  if (!response.ok) throw new Error(`Jetson returned HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
   const data = await response.json();
   const text = data.response || data.text || data.output || data.content;
   if (!text) throw new Error('Jetson returned an empty response');
@@ -193,7 +193,9 @@ async function processOne() {
   try {
     const page = await fetch(job.source.articleUrl, { method:'HEAD', signal:AbortSignal.timeout(15000) });
     if (!page.ok) { await pool.query(`UPDATE social_jobs SET status='waiting_article',locked_at=NULL,last_error=$2,updated_at=now() WHERE id=$1`,[job.id,`article HTTP ${page.status}`]); return true; }
-    const score = await scoreSource(job.source);
+    const score = job.status === 'eligible' && job.package?.score
+      ? job.package.score
+      : await scoreSource(job.source);
     if (score.total < 6) { await pool.query(`UPDATE social_jobs SET status='skipped',score=$2,package=$3::jsonb,locked_at=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify({score})]); return true; }
     if (job.status === 'waiting_article') {
       await pool.query(`UPDATE social_jobs SET status='eligible',score=$2,package=$3::jsonb,locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify({score})]);
