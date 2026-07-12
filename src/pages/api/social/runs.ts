@@ -4,6 +4,7 @@ import { isPrivateGeneratorRequest } from '../../../server/generatorAuth';
 import { validateSocialPackage } from '../../../social/validation';
 import { validateWeeklyRun, type WeeklyRunInput } from '../../../social/weekly';
 import type { SocialSource } from '../../../social/types';
+import { isSealedSocialRunStatus } from '../../../social/runState';
 
 export const prerender = false;
 
@@ -31,6 +32,13 @@ export const POST: APIRoute = async ({ request }) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    const existingRun = await client.query<{ id: string; status: string }>(
+      'SELECT id,status FROM social_runs WHERE week_key=$1 FOR UPDATE', [input.weekKey],
+    );
+    if (existingRun.rows[0] && isSealedSocialRunStatus(existingRun.rows[0].status)) {
+      await client.query('COMMIT');
+      return json({ id: existingRun.rows[0].id, status: existingRun.rows[0].status, reused: true }, 200);
+    }
     const jobs = await client.query<{ id: string; source: SocialSource }>(
       'SELECT id,source FROM social_jobs WHERE id=ANY($1::uuid[]) FOR UPDATE',
       [input.items.map(item => item.jobId)],
