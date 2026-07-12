@@ -26,20 +26,42 @@ services:
     cap_drop: [ALL]
     networks: [app]
 
+  # Internal-only generation runtime. No host port is published.
+  generator:
+    image: pseudointelekt-app
+    env_file:
+      - .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3001
+      DATABASE_URL: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
+      JETSON_GATEWAY_URL: ${JETSON_GATEWAY_URL:?JETSON_GATEWAY_URL must be set}
+    expose:
+      - "3001"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    networks: [app]
+
   scheduler:
     image: pseudointelekt-app
     command: ["node", "./scripts/selfhosted-scheduler.mjs"]
     env_file:
       - .env
     environment:
-      SCHEDULER_APP_URL: http://app:3000
+      SCHEDULER_APP_URL: http://generator:3001
       SCHEDULER_ENABLED: ${SCHEDULER_ENABLED:-true}
       SCHEDULER_RUN_HOUR: ${SCHEDULER_RUN_HOUR:-10}
       SCHEDULER_RUN_MINUTE: ${SCHEDULER_RUN_MINUTE:-0}
       SCHEDULER_TIME_ZONE: ${SCHEDULER_TIME_ZONE:-Europe/Warsaw}
       SCHEDULER_TIMEOUT_MS: ${SCHEDULER_TIMEOUT_MS:-900000}
     depends_on:
-      app:
+      generator:
         condition: service_started
     restart: unless-stopped
     read_only: true

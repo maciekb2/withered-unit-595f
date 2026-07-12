@@ -10,5 +10,6 @@ ingress:
   - hostname: www.pseudointelekt.pl
     service: http://app:3000
   - hostname: generator.pseudointelekt.pl
-    service: http://app:3000
+    # Protected by the `pseudointelekt_generator_private` Access app.
+    service: http://generator:3001
   - service: http_status:404

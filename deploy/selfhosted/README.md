@@ -11,12 +11,21 @@ at `10.2.11.58:8110`, which is the approved network path to Jetson1
 The current Worker deployment remains the rollback target until the PostgreSQL
 data migration and all API routes have been verified on the Node runtime.
 
-The Node build now exposes the public Astro pages, PostgreSQL-backed engagement
-and contact endpoints, and a private `/api/generate-stream` route. Set
-`GENERATOR_PRIVATE_TOKEN` through Vault for the interim private route; the
-production Tunnel should only expose that route after its VPN/private ingress
-policy is configured. The Worker remains the rollback target until data parity
-and the live Jetson benchmark are complete.
+The Node build exposes the public Astro pages and PostgreSQL-backed engagement
+and contact endpoints. Article generation runs in the internal `generator`
+service on port 3001; it has no host-published port and is reached only by the
+internal scheduler or the `generator.pseudointelekt.pl` Tunnel hostname. That
+hostname is protected by Cloudflare Access (`pseudointelekt_generator_private`)
+with an operator allow policy. The app-level JWT check remains enabled as a
+second, origin-side barrier. `/api/generate-stream`, `/api/update-prompt`,
+`/api/get-prompt`, `/api/client-log`, `/api/sentry-test`, `/generuj` and
+`/generuj.html` are private routes; public engagement, contact and health
+routes are deliberately not behind Access.
+
+`GENERATOR_PRIVATE_TOKEN` is retained only for scheduler-to-service calls and
+break-glass operations. It is never placed in browser code. In production set
+`CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD` (comma-separated audiences for the
+private Access apps) and `CF_ACCESS_ALLOWED_EMAILS` in the host-managed env.
 
 `deploy.sh` is the host-side deploy entrypoint used by GitHub Actions after a
 merge to `main`. It downloads the repository tarball, preserves the

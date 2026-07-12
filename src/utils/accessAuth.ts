@@ -28,6 +28,7 @@ const GENERATION_PATHS = new Set([
   '/api/update-prompt',
   '/api/get-prompt',
   '/api/client-log',
+  '/api/sentry-test',
 ]);
 
 let jwksCache: JWTVerifyGetKey | undefined;
