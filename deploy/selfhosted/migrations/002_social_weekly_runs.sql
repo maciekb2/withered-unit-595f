@@ -3,9 +3,13 @@ CREATE TABLE IF NOT EXISTS social_runs (
   week_key TEXT NOT NULL UNIQUE CHECK (week_key ~ '^[0-9]{4}-W[0-9]{2}$'),
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','uploading','ready','processing','review','failed')),
   brief JSONB NOT NULL DEFAULT '{}'::jsonb,
+  notified_at TIMESTAMPTZ,
+  feedback_notified_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE social_runs ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ;
+ALTER TABLE social_runs ADD COLUMN IF NOT EXISTS feedback_notified_at TIMESTAMPTZ;
 
 ALTER TABLE social_jobs DROP CONSTRAINT IF EXISTS social_jobs_status_check;
 ALTER TABLE social_jobs ADD CONSTRAINT social_jobs_status_check CHECK (

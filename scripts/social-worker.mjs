@@ -195,6 +195,28 @@ async function createDrafts(client, job, pkg, urls) {
   }
 }
 
+async function notifyRunIfReady(runId) {
+  if (!runId || !process.env.SLACK_WEBHOOK_URL) return;
+  const result = await pool.query(`SELECT r.week_key,r.status,r.notified_at,
+    json_agg(json_build_object('slug',j.slug,'drafts',(
+      SELECT json_agg(json_build_object('channel',p.channel,'id',p.buffer_draft_id))
+      FROM social_publications p WHERE p.job_id=j.id
+    )) ORDER BY j.created_at) items
+    FROM social_runs r JOIN social_jobs j ON j.run_id=r.id
+    WHERE r.id=$1 GROUP BY r.id`, [runId]);
+  const run = result.rows[0];
+  if (!run || run.status !== 'review' || run.notified_at) return;
+  const lines = [`Pseudointelekt: szkice social ${run.week_key} są gotowe w Bufferze.`];
+  for (const item of run.items || []) lines.push(`• ${item.slug}: ${(item.drafts || []).map(draft => draft.channel).join(', ')}`);
+  lines.push('Akceptacja i harmonogram: https://publish.buffer.com/calendar');
+  const response = await fetch(process.env.SLACK_WEBHOOK_URL, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: lines.join('\n') }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error(`Slack social digest returned HTTP ${response.status}`);
+  await pool.query('UPDATE social_runs SET notified_at=now(),updated_at=now() WHERE id=$1 AND notified_at IS NULL', [runId]);
+}
+
 async function acquire() {
   const client = await pool.connect();
   try {
@@ -230,6 +252,9 @@ async function processOne() {
         SELECT 1 FROM social_jobs WHERE run_id=$1 AND status NOT IN ('review','published','queued')
       ) THEN 'review' ELSE 'processing' END,updated_at=now() WHERE id=$1`, [job.run_id]);
       await client.query('COMMIT');
+      await notifyRunIfReady(job.run_id).catch(error => {
+        console.error(JSON.stringify({ type: 'social-digest-error', runId: job.run_id, error: error instanceof Error ? error.message : String(error) }));
+      });
     } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
     console.log(JSON.stringify({type:'social-job-complete',jobId:job.id,slug:job.slug,score:score.total,dryRun}));
   } catch (error) {

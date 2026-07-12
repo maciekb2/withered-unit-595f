@@ -26,6 +26,11 @@ opaque, expiring media URLs required by Buffer.
 4. Confirm all Buffer entries are drafts. Human approval remains in Buffer.
 5. The metrics service snapshots Buffer results after 24h, 72h, 7d and 28d.
 
+When all drafts in a weekly run are ready, one Slack digest links the operator
+to Buffer. A second digest is sent only after every publication in the run has
+a seven-day Buffer snapshot; it remains descriptive until 12 comparable posts
+exist.
+
 `POST /api/social/jobs` accepts `{ "id": "uuid", "action": "retry|regenerate|skip" }`
 and is protected by the same private generator authentication. No Buffer secret
 or raw local-model authentication data is written to PostgreSQL.

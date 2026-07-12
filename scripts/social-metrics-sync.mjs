@@ -46,7 +46,32 @@ async function sync() {
       console.error(JSON.stringify({ type: 'social-metrics-error', publicationId: publication.id, error: error instanceof Error ? error.message : String(error) }));
     }
   }
+  await notifyWeeklyFeedback();
   console.log(JSON.stringify({ type: 'social-metrics-sync', publications: publications.rowCount }));
+}
+
+async function notifyWeeklyFeedback() {
+  if (!process.env.SLACK_WEBHOOK_URL) return;
+  const runs = await pool.query("SELECT id,week_key FROM social_runs WHERE status='review' AND feedback_notified_at IS NULL ORDER BY created_at");
+  for (const run of runs.rows) {
+    const publications = await pool.query(`SELECT p.channel,j.slug,s.metrics
+      FROM social_jobs j JOIN social_publications p ON p.job_id=j.id
+      LEFT JOIN social_metric_snapshots s ON s.publication_id=p.id AND s.provider='buffer' AND s.window_hours=168
+      WHERE j.run_id=$1 ORDER BY j.created_at,p.channel`, [run.id]);
+    if (!publications.rowCount || publications.rows.some(row => !row.metrics)) continue;
+    const lines = [`Pseudointelekt: wyniki po 7 dniach dla ${run.week_key}.`];
+    for (const row of publications.rows) {
+      const metrics = (row.metrics || []).slice(0, 6).map(metric => `${metric.name}: ${metric.value}`).join(', ');
+      lines.push(`• ${row.slug} / ${row.channel}: ${metrics}`);
+    }
+    lines.push('To obserwacje opisowe; reguły optymalizacji uruchamiamy dopiero po 12 porównywalnych postach.');
+    const response = await fetch(process.env.SLACK_WEBHOOK_URL, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: lines.join('\n') }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) throw new Error(`Slack feedback digest returned HTTP ${response.status}`);
+    await pool.query('UPDATE social_runs SET feedback_notified_at=now(),updated_at=now() WHERE id=$1', [run.id]);
+  }
 }
 
 async function main() {
