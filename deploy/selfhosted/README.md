@@ -32,6 +32,19 @@ merge to `main`. It downloads the repository tarball, preserves the
 host-managed `.env` and secrets, rebuilds the app image, and recreates the app
 and scheduler containers.
 
+## PostgreSQL backup and restore
+
+Run `deploy/selfhosted/backup-postgres.sh` on `mbprod` (daily from the host
+timer/cron) to create a compressed custom-format dump under
+`/opt/apps/production/pseudointelekt/backups/postgres`. The script keeps 14 days
+by default and never prints credentials. Validate a backup without touching
+production by starting a temporary PostgreSQL 16 container, creating the
+database, and running `pg_restore --list` against the dump. A restore is done
+into an empty maintenance database with `pg_restore --clean --if-exists`; stop
+the app before replacing the production database and take one final backup
+first. The first go-live backup must be followed by a temporary-container
+restore test.
+
 `cloudflared-ingress.example.yml` documents the required public and private
 hostnames. The generator hostname must be protected by Cloudflare Access or a
 private WARP/VPN route before it is published.
