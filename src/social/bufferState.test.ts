@@ -7,6 +7,10 @@ const now = new Date('2026-07-12T12:00:00Z');
 test('zero-valued YouTube metrics do not turn a Buffer draft into a publication', () => {
   const post = { dueAt: null, metricsUpdatedAt: now.toISOString(), metrics: [{ type: 'views', value: 0 }] };
   assert.deepEqual(classifyBufferPost(post, {}, now), { status: 'draft', publishedAt: null });
+  assert.deepEqual(
+    classifyBufferPost(post, { published_at: '2026-07-12T11:00:00Z' }, now),
+    { status: 'draft', publishedAt: null },
+  );
 });
 
 test('future due date is queued and past due date is published', () => {
