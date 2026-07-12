@@ -16,6 +16,7 @@ COPY --from=build /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-sch
 COPY --from=build /app/scripts/social-worker.mjs ./scripts/social-worker.mjs
 COPY --from=build /app/scripts/social-weekly-client.mjs ./scripts/social-weekly-client.mjs
 COPY --from=build /app/scripts/social-metrics-sync.mjs ./scripts/social-metrics-sync.mjs
+COPY --from=build /app/scripts/social-buffer-state.mjs ./scripts/social-buffer-state.mjs
 USER node
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]

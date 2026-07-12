@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import pg from 'pg';
+import { classifyBufferPost } from './social-buffer-state.mjs';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 2 });
@@ -25,14 +26,24 @@ async function bufferPost(id) {
 
 async function sync() {
   if (!process.env.BUFFER_API_KEY) throw new Error('BUFFER_API_KEY is required');
-  const publications = await pool.query(`SELECT id,buffer_draft_id,published_at,created_at
+  const publications = await pool.query(`SELECT id,buffer_draft_id,status,published_at,created_at
     FROM social_publications WHERE buffer_draft_id IS NOT NULL AND status IN ('draft','queued','published')
       AND created_at >= now()-interval '40 days' ORDER BY created_at`);
   for (const publication of publications.rows) {
     try {
       const post = await bufferPost(publication.buffer_draft_id);
-      if (!post?.metrics?.length) continue;
-      const publishedAt = publication.published_at || post.dueAt || publication.created_at;
+      const state = classifyBufferPost(post, publication);
+      if (state.status !== 'published') {
+        await pool.query(`UPDATE social_publications SET status=$2,published_at=NULL,updated_at=now()
+          WHERE id=$1 AND (status<>$2 OR published_at IS NOT NULL)`, [publication.id, state.status]);
+        continue;
+      }
+      const publishedAt = state.publishedAt;
+      if (!post?.metrics?.length) {
+        await pool.query(`UPDATE social_publications SET status='published',published_at=COALESCE(published_at,$2),updated_at=now()
+          WHERE id=$1`, [publication.id, publishedAt]);
+        continue;
+      }
       const ageHours = Math.max(0, (Date.now() - new Date(publishedAt).getTime()) / 3_600_000);
       const dueWindows = windows.filter(window => ageHours >= window);
       for (const window of dueWindows) {
