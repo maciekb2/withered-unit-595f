@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getPool, json, slugFrom } from '../../../server/postgres';
 
+export const prerender = false;
+
 export const GET: APIRoute = async ({ params }) => {
   const slug = slugFrom(params);
   const result = await getPool().query<{ value: number }>(

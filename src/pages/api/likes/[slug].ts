@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getPool, json, sessionId, slugFrom, withSession } from '../../../server/postgres';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ params, request }) => {
   const slug = slugFrom(params);
   const session = sessionId(request);

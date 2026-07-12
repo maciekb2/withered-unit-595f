@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getPool, json, slugFrom } from '../../../server/postgres';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ params, url }) => {
   const slug = slugFrom(params);
   const baseline = Math.max(0, Number.parseInt(url.searchParams.get('value') || '0', 10) || 0);
