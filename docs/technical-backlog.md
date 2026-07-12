@@ -40,8 +40,9 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a long-running Docker scheduler that replaces the Worker cron and consumes the generation SSE stream.
 - [x] Add GlitchTip reporting for Node generation failures and a disabled-by-default protected probe.
 - [x] Add provider-aware reviewer/proofreader tests and local generation-route hardening tests.
+- [x] Configure the production `pseudointelekt-mbprod` Tunnel, switch apex/www DNS to mbprod, and keep the Worker as the rollback artifact.
+- [x] Keep the generator hostname behind the dedicated Cloudflare Access application and origin-side JWT validation.
 - [ ] Export/import D1/KV data and verify parity with the self-hosted database.
-- [ ] Configure the production Tunnel and private/VPN-only generator ingress.
 
 ## UI and SEO polish
 

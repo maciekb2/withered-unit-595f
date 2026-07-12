@@ -8,8 +8,10 @@ committed. Ollama is reached through the authenticated Helpdesk Model Gateway
 at `10.2.11.58:8110`, which is the approved network path to Jetson1
 (`10.2.11.72:11434`).
 
-The current Worker deployment remains the rollback target until the PostgreSQL
-data migration and all API routes have been verified on the Node runtime.
+The self-hosted Node runtime is now the production origin behind the
+`pseudointelekt-mbprod` Cloudflare Tunnel. The Cloudflare Worker remains the
+rollback artifact, but its wildcard route is disabled; restore it only through
+a controlled DNS/route change after verifying the mbprod origin.
 
 The Node build exposes the public Astro pages and PostgreSQL-backed engagement
 and contact endpoints. Article generation runs in the internal `generator`
