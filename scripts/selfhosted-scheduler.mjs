@@ -33,6 +33,7 @@ async function runOnce() {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    let generationFailed = false;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -41,9 +42,18 @@ async function runOnce() {
       buffer = events.pop() || '';
       for (const event of events) {
         const line = event.split('\n').find(item => item.startsWith('data: '));
-        if (line) console.log(line.slice(6));
+        if (line) {
+          const payload = line.slice(6);
+          console.log(payload);
+          try {
+            if (JSON.parse(payload).failed === true) generationFailed = true;
+          } catch {
+            // Keep streaming non-JSON diagnostic events without masking them.
+          }
+        }
       }
     }
+    if (generationFailed) throw new Error('generation endpoint reported failed=true');
     console.log(JSON.stringify({ type: 'scheduler-complete', started, finished: new Date().toISOString() }));
   } catch (error) {
     console.error(JSON.stringify({ type: 'scheduler-error', error: error instanceof Error ? error.message : String(error) }));
