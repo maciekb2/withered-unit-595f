@@ -1,0 +1,61 @@
+name: pseudointelekt
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/selfhosted/Dockerfile
+    env_file:
+      - .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgresql://pseudointelekt:$${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
+      JETSON_GATEWAY_URL: http://10.2.11.72:11434
+    expose:
+      - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    networks: [app]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pseudointelekt
+      POSTGRES_USER: pseudointelekt
+      POSTGRES_PASSWORD: $${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pseudointelekt -d pseudointelekt"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+    networks: [app]
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.6.0
+    command: tunnel --no-autoupdate run --token $$(cat /run/secrets/tunnel-token)
+    volumes:
+      - $${PSEUDOINTELEKT_TUNNEL_TOKEN_FILE:?PSEUDOINTELEKT_TUNNEL_TOKEN_FILE must be set}:/run/secrets/tunnel-token:ro
+    depends_on:
+      app:
+        condition: service_started
+    restart: unless-stopped
+    networks: [app]
+
+volumes:
+  postgres-data:
+
+networks:
+  app:
+    driver: bridge

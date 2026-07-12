@@ -31,6 +31,14 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a configurable image model setting and update the hero-image prompt/style defaults for consistent newer-model output.
 - [x] Verify the full generation flow through Cloudflare Access with audit logs still preserving prompts, client payloads, and Access identity/method.
 
+## Self-hosted runtime migration
+
+- [x] Add a separate Astro Node build target and production Docker Compose scaffold for `mbprod`.
+- [x] Add the PostgreSQL schema foundation for counters, likes, contacts and audit logs.
+- [ ] Port Worker API handlers and D1/KV repositories to PostgreSQL before switching public traffic.
+- [ ] Export/import D1/KV data and verify parity with the self-hosted database.
+- [ ] Configure the production Tunnel and private/VPN-only generator ingress.
+
 ## UI and SEO polish
 
 - [x] Rebuild the public homepage as a responsive Situation Room experience with a scroll-driven procedural globe, progressive fallbacks, and live editorial data.

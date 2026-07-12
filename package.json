@@ -15,6 +15,7 @@
   "dependencies": {
     "@astrojs/cloudflare": "12.6.13",
     "@astrojs/mdx": "4.3.14",
+    "@astrojs/node": "^9.5.2",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/archivo": "^5.2.8",
@@ -34,6 +35,8 @@
   "scripts": {
     "astro": "astro",
     "build": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --main-fields=module,main --conditions=worker,browser --external:./_worker.js --outfile=dist/worker.js",
+    "build:node": "astro build --config astro.config.node.mjs",
+    "start:node": "node ./dist/server/entry.mjs",
     "cf:dry-run": "wrangler deploy --dry-run",
     "check": "npm run typecheck && npm run content:audit && npm test && npm run build && npm run cf:dry-run",
     "ci:pr": "npm run typecheck && npm run content:audit && npm run test:ci && npm run build && npm run cf:dry-run",
