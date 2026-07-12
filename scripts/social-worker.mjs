@@ -244,9 +244,17 @@ async function processOne() {
     const assets = await render(job,pkg);
     const client = await pool.connect();
     try {
+      // Asset metadata must be committed before Buffer fetches the public URL
+      // through a separate application/database connection.
       await client.query('BEGIN');
       const urls = { reel: await persistAsset(client,job.id,'reel',assets.reel), post: await persistAsset(client,job.id,'instagram_post',assets.post) };
+      await client.query('COMMIT');
+
+      // Draft IDs are intentionally persisted one channel at a time. If a
+      // later channel fails, retry skips drafts that Buffer already created.
       await createDrafts(client,job,pkg,urls);
+
+      await client.query('BEGIN');
       await client.query(`UPDATE social_jobs SET status='review',score=$2,package=$3::jsonb,locked_at=NULL,last_error=NULL,updated_at=now() WHERE id=$1`,[job.id,score.total,JSON.stringify(pkg)]);
       await client.query(`UPDATE social_runs SET status=CASE WHEN NOT EXISTS(
         SELECT 1 FROM social_jobs WHERE run_id=$1 AND status NOT IN ('review','published','queued')
