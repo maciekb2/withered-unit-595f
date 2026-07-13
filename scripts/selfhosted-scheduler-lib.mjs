@@ -13,13 +13,14 @@ export function parseSsePayloads(text) {
 export function summarizeGenerationEvents(events) {
   const failed = [...events].reverse().find(event => event.failed === true);
   const completed = [...events].reverse().find(event => event.prUrl || event.articleTitle);
+  const topicEvent = [...events].reverse().find(event => event.baseTopic || event.articleTitle);
   return {
     ok: !failed,
     retryable: failed?.retryable !== false,
     stage: failed?.stage || completed?.stage || null,
-    errorCode: failed?.code || null,
-    error: failed?.error || null,
-    topic: completed?.baseTopic || completed?.articleTitle || null,
+    errorCode: failed?.errorCode || failed?.code || null,
+    error: failed?.errorMessage || failed?.error || null,
+    topic: topicEvent?.baseTopic || topicEvent?.articleTitle || null,
     prUrl: completed?.prUrl || null,
   };
 }

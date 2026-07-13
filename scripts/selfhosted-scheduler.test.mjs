@@ -3,10 +3,13 @@ import assert from 'node:assert/strict';
 import { parseSsePayloads, renderSchedulerMetrics, shouldRetry, summarizeGenerationEvents } from './selfhosted-scheduler-lib.mjs';
 
 test('scheduler extracts a retryable failure from generation SSE', () => {
-  const events = parseSsePayloads('data: {"stage":"write","log":"start"}\n\ndata: {"stage":"write","failed":true,"retryable":true,"code":"UPSTREAM"}\n\n');
+  const events = parseSsePayloads('data: {"stage":"outline","baseTopic":"Temat testowy"}\n\ndata: {"stage":"write","failed":true,"retryable":true,"errorCode":"UPSTREAM","errorMessage":"awaria"}\n\n');
   const result = summarizeGenerationEvents(events);
   assert.equal(result.ok, false);
   assert.equal(result.stage, 'write');
+  assert.equal(result.errorCode, 'UPSTREAM');
+  assert.equal(result.error, 'awaria');
+  assert.equal(result.topic, 'Temat testowy');
   assert.equal(shouldRetry(result, 1), true);
   assert.equal(shouldRetry(result, 2), false);
 });

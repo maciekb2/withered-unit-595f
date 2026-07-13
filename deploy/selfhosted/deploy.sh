@@ -6,12 +6,16 @@ REPO=${GITHUB_REPO:-maciekb2/withered-unit-595f}
 REF=${GITHUB_REF:-main}
 REVISION=${DEPLOY_REVISION:-$REF}
 HEALTH_URL=${PSEUDOINTELEKT_HEALTH_URL:-http://10.2.11.53:3000/api/health}
-TOKEN=${GITHUB_TOKEN:?GITHUB_TOKEN must be set in the host env}
+TOKEN=${GITHUB_TOKEN:-}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-curl -fsSL -H "Authorization: Bearer ${TOKEN}" -H 'Accept: application/vnd.github+json' \
-  "https://api.github.com/repos/${REPO}/tarball/${REF}" -o "$TMP/source.tgz"
+if [[ -n "$TOKEN" ]]; then
+  curl -fsSL -H "Authorization: Bearer ${TOKEN}" -H 'Accept: application/vnd.github+json' \
+    "https://api.github.com/repos/${REPO}/tarball/${REF}" -o "$TMP/source.tgz"
+else
+  curl -fsSL "https://codeload.github.com/${REPO}/tar.gz/${REF}" -o "$TMP/source.tgz"
+fi
 mkdir "$TMP/source"
 tar -xzf "$TMP/source.tgz" -C "$TMP/source" --strip-components=1
 

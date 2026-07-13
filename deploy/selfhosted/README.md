@@ -29,8 +29,9 @@ break-glass operations. It is never placed in browser code. In production set
 `CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD` (comma-separated audiences for the
 private Access apps) and `CF_ACCESS_ALLOWED_EMAILS` in the host-managed env.
 
-`deploy.sh` is the host-side deploy entrypoint used by GitHub Actions after a
-merge to `main`. It downloads the repository tarball, preserves the
+`deploy.sh` is the host-side deploy entrypoint. The committed systemd poller
+checks GitHub `main` every five minutes and invokes it after a merge, without
+placing an SSH private key in GitHub Actions. It downloads the public repository tarball, preserves the
 host-managed `.env` and secrets, rebuilds the app image, and recreates the app
 and scheduler containers.
 

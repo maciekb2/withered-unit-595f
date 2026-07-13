@@ -1,0 +1,12 @@
+[Unit]
+Description=Poll Pseudointelekt GitHub main for deployment
+
+[Timer]
+OnBootSec=2m
+OnUnitActiveSec=5m
+RandomizedDelaySec=30s
+Persistent=true
+Unit=pseudointelekt-deploy-poller.service
+
+[Install]
+WantedBy=timers.target

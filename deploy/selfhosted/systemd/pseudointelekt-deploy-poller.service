@@ -1,0 +1,12 @@
+[Unit]
+Description=Deploy Pseudointelekt when GitHub main changes
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=macie
+ExecStart=/opt/apps/production/pseudointelekt/deploy/selfhosted/deploy-poller.sh
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
