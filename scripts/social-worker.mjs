@@ -260,12 +260,13 @@ async function acquire() {
     await client.query('BEGIN');
     const result = await client.query(`SELECT * FROM social_jobs
       WHERE (status='ready' OR (status='failed' AND run_id IS NOT NULL)) AND attempts < $1
+        AND (scheduled_for IS NULL OR scheduled_for <= now())
         AND (locked_at IS NULL OR locked_at < now()-interval '30 minutes')
       ORDER BY CASE status WHEN 'failed' THEN 0 ELSE 1 END, created_at
       LIMIT 1 FOR UPDATE SKIP LOCKED`, [maxAttempts]);
     const job = result.rows[0];
     if (!job) { await client.query('COMMIT'); return null; }
-    await client.query(`UPDATE social_jobs SET status='generating',locked_at=now(),attempts=attempts+1,updated_at=now() WHERE id=$1`, [job.id]);
+    await client.query(`UPDATE social_jobs SET status='generating',locked_at=now(),scheduled_for=NULL,attempts=attempts+1,updated_at=now() WHERE id=$1`, [job.id]);
     await client.query('COMMIT');
     return job;
   } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
@@ -311,7 +312,13 @@ async function processOne() {
     console.log(JSON.stringify({type:'social-job-complete',jobId:job.id,slug:job.slug,score:score.total,dryRun}));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await pool.query(`UPDATE social_jobs SET status='failed',locked_at=NULL,last_error=$2,updated_at=now() WHERE id=$1`,[job.id,message.slice(0,1000)]);
+    const bufferRateLimited = /too many requests|buffer.*429|http 429/i.test(message);
+    await pool.query(`UPDATE social_jobs SET
+      status=CASE WHEN $3 THEN 'ready' ELSE 'failed' END,
+      attempts=CASE WHEN $3 THEN GREATEST(attempts-1,0) ELSE attempts END,
+      scheduled_for=CASE WHEN $3 THEN now()+interval '15 minutes' ELSE scheduled_for END,
+      locked_at=NULL,last_error=$2,updated_at=now()
+      WHERE id=$1`,[job.id,message.slice(0,1000),bufferRateLimited]);
     console.error(JSON.stringify({type:'social-job-error',jobId:job.id,error:message}));
   }
   return true;

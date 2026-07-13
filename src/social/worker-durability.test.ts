@@ -16,4 +16,7 @@ test('social worker commits public assets before Buffer and checkpoints every dr
   assert.equal(draftsBody.includes("client.query('BEGIN')"), false);
   assert.match(source, /existingId \? 'editPost' : 'createPost'/u);
   assert.match(source, /\?v=\$\{checksum\.slice\(0, 12\)\}/u);
+  assert.match(source, /scheduled_for IS NULL OR scheduled_for <= now\(\)/u);
+  assert.match(source, /now\(\)\+interval '15 minutes'/u);
+  assert.match(source, /GREATEST\(attempts-1,0\)/u);
 });
