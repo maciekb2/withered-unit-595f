@@ -65,6 +65,7 @@ export async function assembleArticle({
     logEvent({ type: 'assemble-complete', postPath, imagePath });
     return { postPath, imagePath };
   } catch (err) {
+    await fs.rm(imagePath, { force: true }).catch(() => undefined);
     logError(err, { type: 'assemble-error' });
     throw err;
   }

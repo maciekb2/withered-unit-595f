@@ -51,8 +51,10 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
   }
   const repo: any = await repoRes.json();
 
-  const refRes = await fetch(`${repoUrl}/git/ref/heads/${repo.default_branch}`, {
+  const refRes = await retryFetch(`${repoUrl}/git/ref/heads/${repo.default_branch}`, {
     headers,
+    retries: 2,
+    retryDelayMs: 1000,
   });
   logEvent({ type: 'github-get-ref-status', status: refRes.status });
   if (!refRes.ok) {
@@ -84,6 +86,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     article.content,
   ].join('\n');
 
+  let branchCreated = false;
   try {
     logEvent({ type: 'github-create-branch', branch });
     const createRes = await retryFetch(`${repoUrl}/git/refs`, {
@@ -99,6 +102,7 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       const msg = await createRes.text();
       throw new Error(`GitHub branch create failed: ${createRes.status} ${msg}`);
     }
+    branchCreated = true;
 
     logEvent({ type: 'github-upload-post', file: postName });
     const postRes = await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`src/content/blog/${postName}`)}`, {
@@ -169,6 +173,19 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
     });
     return prData.html_url as string;
   } catch (err) {
+    if (branchCreated) {
+      try {
+        const cleanupRes = await retryFetch(`${repoUrl}/git/refs/heads/${encodeURIComponent(branch)}`, {
+          method: 'DELETE',
+          headers,
+          retries: 1,
+          retryDelayMs: 500,
+        });
+        logEvent({ type: 'github-cleanup-branch-status', branch, status: cleanupRes.status });
+      } catch (cleanupError) {
+        logError(cleanupError, { type: 'github-cleanup-branch-error', branch });
+      }
+    }
     logError(err, { type: 'github-publish-error' });
     throw err;
   }
