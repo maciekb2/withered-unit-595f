@@ -31,7 +31,7 @@ export function buildCarouselCopy(pkg, source = {}) {
 export function buildCarouselFilter({ textFile, textLength = 0, slideNumber, total, escapePath = value => value }) {
   const base = 'scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350';
   if (slideNumber === 1) return `${base},drawbox=x=0:y=0:w=iw:h=112:color=0x031712bb:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=64:y=42`;
-  const fontSize = textLength > 220 ? 38 : textLength > 150 ? 42 : textLength > 90 ? 46 : 52;
+  const fontSize = textLength > 280 ? 34 : textLength > 220 ? 38 : textLength > 150 ? 42 : textLength > 90 ? 46 : 52;
   return [
     base,
     'gblur=sigma=12',

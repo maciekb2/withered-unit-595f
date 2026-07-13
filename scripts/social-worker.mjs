@@ -173,8 +173,9 @@ async function render(job, pkg) {
       if (index > 0) {
         textFile = path.join(dir, `carousel-${String(index + 1).padStart(2, '0')}.txt`);
         const text = copy[index - 1];
-        const wrapWidth = text.length > 150 ? 34 : text.length > 90 ? 29 : 24;
-        await writeFile(textFile, wrapText(text, wrapWidth, 10), 'utf8');
+        const wrapWidth = text.length > 280 ? 40 : text.length > 220 ? 36 : text.length > 150 ? 34 : text.length > 90 ? 29 : 24;
+        const maxLines = text.length > 280 ? 13 : text.length > 220 ? 12 : 10;
+        await writeFile(textFile, wrapText(text, wrapWidth, maxLines), 'utf8');
       }
       await run('ffmpeg', ['-y','-i',hero,'-vf',buildCarouselFilter({ textFile, textLength:copy[index - 1]?.length || 0, slideNumber:index + 1, total:slideCount, escapePath:ffText }),'-frames:v','1',slide]);
       carousel.push(slide);

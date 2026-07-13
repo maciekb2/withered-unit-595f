@@ -14,6 +14,7 @@ test('carousel adapts between six and ten slides from one sourced package', () =
   assert.equal(copy.at(-1), 'Pełna analiza na pseudointelekt.pl.');
   assert.doesNotMatch(buildCarouselFilter({ textFile: '', slideNumber: 1, total:10 }), /gblur/u);
   assert.match(buildCarouselFilter({ textFile: '/tmp/slide.txt', textLength:240, slideNumber:2, total:10 }), /fontsize=38/u);
+  assert.match(buildCarouselFilter({ textFile: '/tmp/slide.txt', textLength:320, slideNumber:2, total:10 }), /fontsize=34/u);
   assert.match(buildCarouselFilter({ textFile: '/tmp/slide.txt', textLength:240, slideNumber:2, total:10 }), /color=0x000000d9/u);
 });
 
