@@ -27,6 +27,7 @@ import { classifyGenerationError, type ClassifiedGenerationError } from '../util
 import { buildSocialSource } from '../social/types';
 import { filterEditorialTopics } from '../pipeline/topicRelevance';
 import { assessEditorialCandidate } from '../pipeline/editorialCandidate';
+import { modelForProvider } from '../pipeline/providerSelection';
 
 export interface GenerateAndPublishResult {
   article: FinalJson;
@@ -509,9 +510,11 @@ export async function generateAndPublish(
             repairTemplate,
             styleGuide,
             contextPack,
-            model: qualityRepairProvider.type === 'openai'
-              ? env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5'
-              : repairModel,
+            model: modelForProvider(
+              qualityRepairProvider,
+              repairModel,
+              env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+            ),
             provider: qualityRepairProvider,
             maxTokens: 5000,
           });
@@ -598,7 +601,11 @@ export async function generateAndPublish(
           repairTemplate,
           styleGuide,
           contextPack,
-          model: env.OPENAI_REPAIR_MODEL || repairModel,
+          model: modelForProvider(
+            editorialProvider,
+            env.OPENAI_REPAIR_MODEL || repairModel,
+            env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+          ),
           provider: editorialProvider,
           maxTokens: 5200,
         });

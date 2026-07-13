@@ -136,3 +136,20 @@ test('generateOutline exposes prompt and raw on error', async () => {
   });
   globalThis.fetch = original;
 });
+
+test('generateOutline reports a clear error when a small model omits sections', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({
+      choices: [{ message: { content: JSON.stringify({ finalTitle: 'Tytuł', description: 'Opis' }) } }],
+    }), { status: 200 }) as any;
+
+  try {
+    await assert.rejects(
+      () => generateOutline({ apiKey: 'k', baseTopic: 'T' }),
+      /missing sections array/,
+    );
+  } finally {
+    globalThis.fetch = original;
+  }
+});

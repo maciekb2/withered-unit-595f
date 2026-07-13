@@ -3,15 +3,24 @@ let execCtx: ExecutionContext | undefined;
 let workerId: string | undefined;
 let logsTableReady: Promise<void> | undefined;
 let logsTableDb: D1Database | undefined;
+let runtimePlatform: string | undefined;
 
 export function initLogger(
   db?: D1Database,
   ctx?: ExecutionContext,
-  id?: string
+  id?: string,
+  platform?: string,
 ): void {
   logsDb = db;
   execCtx = ctx;
   workerId = id;
+  runtimePlatform = platform;
+}
+
+export function logsTableDdl(platform?: string): string {
+  return platform === 'node-selfhosted'
+    ? 'CREATE TABLE IF NOT EXISTS logs (id BIGSERIAL PRIMARY KEY, time TIMESTAMPTZ NOT NULL DEFAULT now(), worker_id TEXT NOT NULL, data JSONB NOT NULL)'
+    : 'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)';
 }
 
 function storeLog(entry: Record<string, unknown>): void {
@@ -23,9 +32,7 @@ function storeLog(entry: Record<string, unknown>): void {
       // D1 accepts SQLite AUTOINCREMENT, while the self-hosted adapter is
       // PostgreSQL. Keep the Worker schema intact but never issue invalid
       // SQLite DDL against the production Postgres pool.
-      const ddl = process.env.RUNTIME_PLATFORM === 'node-selfhosted'
-        ? 'CREATE TABLE IF NOT EXISTS logs (id BIGSERIAL PRIMARY KEY, time TIMESTAMPTZ NOT NULL DEFAULT now(), worker_id TEXT NOT NULL, data JSONB NOT NULL)'
-        : 'CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, time TEXT, worker_id TEXT, data TEXT)';
+      const ddl = logsTableDdl(runtimePlatform || process.env.RUNTIME_PLATFORM);
       logsTableReady = db.exec(ddl).then(() => undefined);
     }
     await logsTableReady;

@@ -65,6 +65,7 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     });
 
     const json = extractJson<any>(text);
+    assertOutlineShape(json);
 
     const outline: Outline = {
       finalTitle: normalizeObviousPolishNames(json.finalTitle),
@@ -99,6 +100,32 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     (err as any).raw = text;
     if (debug) (err as any).debug = debug;
     throw err;
+  }
+}
+
+function assertOutlineShape(value: unknown): asserts value is {
+  finalTitle: string;
+  description: string;
+  sections: { h2: string; bullets: string[] }[];
+  guardrails?: string[];
+} {
+  if (!value || typeof value !== 'object') throw new Error('Outline response must be an object');
+  const outline = value as Record<string, unknown>;
+  if (typeof outline.finalTitle !== 'string' || typeof outline.description !== 'string') {
+    throw new Error('Outline response is missing finalTitle or description');
+  }
+  if (!Array.isArray(outline.sections)) {
+    throw new Error('Outline response is missing sections array');
+  }
+  for (const section of outline.sections) {
+    if (!section || typeof section !== 'object') throw new Error('Outline section must be an object');
+    const candidate = section as Record<string, unknown>;
+    if (typeof candidate.h2 !== 'string' || !Array.isArray(candidate.bullets)) {
+      throw new Error('Outline section is missing h2 or bullets array');
+    }
+  }
+  if (outline.guardrails !== undefined && !Array.isArray(outline.guardrails)) {
+    throw new Error('Outline guardrails must be an array');
   }
 }
 

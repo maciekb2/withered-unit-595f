@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ request, url }) => {
   const controller = createSseController(stream.writable);
   const env = nodeGenerationEnv();
   const ctx = nodeExecutionContext();
-  initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
+  initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID, env.RUNTIME_PLATFORM);
   const session = sessionId(request);
   const initialTopic = url.searchParams.get('topic')?.trim() || '';
   const interactive = url.searchParams.get('interactive') === '1';
