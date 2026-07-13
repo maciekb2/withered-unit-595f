@@ -20,6 +20,8 @@ COPY --from=build /app/scripts/social-buffer-state.mjs ./scripts/social-buffer-s
 COPY --from=build /app/scripts/social-copy.mjs ./scripts/social-copy.mjs
 COPY --from=build /app/scripts/social-outro.mjs ./scripts/social-outro.mjs
 COPY --from=build /app/scripts/social-motion.mjs ./scripts/social-motion.mjs
+COPY --from=build /app/scripts/social-carousel.mjs ./scripts/social-carousel.mjs
+COPY --from=build /app/scripts/social-buffer-assets.mjs ./scripts/social-buffer-assets.mjs
 USER node
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]

@@ -24,6 +24,7 @@ export function validateWeeklyRun(input: WeeklyRunInput): string[] {
   let current = 0;
   let evergreen = 0;
   let staticPosts = 0;
+  let carousels = 0;
   for (const item of input.items || []) {
     if (!uuid.test(item.jobId || '')) errors.push('invalid jobId');
     ids.add(item.jobId);
@@ -31,9 +32,12 @@ export function validateWeeklyRun(input: WeeklyRunInput): string[] {
     if (item.package?.contentKind === 'current') current += 1;
     if (item.package?.contentKind === 'evergreen') evergreen += 1;
     if (item.package?.staticPost) staticPosts += 1;
+    if (item.package?.carousel) carousels += 1;
+    if (item.package?.staticPost && item.package?.carousel) errors.push('one item cannot request both static post and carousel');
   }
   if (ids.size !== input.items?.length) errors.push('duplicate jobId');
   if (current !== 2 || evergreen !== 1) errors.push('weekly run requires 2 current and 1 evergreen item');
   if (staticPosts > 1) errors.push('weekly run allows at most 1 static post');
+  if (carousels > 1) errors.push('weekly run allows at most 1 carousel');
   return [...new Set(errors)];
 }

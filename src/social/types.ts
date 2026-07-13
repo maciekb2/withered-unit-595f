@@ -31,6 +31,7 @@ export interface SocialPackage {
   scenes: string[];
   hashtags: string[];
   staticPost?: boolean;
+  carousel?: boolean;
   imagePrompt: string;
   contentKind: 'current' | 'evergreen';
   experiment: string;

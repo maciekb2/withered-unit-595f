@@ -8,6 +8,8 @@ import { spawn } from 'node:child_process';
 import { buildChannelHashtags, buildYouTubeDraftText } from './social-copy.mjs';
 import { ensureSocialOutro } from './social-outro.mjs';
 import { buildSocialMotionFilter, buildSocialSceneCopy, buildSocialWhooshFilter, socialBodyDuration } from './social-motion.mjs';
+import { buildCarouselCopy, buildCarouselFilter, SOCIAL_CAROUSEL_SLIDES } from './social-carousel.mjs';
+import { buildBufferAssetsInput } from './social-buffer-assets.mjs';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 });
@@ -161,7 +163,21 @@ async function render(job, pkg) {
   const hookFile = path.join(dir, 'hook.txt');
   await writeFile(hookFile, wrapText(pkg.hook, 30), 'utf8');
   await run('ffmpeg', ['-y','-i',hero,'-vf',`scale=960:760:force_original_aspect_ratio=decrease,pad=1080:1350:(ow-iw)/2:120:0x031712,drawbox=x=0:y=820:w=iw:h=530:color=0x031712ee:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(hookFile)}':fontcolor=0xf4f0df:fontsize=48:line_spacing=14:x=64:y=900:box=1:boxcolor=0x031712cc:boxborderw=24,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=64:y=54`,'-frames:v','1',post]);
-  return { reel, post };
+  const carousel = [];
+  if (pkg.carousel) {
+    const copy = buildCarouselCopy(pkg);
+    for (let index = 0; index < SOCIAL_CAROUSEL_SLIDES; index++) {
+      const slide = path.join(dir, `carousel-${String(index + 1).padStart(2, '0')}.png`);
+      let textFile = '';
+      if (index > 0) {
+        textFile = path.join(dir, `carousel-${String(index + 1).padStart(2, '0')}.txt`);
+        await writeFile(textFile, wrapText(copy[index - 1], 24), 'utf8');
+      }
+      await run('ffmpeg', ['-y','-i',hero,'-vf',buildCarouselFilter({ textFile, slideNumber:index + 1, escapePath:ffText }),'-frames:v','1',slide]);
+      carousel.push(slide);
+    }
+  }
+  return { reel, post, carousel };
 }
 
 async function persistAsset(client, jobId, kind, file) {
@@ -176,18 +192,18 @@ const gqlString = value => JSON.stringify(value);
 function bufferMetadata(channel, youtubeTitle) {
   return channel === 'instagram_reel'
     ? ',metadata:{instagram:{type:reel,shouldShareToFeed:true,isAiGenerated:true}}'
-    : channel === 'instagram_post'
+    : channel === 'instagram_post' || channel === 'instagram_carousel'
       ? ',metadata:{instagram:{type:post,shouldShareToFeed:true,isAiGenerated:true}}'
       : `,metadata:{youtube:{title:${gqlString(youtubeTitle)},categoryId:"25",privacy:public,madeForKids:false,isAiGenerated:true}}`;
 }
 
-async function bufferSaveDraft({ existingId, channelId, text, mediaUrl, mediaType, channel, youtubeTitle }) {
+async function bufferSaveDraft({ existingId, channelId, text, mediaAssets, channel, youtubeTitle }) {
   if (dryRun || !process.env.BUFFER_API_KEY || !channelId) return existingId || `dry-run-${Date.now()}`;
-  const asset = mediaType === 'video' ? `video: { url: ${gqlString(mediaUrl)} }` : `image: { url: ${gqlString(mediaUrl)} }`;
+  const assets = buildBufferAssetsInput(mediaAssets);
   const metadata = bufferMetadata(channel, youtubeTitle);
   const action = existingId ? 'editPost' : 'createPost';
   const identity = existingId ? `id:${gqlString(existingId)}` : `channelId:${gqlString(channelId)}`;
-  const query = `mutation SaveDraftPost { ${action}(input:{${identity},text:${gqlString(text)},schedulingType:automatic,mode:addToQueue,saveToDraft:true,assets:[{${asset}}]${metadata}}) { ... on PostActionSuccess { post { id } } ... on MutationError { message } } }`;
+  const query = `mutation SaveDraftPost { ${action}(input:{${identity},text:${gqlString(text)},schedulingType:automatic,mode:addToQueue,saveToDraft:true,assets:[${assets}]${metadata}}) { ... on PostActionSuccess { post { id } } ... on MutationError { message } } }`;
   const response = await fetch('https://api.buffer.com', { method:'POST', headers:{'content-type':'application/json',authorization:`Bearer ${process.env.BUFFER_API_KEY}`}, body:JSON.stringify({query}), signal:AbortSignal.timeout(30000) });
   const data = await response.json();
   const result = data?.data?.[action];
@@ -199,14 +215,15 @@ async function createDrafts(client, job, pkg, urls) {
   const utm = channel => `${job.source.articleUrl}?utm_source=${channel}&utm_medium=social&utm_campaign=article_social&utm_content=${job.source.slug}-${job.variant_key || 'weekly'}-situation-room-v2`;
   const instagramHashtags = buildChannelHashtags(pkg.hashtags, 'instagram').join(' ');
   const specs = [
-    ['instagram_reel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,urls.reel,'video'],
-    ['youtube_short',process.env.BUFFER_YOUTUBE_CHANNEL_ID,buildYouTubeDraftText(pkg,utm('youtube')),urls.reel,'video'],
+    ['instagram_reel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,[{ url:urls.reel, type:'video' }]],
+    ['youtube_short',process.env.BUFFER_YOUTUBE_CHANNEL_ID,buildYouTubeDraftText(pkg,utm('youtube')),[{ url:urls.reel, type:'video' }]],
   ];
-  if (pkg.staticPost) specs.push(['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,urls.post,'image']);
-  for (const [channel,channelId,text,url,type] of specs) {
+  if (pkg.staticPost) specs.push(['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,[{ url:urls.post, type:'image' }]]);
+  if (pkg.carousel && urls.carousel?.length) specs.push(['instagram_carousel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,urls.carousel.map(url => ({ url, type:'image' }))]);
+  for (const [channel,channelId,text,mediaAssets] of specs) {
     if (!channelId && !dryRun) continue;
     const existing = await client.query('SELECT buffer_draft_id FROM social_publications WHERE job_id=$1 AND channel=$2', [job.id, channel]);
-    const id = await bufferSaveDraft({ existingId: existing.rows[0]?.buffer_draft_id, channelId, text, mediaUrl: url, mediaType: type, channel, youtubeTitle: pkg.youtubeTitle });
+    const id = await bufferSaveDraft({ existingId: existing.rows[0]?.buffer_draft_id, channelId, text, mediaAssets, channel, youtubeTitle: pkg.youtubeTitle });
     await client.query(`INSERT INTO social_publications(job_id,channel,buffer_draft_id,status,variant_key) VALUES($1,$2,$3,'draft',$4) ON CONFLICT(job_id,channel) DO UPDATE SET buffer_draft_id=EXCLUDED.buffer_draft_id,status='draft',variant_key=EXCLUDED.variant_key,updated_at=now()`, [job.id,channel,id,job.variant_key]);
   }
 }
@@ -263,7 +280,14 @@ async function processOne() {
       // Asset metadata must be committed before Buffer fetches the public URL
       // through a separate application/database connection.
       await client.query('BEGIN');
-      const urls = { reel: await persistAsset(client,job.id,'reel',assets.reel), post: await persistAsset(client,job.id,'instagram_post',assets.post) };
+      const urls = {
+        reel: await persistAsset(client,job.id,'reel',assets.reel),
+        post: await persistAsset(client,job.id,'instagram_post',assets.post),
+        carousel: [],
+      };
+      for (let index = 0; index < assets.carousel.length; index++) {
+        urls.carousel.push(await persistAsset(client,job.id,`carousel_${String(index + 1).padStart(2, '0')}`,assets.carousel[index]));
+      }
       await client.query('COMMIT');
 
       // Draft IDs are intentionally persisted one channel at a time. If a
