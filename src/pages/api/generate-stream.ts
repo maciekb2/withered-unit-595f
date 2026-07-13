@@ -3,10 +3,11 @@ import { generateAndPublish } from '../../modules/generateAndPublish';
 import { nodeExecutionContext, nodeGenerationEnv } from '../../server/nodeEnv';
 import { sessionId, withSession } from '../../server/postgres';
 import { initLogger } from '../../utils/logger';
-import { waitForTopic, clearTopic } from '../../server/generationSessions';
+import { waitForTopic, clearTopic, isTopicSelectionError, TopicSelectionError } from '../../server/generationSessions';
 import { isPrivateGeneratorRequest } from '../../server/generatorAuth';
 import { reportWorkerError } from '../../utils/glitchtip';
 import { generationCorsHeaders, withGenerationCors } from '../../server/generationCors';
+import { createSseController } from '../../server/sseController';
 
 export const OPTIONS: APIRoute = ({ request }) => new Response(null, {
   status: 204,
@@ -16,14 +17,8 @@ export const OPTIONS: APIRoute = ({ request }) => new Response(null, {
 export const GET: APIRoute = async ({ request, url }) => {
   if (!await isPrivateGeneratorRequest(request)) return new Response('Generator unavailable', { status: 403 });
 
-  const encoder = new TextEncoder();
   const stream = new TransformStream<Uint8Array, Uint8Array>();
-  const writer = stream.writable.getWriter();
-  let closed = false;
-  const controller = {
-    enqueue(chunk: string) { if (!closed) void writer.write(encoder.encode(chunk)); },
-    close() { if (!closed) { closed = true; void writer.close(); } },
-  };
+  const controller = createSseController(stream.writable);
   const env = nodeGenerationEnv();
   const ctx = nodeExecutionContext();
   initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
@@ -31,6 +26,15 @@ export const GET: APIRoute = async ({ request, url }) => {
   const initialTopic = url.searchParams.get('topic')?.trim() || '';
   const interactive = url.searchParams.get('interactive') === '1';
   const promptPromise = initialTopic || !interactive ? undefined : waitForTopic(session);
+  const onDisconnect = () => {
+    clearTopic(
+      session,
+      new TopicSelectionError('Generation stream disconnected', 'TOPIC_CANCELLED'),
+    );
+    controller.close();
+  };
+  if (request.signal.aborted) onDisconnect();
+  else request.signal.addEventListener('abort', onDisconnect, { once: true });
   void generateAndPublish(
     env,
     controller,
@@ -41,6 +45,10 @@ export const GET: APIRoute = async ({ request, url }) => {
       initialSourceUrl: url.searchParams.get('sourceUrl')?.trim() || undefined,
     },
   ).catch(error => {
+    if (isTopicSelectionError(error)) {
+      controller.close();
+      return;
+    }
     void reportWorkerError(env, error, {
       request,
       transaction: 'selfhosted article generation',
@@ -50,6 +58,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     controller.enqueue(`data: ${JSON.stringify({ failed: true, error: error instanceof Error ? error.message : String(error) })}\n\n`);
     controller.close();
   }).finally(() => {
+    request.signal.removeEventListener('abort', onDisconnect);
     clearTopic(session);
   });
 

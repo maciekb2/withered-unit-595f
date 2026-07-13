@@ -280,6 +280,80 @@ test('Jetson gateway maps Chat messages to the native prompt contract', async ()
   }
 });
 
+test('Jetson gateway rejects a successful but unsupported response shape', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () => new Response(JSON.stringify({ done: true }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })) as typeof fetch;
+
+  try {
+    await assert.rejects(
+      chat('unused', {
+        messages: [{ role: 'user', content: 'Napisz lead.' }],
+        max_completion_tokens: 100,
+        provider: {
+          type: 'jetson',
+          gatewayUrl: 'https://jetson.example.test',
+          token: 'secret',
+          timeoutMs: 1000,
+          fallback: 'none',
+        },
+      }),
+      /Jetson gateway response empty/,
+    );
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test('Jetson gateway falls back once after an empty response', async () => {
+  const original = globalThis.fetch;
+  const urls: string[] = [];
+  const provider = {
+    type: 'jetson' as const,
+    gatewayUrl: 'https://jetson.example.test',
+    token: 'secret',
+    timeoutMs: 1000,
+    fallback: 'openai' as const,
+    fallbackModel: 'gpt-5.5',
+  };
+  globalThis.fetch = (async input => {
+    const url = String(input);
+    urls.push(url);
+    if (url.includes('jetson.example.test')) {
+      return new Response(JSON.stringify({ response: '' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    return Response.json({ choices: [{ message: { content: 'awaryjna odpowiedź' } }] });
+  }) as typeof fetch;
+
+  try {
+    const first = await chat('openai-key', {
+      messages: [{ role: 'user', content: 'Napisz lead.' }],
+      max_completion_tokens: 100,
+      provider,
+    });
+    const second = await chat('openai-key', {
+      messages: [{ role: 'user', content: 'Napisz drugą sekcję.' }],
+      max_completion_tokens: 100,
+      provider,
+    });
+
+    assert.equal(first, 'awaryjna odpowiedź');
+    assert.equal(second, 'awaryjna odpowiedź');
+    assert.deepEqual(urls, [
+      'https://jetson.example.test/api/generate',
+      'https://api.openai.com/v1/chat/completions',
+      'https://api.openai.com/v1/chat/completions',
+    ]);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test('textGenerationProviderFromEnv reads Cloudflare Workers AI config', () => {
   const ai = { run: async () => ({ response: 'ok' }) } as unknown as Ai;
   const db = {} as D1Database;

@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clearTopic, resolveTopic, waitForTopic } from './generationSessions.js';
+import {
+  clearTopic,
+  isTopicSelectionError,
+  resolveTopic,
+  TopicSelectionError,
+  waitForTopic,
+} from './generationSessions.js';
 
 test('topic session resolves exactly once and removes the pending resolver', async () => {
   const result = waitForTopic('session-resolve', 1000);
@@ -32,4 +38,19 @@ test('clearTopic rejects a pending wait and is safe for unknown sessions', async
   clearTopic('missing-session');
 
   await assert.rejects(result, /Topic selection cancelled/);
+});
+
+test('topic selection errors expose stable cancellation codes', async () => {
+  const result = waitForTopic('session-coded-clear', 1000);
+  clearTopic(
+    'session-coded-clear',
+    new TopicSelectionError('stream disconnected', 'TOPIC_CANCELLED'),
+  );
+
+  await assert.rejects(result, error => {
+    assert.equal(isTopicSelectionError(error), true);
+    assert.equal((error as TopicSelectionError).code, 'TOPIC_CANCELLED');
+    return true;
+  });
+  assert.equal(isTopicSelectionError(new Error('ordinary failure')), false);
 });
