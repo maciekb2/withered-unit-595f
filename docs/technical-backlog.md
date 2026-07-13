@@ -61,4 +61,4 @@ This backlog captures the repository review findings from April 2026. Items are 
 - [x] Add a Codex-led explicit weekly run with 2 current articles, 1 evergreen article, inspected master images and Buffer drafts.
 - [x] Add Buffer metric snapshots at 24h, 72h, 7d and 28d for the editorial feedback loop.
 - [ ] Add direct YouTube Analytics and GA4 adapters after the first 12 comparable posts.
-- [ ] Add carousel rendering after the first 12 posts provide enough performance data.
+- [x] Add carousel rendering with six to ten slides built from one sourced article package.

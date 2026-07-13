@@ -5,7 +5,7 @@ ROOT=${PSEUDOINTELEKT_ROOT:-/opt/apps/production/pseudointelekt}
 COMPOSE=(docker compose -f "$ROOT/deploy/selfhosted/docker-compose.yml" --env-file "$ROOT/deploy/selfhosted/.env")
 BACKUP_DIR=${PSEUDOINTELEKT_BACKUP_DIR:-$ROOT/backups}
 RETENTION_DAYS=${PSEUDOINTELEKT_BACKUP_RETENTION_DAYS:-14}
-METRICS_DIR=${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}/pseudointelekt
+METRICS_DIR=${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}
 mkdir -p "$BACKUP_DIR/postgres" "$BACKUP_DIR/social" "$METRICS_DIR"
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 dump="$BACKUP_DIR/postgres/pseudointelekt-$stamp.dump"

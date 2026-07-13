@@ -72,7 +72,7 @@ services:
       SCHEDULER_METRICS_FILE: /metrics/pseudointelekt_generation.prom
     volumes:
       - scheduler-state:/state
-      - ${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}/pseudointelekt:/metrics
+      - ${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}:/metrics
     depends_on:
       generator:
         condition: service_started
@@ -91,7 +91,6 @@ services:
     command: ["sh", "-c", "mkdir -p /state /metrics && chown -R 1000:1000 /state /metrics"]
     volumes:
       - scheduler-state:/state
-      - ${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}/pseudointelekt:/metrics
     restart: "no"
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
