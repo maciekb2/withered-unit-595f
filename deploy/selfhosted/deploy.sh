@@ -5,6 +5,7 @@ ROOT=${PSEUDOINTELEKT_ROOT:-/opt/apps/production/pseudointelekt}
 REPO=${GITHUB_REPO:-maciekb2/withered-unit-595f}
 REF=${GITHUB_REF:-main}
 REVISION=${DEPLOY_REVISION:-$REF}
+HEALTH_URL=${PSEUDOINTELEKT_HEALTH_URL:-http://10.2.11.53:3000/api/health}
 TOKEN=${GITHUB_TOKEN:?GITHUB_TOKEN must be set in the host env}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -33,7 +34,7 @@ docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhos
 
 healthy=false
 for _ in $(seq 1 20); do
-  if curl -fsS http://127.0.0.1:3000/api/health >/dev/null; then
+  if curl -fsS "$HEALTH_URL" >/dev/null; then
     healthy=true
     break
   fi

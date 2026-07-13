@@ -48,4 +48,4 @@ jobs:
             export DEPLOY_REVISION='${{ github.sha }}'
             /opt/apps/production/pseudointelekt/deploy/selfhosted/deploy.sh
             test "$(cat /opt/apps/production/pseudointelekt/.deployed-revision)" = '${{ github.sha }}'
-            curl -fsS --retry 10 --retry-delay 3 http://127.0.0.1:3000/api/health >/dev/null
+            curl -fsS --retry 10 --retry-delay 3 http://10.2.11.53:3000/api/health >/dev/null
