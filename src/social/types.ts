@@ -32,6 +32,7 @@ export interface SocialPackage {
   hashtags: string[];
   staticPost?: boolean;
   carousel?: boolean;
+  carouselSlides?: string[];
   imagePrompt: string;
   contentKind: 'current' | 'evergreen';
   experiment: string;

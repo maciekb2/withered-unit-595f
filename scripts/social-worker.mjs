@@ -8,7 +8,7 @@ import { spawn } from 'node:child_process';
 import { buildChannelHashtags, buildYouTubeDraftText } from './social-copy.mjs';
 import { ensureSocialOutro } from './social-outro.mjs';
 import { buildSocialMotionFilter, buildSocialSceneCopy, buildSocialWhooshFilter, socialBodyDuration } from './social-motion.mjs';
-import { buildCarouselCopy, buildCarouselFilter, SOCIAL_CAROUSEL_SLIDES } from './social-carousel.mjs';
+import { buildCarouselCopy, buildCarouselFilter } from './social-carousel.mjs';
 import { buildBufferAssetsInput } from './social-buffer-assets.mjs';
 
 const { Pool } = pg;
@@ -123,7 +123,7 @@ async function download(url, destination) {
 }
 
 const ffText = file => file.replaceAll('\\', '/').replaceAll(':', '\\:').replaceAll("'", "\\'");
-function wrapText(value, width = 28) {
+function wrapText(value, width = 28, maxLines = 5) {
   const lines = [];
   let line = '';
   for (const word of value.split(/\s+/)) {
@@ -131,7 +131,7 @@ function wrapText(value, width = 28) {
     else line = line ? `${line} ${word}` : word;
   }
   if (line) lines.push(line);
-  return lines.slice(0, 5).join('\n');
+  return lines.slice(0, maxLines).join('\n');
 }
 async function render(job, pkg) {
   const dir = path.join(mediaRoot, job.id);
@@ -165,15 +165,18 @@ async function render(job, pkg) {
   await run('ffmpeg', ['-y','-i',hero,'-vf',`scale=960:760:force_original_aspect_ratio=decrease,pad=1080:1350:(ow-iw)/2:120:0x031712,drawbox=x=0:y=820:w=iw:h=530:color=0x031712ee:t=fill,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:textfile='${ffText(hookFile)}':fontcolor=0xf4f0df:fontsize=48:line_spacing=14:x=64:y=900:box=1:boxcolor=0x031712cc:boxborderw=24,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text=PSEUDOINTELEKT:fontcolor=0xdabc42:fontsize=28:x=64:y=54`,'-frames:v','1',post]);
   const carousel = [];
   if (pkg.carousel) {
-    const copy = buildCarouselCopy(pkg);
-    for (let index = 0; index < SOCIAL_CAROUSEL_SLIDES; index++) {
+    const copy = buildCarouselCopy(pkg, job.source);
+    const slideCount = copy.length + 1;
+    for (let index = 0; index < slideCount; index++) {
       const slide = path.join(dir, `carousel-${String(index + 1).padStart(2, '0')}.png`);
       let textFile = '';
       if (index > 0) {
         textFile = path.join(dir, `carousel-${String(index + 1).padStart(2, '0')}.txt`);
-        await writeFile(textFile, wrapText(copy[index - 1], 24), 'utf8');
+        const text = copy[index - 1];
+        const wrapWidth = text.length > 150 ? 34 : text.length > 90 ? 29 : 24;
+        await writeFile(textFile, wrapText(text, wrapWidth, 10), 'utf8');
       }
-      await run('ffmpeg', ['-y','-i',hero,'-vf',buildCarouselFilter({ textFile, slideNumber:index + 1, escapePath:ffText }),'-frames:v','1',slide]);
+      await run('ffmpeg', ['-y','-i',hero,'-vf',buildCarouselFilter({ textFile, textLength:copy[index - 1]?.length || 0, slideNumber:index + 1, total:slideCount, escapePath:ffText }),'-frames:v','1',slide]);
       carousel.push(slide);
     }
   }

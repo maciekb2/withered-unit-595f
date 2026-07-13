@@ -11,12 +11,13 @@ const withoutUrls = (value: string) => value.replace(/https?:\/\/\S+/giu, ' ');
 
 export function validateSocialPackage(pkg: SocialPackage, source: SocialSource): string[] {
   const errors: string[] = [];
-  const all = norm([pkg.hook, pkg.instagramCaption, pkg.youtubeTitle, pkg.youtubeDescription, ...pkg.scenes].join(' '));
+  const all = norm([pkg.hook, pkg.instagramCaption, pkg.youtubeTitle, pkg.youtubeDescription, ...pkg.scenes, ...(pkg.carouselSlides || [])].join(' '));
   if (banned.some(phrase => all.includes(phrase))) errors.push('contains banned generic phrasing');
   if (pkg.hook.length < 20 || pkg.hook.length > 130) errors.push('invalid hook length');
   if (pkg.scenes.length < 5 || pkg.scenes.length > 6) errors.push('scenes must contain 5-6 items');
   if (pkg.scenes.some(scene => scene.length < 8 || scene.length > 115)) errors.push('invalid scene length');
   if (pkg.hashtags.length > 5 || pkg.hashtags.some(tag => !/^#[\p{L}\p{N}_]+$/u.test(tag))) errors.push('invalid hashtags');
+  if (pkg.carouselSlides && (pkg.carouselSlides.length < 4 || pkg.carouselSlides.length > 8 || pkg.carouselSlides.some(slide => slide.length < 30 || slide.length > 360))) errors.push('invalid carousel slides');
   if (pkg.youtubeTitle.length > 100) errors.push('youtube title too long');
   if (!pkg.imagePrompt || pkg.imagePrompt.length < 80 || pkg.imagePrompt.length > 1800) errors.push('invalid image prompt');
   if (!['current', 'evergreen'].includes(pkg.contentKind)) errors.push('invalid content kind');
