@@ -87,6 +87,21 @@ test('validateArticleQuality rejects near-duplicate paragraphs', () => {
   assert(result.errors.some(error => error.includes('powtorzone akapity')));
 });
 
+test('validateArticleQuality rejects a boilerplate sentence repeated inside different paragraphs', () => {
+  const repeated = 'W zależności od źródeł trend bywa rozbieżny, dlatego istotne jest tempo zmian, a nie pojedyncza wartość.';
+  const article = articleWithBody([
+    '## Parasol z metką',
+    `${longParagraph('Pierwszy argument')} ${repeated}`,
+    `${longParagraph('Drugi argument')} ${repeated}`,
+    '## Lekcja z przerwy',
+    `${longParagraph('Trzeci argument')} ${repeated}`,
+    '## Polska puenta',
+    `${longParagraph('Czwarty argument')} ${repeated}`,
+  ].join('\n\n'));
+  const result = validateArticleQuality(article, outline);
+  assert(result.errors.some(error => error.includes('powtorzone zdania')));
+});
+
 function articleWithBody(content: string): FinalJson {
   return {
     title: outline.finalTitle,
@@ -95,13 +110,16 @@ function articleWithBody(content: string): FinalJson {
   };
 }
 
+let paragraphSequence = 0;
 function longParagraph(extra = ''): string {
+  paragraphSequence += 1;
   const sentence = [
     extra,
+    `Fragment redakcyjny numer ${paragraphSequence}`,
     'Europa przestaje traktować bezpieczeństwo jak rachunek dopisany drobnym drukiem do cudzej faktury',
     'Politycy odkrywają, że magazyny, fabryki i decyzje budżetowe są mniej efektowne niż konferencje, ale bardziej użyteczne',
     'W tej historii nie chodzi o panikę, tylko o nudną zdolność do wykonania obietnic',
     'Polska ma tu interes prosty: mniej teatralnych deklaracji, więcej realnej produkcji i odporności',
-  ].filter(Boolean).join('. ');
+  ].filter(Boolean).map(part => `${part} [${paragraphSequence}]`).join('. ');
   return `${sentence}. ${sentence}. ${sentence}.`;
 }

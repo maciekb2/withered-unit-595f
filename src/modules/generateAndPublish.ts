@@ -509,7 +509,9 @@ export async function generateAndPublish(
             repairTemplate,
             styleGuide,
             contextPack,
-            model: repairModel,
+            model: qualityRepairProvider.type === 'openai'
+              ? env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5'
+              : repairModel,
             provider: qualityRepairProvider,
             maxTokens: 5000,
           });
@@ -559,13 +561,27 @@ export async function generateAndPublish(
 
     setStage('editorial-review');
     send('editorial-review-start');
-    const reviewRes = await reviewArticle({
-      apiKey: env.OPENAI_API_KEY,
-      article,
-      model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
-      provider: textProvider,
-      maxTokens: 1800,
-    });
+    let reviewRes;
+    try {
+      reviewRes = await reviewArticle({
+        apiKey: env.OPENAI_API_KEY,
+        article,
+        model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
+        provider: textProvider,
+        maxTokens: 1800,
+      });
+    } catch (error) {
+      const reviewFallback = fallbackTextProvider(textProvider);
+      if (!reviewFallback) throw error;
+      send('editorial-review-fallback', { from: textProvider.type, to: reviewFallback.type, error: (error as Error).message });
+      reviewRes = await reviewArticle({
+        apiKey: env.OPENAI_API_KEY,
+        article,
+        model: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+        provider: reviewFallback,
+        maxTokens: 1800,
+      });
+    }
     send('editorial-review', { review: reviewRes.review });
 
     if (!reviewRes.review.ok || reviewRes.review.issues.length > 0) {
@@ -592,13 +608,26 @@ export async function generateAndPublish(
         send('editorial-repair-candidate', { attempt, ...decision });
         if (!decision.accepted) continue;
 
-        const candidateReview = await reviewArticle({
-          apiKey: env.OPENAI_API_KEY,
-          article: candidateArticle,
-          model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
-          provider: textProvider,
-          maxTokens: 1800,
-        });
+        let candidateReview;
+        try {
+          candidateReview = await reviewArticle({
+            apiKey: env.OPENAI_API_KEY,
+            article: candidateArticle,
+            model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
+            provider: textProvider,
+            maxTokens: 1800,
+          });
+        } catch (error) {
+          const candidateReviewFallback = fallbackTextProvider(textProvider);
+          if (!candidateReviewFallback) throw error;
+          candidateReview = await reviewArticle({
+            apiKey: env.OPENAI_API_KEY,
+            article: candidateArticle,
+            model: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+            provider: candidateReviewFallback,
+            maxTokens: 1800,
+          });
+        }
         send('editorial-repair-review', { attempt, review: candidateReview.review });
         if (!candidateReview.review.ok || candidateReview.review.issues.length > 0) continue;
         edited = repairRes.edited;

@@ -93,6 +93,11 @@ export function validateArticleQuality(
     errors.push(`ERROR: Wykryto powtorzone akapity (${duplicateParagraphs})`);
   }
 
+  const duplicateSentences = repeatedSentenceCount(content);
+  if (duplicateSentences > 0) {
+    errors.push(`ERROR: Wykryto wielokrotnie powtorzone zdania (${duplicateSentences})`);
+  }
+
   const genericHits = GENERIC_PHRASES.filter(phrase =>
     content.toLowerCase().includes(phrase),
   );
@@ -115,6 +120,17 @@ export function validateArticleQuality(
       paragraphs: paragraphs.length,
     },
   };
+}
+
+function repeatedSentenceCount(content: string): number {
+  const counts = new Map<string, number>();
+  const sentences = content
+    .replace(/^#{1,6}\s+.+$/gm, '')
+    .split(/(?<=[.!?])\s+/)
+    .map(sentence => normalizeArticleFragment(sentence))
+    .filter(sentence => sentence.length >= 55);
+  for (const sentence of sentences) counts.set(sentence, (counts.get(sentence) || 0) + 1);
+  return [...counts.values()].filter(count => count >= 4).reduce((sum, count) => sum + count - 1, 0);
 }
 
 function headingTooCloseToTitle(title: string, heading: string): boolean {
