@@ -1,0 +1,175 @@
+---
+- name: Register Pseudointelekt backup hosts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - ansible.builtin.add_host:
+        name: pseudointelekt_app
+        ansible_host: 10.2.11.53
+        ansible_user: macie
+    - ansible.builtin.add_host:
+        name: pseudointelekt_backup
+        ansible_host: 10.2.11.51
+        ansible_user: macie
+
+- name: Prepare the encrypted backup client on mbprod
+  hosts: pseudointelekt_app
+  become: true
+  gather_facts: false
+  tasks:
+    - ansible.builtin.apt:
+        name: [restic, postgresql-client]
+        state: present
+        update_cache: true
+    - ansible.builtin.file:
+        path: /etc/pseudointelekt
+        state: directory
+        owner: macie
+        group: macie
+        mode: "0700"
+    - community.crypto.openssh_keypair:
+        path: /etc/pseudointelekt/restic_ed25519
+        type: ed25519
+        owner: macie
+        group: macie
+        mode: "0600"
+        comment: restic-pseudointelekt@mbprod
+      no_log: true
+    - ansible.builtin.command:
+        argv: [openssl, rand, -base64, -out, /etc/pseudointelekt/restic-password, "48"]
+        creates: /etc/pseudointelekt/restic-password
+      no_log: true
+    - ansible.builtin.file:
+        path: /etc/pseudointelekt/restic-password
+        owner: macie
+        group: macie
+        mode: "0600"
+    - ansible.builtin.slurp:
+        src: /etc/pseudointelekt/restic_ed25519.pub
+      register: pseudointelekt_restic_public_key_raw
+      no_log: true
+    - ansible.builtin.set_fact:
+        pseudointelekt_restic_public_key: "{{ pseudointelekt_restic_public_key_raw.content | b64decode | trim }}"
+      no_log: true
+
+- name: Provision a source-isolated SFTP repository on mb-bcp
+  hosts: pseudointelekt_backup
+  become: true
+  gather_facts: false
+  vars:
+    repository_user: restic_pseudointelekt
+    repository_jail: /srv/restic-jails/restic_pseudointelekt
+  tasks:
+    - ansible.builtin.user:
+        name: "{{ repository_user }}"
+        system: true
+        create_home: false
+        home: "{{ repository_jail }}"
+        shell: /usr/sbin/nologin
+        password: '$6$5DKUF1HV3FLF/4kz$L.lW2KaTqjuYrH1YxZaMS4i.wOwHSZcJWDH0Nz6g.pQgXO4uRlWWuq3Is7p1aP8PXpq3HHrCYTk9G9fdKgUZq1'
+    - ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: /srv/restic-jails, owner: root, group: root, mode: "0755" }
+        - { path: "{{ repository_jail }}", owner: root, group: root, mode: "0755" }
+        - { path: "{{ repository_jail }}/repo", owner: "{{ repository_user }}", group: "{{ repository_user }}", mode: "0700" }
+        - { path: /etc/ssh/authorized_keys, owner: root, group: root, mode: "0755" }
+    - ansible.builtin.copy:
+        dest: "/etc/ssh/authorized_keys/{{ repository_user }}"
+        owner: root
+        group: root
+        mode: "0644"
+        content: "from=\"10.2.11.53\",restrict {{ hostvars['pseudointelekt_app'].pseudointelekt_restic_public_key }}\n"
+      no_log: true
+      register: pseudointelekt_authorized_key
+    - ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/61-restic-pseudointelekt.conf
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          Match User {{ repository_user }}
+              ChrootDirectory {{ repository_jail }}
+              AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+              ForceCommand internal-sftp -d /repo
+              PasswordAuthentication no
+              KbdInteractiveAuthentication no
+              PermitTTY no
+              AllowTcpForwarding no
+              X11Forwarding no
+      register: pseudointelekt_sshd_config
+    - ansible.builtin.command: sshd -t
+      changed_when: false
+    - ansible.builtin.systemd_service:
+        name: ssh
+        state: restarted
+      when: pseudointelekt_authorized_key.changed or pseudointelekt_sshd_config.changed
+    - ansible.builtin.meta: reset_connection
+      when: pseudointelekt_authorized_key.changed or pseudointelekt_sshd_config.changed
+    - ansible.builtin.pause:
+        seconds: 3
+      when: pseudointelekt_authorized_key.changed or pseudointelekt_sshd_config.changed
+
+- name: Initialize Restic and install backup timers
+  hosts: pseudointelekt_app
+  become: true
+  gather_facts: false
+  vars:
+    restic_environment:
+      RESTIC_REPOSITORY: sftp:restic_pseudointelekt@10.2.11.51:/repo
+      RESTIC_PASSWORD_FILE: /etc/pseudointelekt/restic-password
+  tasks:
+    - ansible.builtin.known_hosts:
+        path: /home/macie/.ssh/known_hosts
+        name: 10.2.11.51
+        key: "{{ lookup('ansible.builtin.pipe', 'ssh-keyscan -t ed25519 10.2.11.51 2>/dev/null') }}"
+    - ansible.builtin.file:
+        path: /home/macie/.ssh/known_hosts
+        owner: macie
+        group: macie
+        mode: "0600"
+    - ansible.builtin.copy:
+        dest: /home/macie/.ssh/config
+        owner: macie
+        group: macie
+        mode: "0600"
+        content: |
+          Host 10.2.11.51
+              User restic_pseudointelekt
+              IdentityFile /etc/pseudointelekt/restic_ed25519
+              IdentitiesOnly yes
+              BatchMode yes
+              StrictHostKeyChecking yes
+    - ansible.builtin.command: restic snapshots --latest 1
+      environment: "{{ restic_environment }}"
+      register: restic_snapshots
+      become_user: macie
+      changed_when: false
+      failed_when: false
+      no_log: true
+    - ansible.builtin.command: restic init
+      environment: "{{ restic_environment }}"
+      become_user: macie
+      when: restic_snapshots.rc != 0
+      no_log: true
+    - ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item | basename }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - "{{ playbook_dir }}/systemd/pseudointelekt-backup.service"
+        - "{{ playbook_dir }}/systemd/pseudointelekt-backup.timer"
+        - "{{ playbook_dir }}/systemd/pseudointelekt-restore-test.service"
+        - "{{ playbook_dir }}/systemd/pseudointelekt-restore-test.timer"
+    - ansible.builtin.systemd_service:
+        daemon_reload: true
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop: [pseudointelekt-backup.timer, pseudointelekt-restore-test.timer]

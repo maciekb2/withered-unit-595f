@@ -7,6 +7,8 @@ Wants=network-online.target
 Type=oneshot
 User=macie
 EnvironmentFile=-/etc/pseudointelekt/backup.env
+Environment=RESTIC_REPOSITORY=sftp:restic_pseudointelekt@10.2.11.51:/repo
+Environment=RESTIC_PASSWORD_FILE=/etc/pseudointelekt/restic-password
 ExecStart=/opt/apps/production/pseudointelekt/deploy/selfhosted/backup-postgres.sh
 Nice=10
 IOSchedulingClass=best-effort
