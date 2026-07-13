@@ -1,9 +1,8 @@
-name: Deploy to Cloudflare
+name: Legacy Cloudflare emergency deploy
 
 on:
-  push:
-    branches:
-      - main
+  # Production is self-hosted on mbprod behind Cloudflare Tunnel. Keep the
+  # Worker deployment only as an explicit break-glass operation.
   workflow_dispatch:
 
 concurrency:
