@@ -59,20 +59,43 @@ services:
     env_file:
       - .env
     environment:
+      DATABASE_URL: postgresql://pseudointelekt:${POSTGRES_PASSWORD}@postgres:5432/pseudointelekt
       SCHEDULER_APP_URL: http://generator:3001
       SCHEDULER_ENABLED: ${SCHEDULER_ENABLED:-true}
       SCHEDULER_RUN_HOUR: ${SCHEDULER_RUN_HOUR:-10}
       SCHEDULER_RUN_MINUTE: ${SCHEDULER_RUN_MINUTE:-0}
       SCHEDULER_TIME_ZONE: ${SCHEDULER_TIME_ZONE:-Europe/Warsaw}
       SCHEDULER_TIMEOUT_MS: ${SCHEDULER_TIMEOUT_MS:-900000}
+      SCHEDULER_RETRY_DELAY_MS: ${SCHEDULER_RETRY_DELAY_MS:-3600000}
+      SCHEDULER_MAX_ATTEMPTS: ${SCHEDULER_MAX_ATTEMPTS:-2}
+      SCHEDULER_STATE_FILE: /state/scheduler.json
+      SCHEDULER_METRICS_FILE: /metrics/pseudointelekt_generation.prom
+    volumes:
+      - scheduler-state:/state
+      - ${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}/pseudointelekt:/metrics
     depends_on:
       generator:
         condition: service_started
+      scheduler-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     read_only: true
     tmpfs: [/tmp]
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+    networks: [app]
+
+  scheduler-init:
+    image: busybox:1.37
+    user: "0:0"
+    command: ["sh", "-c", "mkdir -p /state /metrics && chown -R 1000:1000 /state /metrics"]
+    volumes:
+      - scheduler-state:/state
+      - ${NODE_EXPORTER_TEXTFILE_DIR:-/var/lib/node_exporter/textfile_collector}/pseudointelekt:/metrics
+    restart: "no"
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE]
     networks: [app]
 
   social-worker:
@@ -197,6 +220,7 @@ services:
 volumes:
   postgres-data:
   social-media:
+  scheduler-state:
 
 networks:
   app:

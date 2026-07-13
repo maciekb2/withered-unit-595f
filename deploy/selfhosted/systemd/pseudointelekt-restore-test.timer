@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly Pseudointelekt restore-readiness test
+
+[Timer]
+OnCalendar=Sun *-*-* 04:15:00 Europe/Warsaw
+Persistent=true
+RandomizedDelaySec=15m
+Unit=pseudointelekt-restore-test.service
+
+[Install]
+WantedBy=timers.target

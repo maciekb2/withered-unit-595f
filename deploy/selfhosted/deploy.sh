@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT=${PSEUDOINTELEKT_ROOT:-/opt/apps/production/pseudointelekt}
 REPO=${GITHUB_REPO:-maciekb2/withered-unit-595f}
 REF=${GITHUB_REF:-main}
+REVISION=${DEPLOY_REVISION:-$REF}
 TOKEN=${GITHUB_TOKEN:?GITHUB_TOKEN must be set in the host env}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -29,3 +30,18 @@ cd "$ROOT"
 COMPOSE_BAKE=false docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env build app
 docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env up -d app generator scheduler social-worker social-metrics
 docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env ps
+
+healthy=false
+for _ in $(seq 1 20); do
+  if curl -fsS http://127.0.0.1:3000/api/health >/dev/null; then
+    healthy=true
+    break
+  fi
+  sleep 3
+done
+if [[ "$healthy" != true ]]; then
+  docker compose -f deploy/selfhosted/docker-compose.yml --env-file deploy/selfhosted/.env logs --tail=100 app
+  exit 1
+fi
+printf '%s\n' "$REVISION" > "$ROOT/.deployed-revision.tmp"
+mv "$ROOT/.deployed-revision.tmp" "$ROOT/.deployed-revision"

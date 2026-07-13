@@ -25,6 +25,8 @@ import type { FinalJson } from '../pipeline/types';
 import { logEvent, logError } from '../utils/logger';
 import { classifyGenerationError, type ClassifiedGenerationError } from '../utils/openaiErrors';
 import { buildSocialSource } from '../social/types';
+import { filterEditorialTopics } from '../pipeline/topicRelevance';
+import { assessEditorialCandidate } from '../pipeline/editorialCandidate';
 
 export interface GenerateAndPublishResult {
   article: FinalJson;
@@ -118,10 +120,20 @@ export async function generateAndPublish(
     send('📑 Pobrane tytuły', { recentTitles: recent });
 
     setStage('hot-topics');
-    const hotTopics = await getHotTopics();
+    const rawHotTopics = await getHotTopics();
+    const filteredHotTopics = filterEditorialTopics(rawHotTopics);
+    const manualTopicRequested = Boolean(options.initialTopic || options.initialSourceUrl);
+    const hotTopics = manualTopicRequested ? rawHotTopics : filteredHotTopics;
     send('🔥 Gorące tematy z ostatnich dni', {
       hotTopics: hotTopics.map(t => t.title),
+      rejectedTopics: manualTopicRequested
+        ? []
+        : rawHotTopics.filter(topic => !filteredHotTopics.includes(topic)).map(topic => topic.title),
     });
+
+    if (!manualTopicRequested && hotTopics.length === 0) {
+      throw new Error('Brak wiarygodnego tematu redakcyjnego po odfiltrowaniu RSS; automatyczna publikacja zostala pominięta');
+    }
 
     const writePrompt = writeTemplate.replace(
       '{recent_titles}',
@@ -327,13 +339,51 @@ export async function generateAndPublish(
       send('write-prompt', { prompt: writeRes.messages });
       send('write-response', { response: writeRes.raw });
     } catch (err) {
-      send('write-error', {
+      const fallbackProvider = fallbackTextProvider(textProvider);
+      if (!fallbackProvider) {
+        send('write-error', {
+          error: (err as Error).message,
+          ...errorTelemetry(err, currentStage),
+          prompt: (err as any).messages,
+          response: (err as any).raw,
+        });
+        throw err;
+      }
+      send('write-fallback-start', {
+        from: textProvider.type,
+        to: fallbackProvider.type,
         error: (err as Error).message,
-        ...errorTelemetry(err, currentStage),
-        prompt: (err as any).messages,
-        response: (err as any).raw,
       });
-      throw err;
+      logEvent({
+        type: 'text-provider-fallback',
+        from: textProvider.type,
+        to: fallbackProvider.type,
+        stage: currentStage,
+        reason: (err as Error).message,
+      });
+      writeRes = sectionedText
+        ? await writeArticleSectioned({
+            apiKey: env.OPENAI_API_KEY,
+            outline,
+            styleGuide,
+            contextPack,
+            model: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+            provider: fallbackProvider,
+            leadSourceUrl,
+            paragraphsPerSection: Number.parseInt(env.TEXT_SECTION_PARAGRAPHS || '', 10) || 3,
+            maxTokensPerCall: Number.parseInt(env.TEXT_SECTION_MAX_TOKENS || '', 10) || 1800,
+          })
+        : await writeArticle({
+            apiKey: env.OPENAI_API_KEY,
+            outline,
+            writeTemplate: writePrompt,
+            styleGuide,
+            contextPack,
+            model: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
+            provider: fallbackProvider,
+            maxTokens: 7200,
+          });
+      send('write-fallback-complete', { title: writeRes.edited.title });
     }
     let edited = writeRes.edited;
     send('write-end', { title: edited.title });
@@ -519,26 +569,45 @@ export async function generateAndPublish(
     send('editorial-review', { review: reviewRes.review });
 
     if (!reviewRes.review.ok || reviewRes.review.issues.length > 0) {
-      setStage('proofread');
-      send('proofread-start', { issues: reviewRes.review.issues });
-      const proofreadRes = await proofread({
-        apiKey: env.OPENAI_API_KEY,
-        edited,
-        model: env.OPENAI_PROOFREAD_MODEL || env.OPENAI_EDIT_MODEL || repairModel,
-        provider: textProvider,
-        maxTokens: 5200,
-      });
-      edited = proofreadRes.edited;
-      article = formatFinal(edited);
-      article.sourceUrl = leadSourceUrl;
-      const postProofreadQuality = validateArticleQuality(article, outline);
-      send('proofread-complete', {
-        title: article.title,
-        words: postProofreadQuality.stats.words,
-        qualityOk: postProofreadQuality.ok,
-      });
-      if (!postProofreadQuality.ok) {
-        throw new Error(`Proofread reduced article quality: ${postProofreadQuality.errors.join('; ')}`);
+      const editorialProvider = fallbackTextProvider(textProvider) || textProvider;
+      let repairedAndReviewed = false;
+      for (let attempt = 1; attempt <= 2; attempt += 1) {
+        setStage(`editorial-repair-${attempt}`);
+        send('editorial-repair-start', { attempt, issues: reviewRes.review.issues });
+        const repairRes = await repairEdited({
+          apiKey: env.OPENAI_API_KEY,
+          edited,
+          outline,
+          errors: reviewRes.review.issues.map(issue => `ERROR: Recenzent: ${issue}`),
+          repairTemplate,
+          styleGuide,
+          contextPack,
+          model: env.OPENAI_REPAIR_MODEL || repairModel,
+          provider: editorialProvider,
+          maxTokens: 5200,
+        });
+        const candidateArticle = formatFinal(repairRes.edited);
+        candidateArticle.sourceUrl = leadSourceUrl;
+        const decision = assessEditorialCandidate(article, candidateArticle, outline);
+        send('editorial-repair-candidate', { attempt, ...decision });
+        if (!decision.accepted) continue;
+
+        const candidateReview = await reviewArticle({
+          apiKey: env.OPENAI_API_KEY,
+          article: candidateArticle,
+          model: env.OPENAI_REVIEW_MODEL || 'gpt-oss:20b',
+          provider: textProvider,
+          maxTokens: 1800,
+        });
+        send('editorial-repair-review', { attempt, review: candidateReview.review });
+        if (!candidateReview.review.ok || candidateReview.review.issues.length > 0) continue;
+        edited = repairRes.edited;
+        article = candidateArticle;
+        repairedAndReviewed = true;
+        break;
+      }
+      if (!repairedAndReviewed) {
+        throw new Error(`Editorial review failed: ${reviewRes.review.issues.join('; ')}`);
       }
     } else {
       send('proofread-skipped', { reason: 'review-ok' });
@@ -554,17 +623,19 @@ export async function generateAndPublish(
         provider: textProvider,
         maxTokens: 5200,
       });
-      edited = finalEdit.edited;
-      article = formatFinal(edited);
-      article.sourceUrl = leadSourceUrl;
-      const finalQuality = validateArticleQuality(article, outline);
+      const candidateArticle = formatFinal(finalEdit.edited);
+      candidateArticle.sourceUrl = leadSourceUrl;
+      const finalDecision = assessEditorialCandidate(article, candidateArticle, outline);
       send('local-final-edit-complete', {
-        qualityOk: finalQuality.ok,
-        words: finalQuality.stats.words,
-        errors: finalQuality.errors,
+        qualityOk: finalDecision.accepted,
+        words: finalDecision.candidateWords,
+        errors: finalDecision.reasons,
       });
-      if (!finalQuality.ok) {
-        throw new Error(`Local final edit reduced article quality: ${finalQuality.errors.join('; ')}`);
+      if (finalDecision.accepted) {
+        edited = finalEdit.edited;
+        article = candidateArticle;
+      } else {
+        send('local-final-edit-rejected', { reasons: finalDecision.reasons });
       }
     }
 

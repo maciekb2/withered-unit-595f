@@ -36,12 +36,14 @@ and scheduler containers.
 
 ## PostgreSQL backup and restore
 
-Run `deploy/selfhosted/backup-postgres.sh` on `mbprod` (daily from the host
-timer/cron) to create a compressed custom-format dump under
-`/opt/apps/production/pseudointelekt/backups/postgres`. The script keeps 14 days
-by default and never prints credentials. Validate a backup without touching
-production by starting a temporary PostgreSQL 16 container, creating the
-database, and running `pg_restore --list` against the dump. A restore is done
+Install the committed systemd units with `deploy/selfhosted/install-systemd-units.sh`.
+The daily 02:30 timer creates a compressed PostgreSQL dump and a social-media
+archive. When `/etc/pseudointelekt/backup.env` defines `RESTIC_REPOSITORY` and
+`RESTIC_PASSWORD_FILE`, both artifacts are encrypted and copied off host with
+14 daily, 8 weekly and 12 monthly snapshots. The weekly timer validates the
+latest PostgreSQL dump, social archive and Restic repository without touching
+production. Backup and scheduler freshness are exported to node_exporter textfile
+metrics. A full restore is done
 into an empty maintenance database with `pg_restore --clean --if-exists`; stop
 the app before replacing the production database and take one final backup
 first. The first go-live backup must be followed by a temporary-container

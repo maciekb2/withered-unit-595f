@@ -21,6 +21,20 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run test:ci
+      - name: Validate deployment configuration
+        env:
+          MBPROD_HOST: ${{ secrets.MBPROD_HOST }}
+          MBPROD_USER: ${{ secrets.MBPROD_USER }}
+          MBPROD_SSH_KEY: ${{ secrets.MBPROD_SSH_KEY }}
+          MBPROD_GITHUB_TOKEN: ${{ secrets.MBPROD_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for variable in MBPROD_HOST MBPROD_USER MBPROD_SSH_KEY MBPROD_GITHUB_TOKEN; do
+            if [[ -z "${!variable:-}" ]]; then
+              echo "::error::Required repository secret ${variable} is missing"
+              exit 1
+            fi
+          done
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -31,4 +45,7 @@ jobs:
             export GITHUB_TOKEN='${{ secrets.MBPROD_GITHUB_TOKEN }}'
             export GITHUB_REPO='maciekb2/withered-unit-595f'
             export GITHUB_REF='main'
+            export DEPLOY_REVISION='${{ github.sha }}'
             /opt/apps/production/pseudointelekt/deploy/selfhosted/deploy.sh
+            test "$(cat /opt/apps/production/pseudointelekt/.deployed-revision)" = '${{ github.sha }}'
+            curl -fsS --retry 10 --retry-delay 3 http://127.0.0.1:3000/api/health >/dev/null

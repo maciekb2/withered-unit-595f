@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Pseudointelekt backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 Europe/Warsaw
+Persistent=true
+RandomizedDelaySec=10m
+Unit=pseudointelekt-backup.service
+
+[Install]
+WantedBy=timers.target

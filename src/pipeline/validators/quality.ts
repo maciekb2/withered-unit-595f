@@ -4,6 +4,7 @@ import {
   isRedundantLeadBlock,
   normalizeArticleFragment,
 } from '../articleBody';
+import { detectReasoningLeakage } from '../reasoningFilter';
 
 export interface QualityValidationResult {
   ok: boolean;
@@ -53,6 +54,11 @@ export function validateArticleQuality(
     .map(part => part.trim())
     .filter(part => part && !/^#{1,6}\s+/.test(part));
   const words = (content.match(/\p{L}[\p{L}\p{M}-]*/gu) || []).length;
+
+  const reasoningLeaks = detectReasoningLeakage(content);
+  if (reasoningLeaks.length > 0) {
+    errors.push(`ERROR: Wykryto ujawnione rozumowanie modelu (${reasoningLeaks.length})`);
+  }
 
   if (blocks[0] && headingRepeatsTitle(blocks[0], article.title)) {
     errors.push('ERROR: Body zaczyna sie od powtorzonego tytulu artykulu');

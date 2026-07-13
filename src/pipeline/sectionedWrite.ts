@@ -5,7 +5,7 @@ import { guardrails } from './guardrails';
 import { scrubTodoClaims } from './scrubTodoClaims';
 import { extractJson } from '../utils/json';
 import { cleanArticleDescription } from './description';
-import { stripModelReasoning } from './reasoningFilter';
+import { assertNoModelReasoning, stripModelReasoning } from './reasoningFilter';
 
 export interface SectionedWriteOptions {
   apiKey: string;
@@ -85,10 +85,12 @@ export async function writeArticleSectioned({
         response_style: 'full',
       }), section.h2);
       rawParts.push(sectionRaw);
+      const markdown = sanitizeBodyText(sectionRaw, sourceUrl, section.h2);
+      assertNoModelReasoning(markdown);
       writtenSections.push({
         h2: section.h2,
         raw: sectionRaw,
-        markdown: sanitizeBodyText(sectionRaw, sourceUrl, section.h2),
+        markdown,
       });
       logEvent({ type: 'sectioned-write-section-complete', h2: section.h2, index });
     } catch (err) {

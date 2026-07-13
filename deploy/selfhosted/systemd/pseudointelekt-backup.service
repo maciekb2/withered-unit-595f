@@ -1,0 +1,15 @@
+[Unit]
+Description=Pseudointelekt PostgreSQL, social media and encrypted off-host backup
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=macie
+EnvironmentFile=-/etc/pseudointelekt/backup.env
+ExecStart=/opt/apps/production/pseudointelekt/deploy/selfhosted/backup-postgres.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+PrivateTmp=true
+NoNewPrivileges=true

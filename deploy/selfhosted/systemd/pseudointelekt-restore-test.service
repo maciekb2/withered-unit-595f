@@ -1,0 +1,11 @@
+[Unit]
+Description=Verify latest Pseudointelekt backup is readable
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=macie
+EnvironmentFile=-/etc/pseudointelekt/backup.env
+ExecStart=/opt/apps/production/pseudointelekt/deploy/selfhosted/restore-test.sh
+PrivateTmp=true
+NoNewPrivileges=true

@@ -25,6 +25,32 @@ export function stripModelReasoning(text: string, expectedHeading?: string): str
   return value.trim();
 }
 
+const REASONING_LEAK_PATTERNS = [
+  /\b(?:okay|ok),?\s+let(?:'s| us)\s+(?:tackle|draft|think|write|plan)/i,
+  /\bthe user (?:wants|asked|provided|expects)/i,
+  /\b(?:i|we) need to\b/i,
+  /\blet me (?:draft|think|check|write|plan)/i,
+  /\b(?:first|second|third|next|final) paragraph\s*:/i,
+  /\bcheck (?:the )?word count\b/i,
+  /\bthe (?:bbc|reuters|pap|politico) source\b/i,
+  /\bthe user's example\b/i,
+  /\b(?:system|developer) prompt\b/i,
+  /\b(?:response_style|markdown fences|guardrails)\b/i,
+];
+
+export function detectReasoningLeakage(text: string): string[] {
+  return REASONING_LEAK_PATTERNS
+    .filter(pattern => pattern.test(text))
+    .map(pattern => pattern.source);
+}
+
+export function assertNoModelReasoning(text: string): void {
+  const hits = detectReasoningLeakage(text);
+  if (hits.length > 0) {
+    throw new Error(`Model reasoning leakage detected (${hits.length} pattern${hits.length === 1 ? '' : 's'})`);
+  }
+}
+
 export function stripEditedReasoning<T extends { markdown: string; title: string; description: string }>(edited: T): T {
   return { ...edited, markdown: stripModelReasoning(edited.markdown), title: stripModelReasoning(edited.title), description: stripModelReasoning(edited.description) };
 }
