@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { buildYouTubeDraftText } from './social-copy.mjs';
+import { buildChannelHashtags, buildYouTubeDraftText } from './social-copy.mjs';
 import { ensureSocialOutro } from './social-outro.mjs';
 import { buildSocialMotionFilter, buildSocialSceneCopy, buildSocialWhooshFilter, socialBodyDuration } from './social-motion.mjs';
 
@@ -197,11 +197,12 @@ async function bufferSaveDraft({ existingId, channelId, text, mediaUrl, mediaTyp
 
 async function createDrafts(client, job, pkg, urls) {
   const utm = channel => `${job.source.articleUrl}?utm_source=${channel}&utm_medium=social&utm_campaign=article_social&utm_content=${job.source.slug}-${job.variant_key || 'weekly'}-situation-room-v2`;
+  const instagramHashtags = buildChannelHashtags(pkg.hashtags, 'instagram').join(' ');
   const specs = [
-    ['instagram_reel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${pkg.hashtags.join(' ')}\n${utm('instagram')}`,urls.reel,'video'],
+    ['instagram_reel',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,urls.reel,'video'],
     ['youtube_short',process.env.BUFFER_YOUTUBE_CHANNEL_ID,buildYouTubeDraftText(pkg,utm('youtube')),urls.reel,'video'],
   ];
-  if (pkg.staticPost) specs.push(['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${pkg.hashtags.join(' ')}\n${utm('instagram')}`,urls.post,'image']);
+  if (pkg.staticPost) specs.push(['instagram_post',process.env.BUFFER_INSTAGRAM_CHANNEL_ID,`${pkg.instagramCaption}\n\n${instagramHashtags}\n${utm('instagram')}`,urls.post,'image']);
   for (const [channel,channelId,text,url,type] of specs) {
     if (!channelId && !dryRun) continue;
     const existing = await client.query('SELECT buffer_draft_id FROM social_publications WHERE job_id=$1 AND channel=$2', [job.id, channel]);
