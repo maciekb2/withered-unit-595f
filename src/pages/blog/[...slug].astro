@@ -1,29 +1,49 @@
 ---
-import { type CollectionEntry, getCollection } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
 import { render } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BlogArchivePage from '../../layouts/BlogArchivePage.astro';
+import BlogPost from '../../layouts/BlogPost.astro';
 import { getRelatedPosts } from '../../utils/topics';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
+	const posts = (await getCollection('blog')).sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.id.localeCompare(a.id),
+	);
+	const totalPages = Math.ceil(posts.length / 20);
+	const articlePaths = posts.map((post) => ({
 		params: { slug: post.id },
-		props: post,
+		props: { kind: 'post' as const, post },
 	}));
+	const archivePaths = Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+		params: { slug: String(index + 2) },
+		props: { kind: 'archive' as const, page: index + 2 },
+	}));
+	return [...articlePaths, ...archivePaths];
 }
-type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props as Props;
-const { Content } = await render(post);
-const allPosts = (await getCollection('blog')).sort(
-    (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf(),
+type Props =
+	| { kind: 'post'; post: CollectionEntry<'blog'> }
+	| { kind: 'archive'; page: number };
+
+const props = Astro.props as Props;
+const chronologicalPosts = (await getCollection('blog')).sort(
+	(a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf(),
 );
-const index = allPosts.findIndex((p) => p.id === post.id);
-const prev = index > 0 ? allPosts[index - 1] : undefined;
-const next = index < allPosts.length - 1 ? allPosts[index + 1] : undefined;
-const related = getRelatedPosts(post, allPosts, 3);
+const archivePosts = [...chronologicalPosts].reverse();
+const totalPages = Math.ceil(archivePosts.length / 20);
+const post = props.kind === 'post' ? props.post : undefined;
+const page = props.kind === 'archive' ? props.page : undefined;
+const rendered = post ? await render(post) : undefined;
+const index = post ? chronologicalPosts.findIndex((entry) => entry.id === post.id) : -1;
+const prev = index > 0 ? chronologicalPosts[index - 1] : undefined;
+const next = index >= 0 && index < chronologicalPosts.length - 1 ? chronologicalPosts[index + 1] : undefined;
+const related = post ? getRelatedPosts(post, chronologicalPosts, 3) : [];
 ---
 
-<BlogPost {...post.data} slug={post.id} prev={prev} next={next} related={related}>
-        <Content />
-</BlogPost>
+{post && rendered ? (
+	<BlogPost {...post.data} slug={post.id} prev={prev} next={next} related={related}>
+		<rendered.Content />
+	</BlogPost>
+) : page ? (
+	<BlogArchivePage posts={archivePosts} page={page} totalPages={totalPages} />
+) : null}

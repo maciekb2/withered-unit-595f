@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import BlogArchive from '../components/BlogArchive.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+	page: number;
+	totalPages: number;
+}
+
+const { posts, page, totalPages } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pl">
+	<head>
+		<BaseHead
+			title={`Archiwum analiz — strona ${page} | Pseudointelekt`}
+			description={`Starsze analizy Pseudointelektu — strona ${page} archiwum.`}
+			prevUrl={page === 2 ? '/blog/' : `/blog/${page - 1}/`}
+			nextUrl={page < totalPages ? `/blog/${page + 1}/` : undefined}
+		/>
+		<script type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'CollectionPage',
+			name: `Archiwum analiz — strona ${page}`,
+			url: new URL(`/blog/${page}/`, Astro.site).toString(),
+			inLanguage: 'pl-PL',
+		})} />
+	</head>
+	<body data-page-section="archive">
+		<Header />
+		<BlogArchive posts={posts} page={page} perPage={20} />
+		<Footer />
+	</body>
+</html>
