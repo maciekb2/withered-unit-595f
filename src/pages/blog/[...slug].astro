@@ -1,6 +1,6 @@
 ---
 import { render } from 'astro:content';
-import { type CollectionEntry, getCollection } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BlogArchivePage from '../../layouts/BlogArchivePage.astro';
 import BlogPost from '../../layouts/BlogPost.astro';
 import { getRelatedPosts } from '../../utils/topics';
@@ -21,18 +21,16 @@ export async function getStaticPaths() {
 	return [...articlePaths, ...archivePaths];
 }
 
-type Props =
-	| { kind: 'post'; post: CollectionEntry<'blog'> }
-	| { kind: 'archive'; page: number };
-
-const props = Astro.props as Props;
 const chronologicalPosts = (await getCollection('blog')).sort(
 	(a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf(),
 );
 const archivePosts = [...chronologicalPosts].reverse();
 const totalPages = Math.ceil(archivePosts.length / 20);
-const post = props.kind === 'post' ? props.post : undefined;
-const page = props.kind === 'archive' ? props.page : undefined;
+const slug = Astro.params.slug ?? '';
+const post = chronologicalPosts.find((entry) => entry.id === slug);
+const requestedPage = /^\d+$/.test(slug) ? Number(slug) : undefined;
+const page = requestedPage && requestedPage >= 2 && requestedPage <= totalPages ? requestedPage : undefined;
+if (!post && !page) Astro.response.status = 404;
 const rendered = post ? await render(post) : undefined;
 const index = post ? chronologicalPosts.findIndex((entry) => entry.id === post.id) : -1;
 const prev = index > 0 ? chronologicalPosts[index - 1] : undefined;
