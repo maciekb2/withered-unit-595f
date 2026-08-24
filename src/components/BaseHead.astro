@@ -194,7 +194,7 @@ const websiteJsonLd = type === 'website'
     banner.className = 'cookie-consent';
     banner.dataset.cookieConsentBanner = 'true';
     banner.setAttribute('role', 'dialog');
-    banner.setAttribute('aria-modal', 'true');
+    banner.setAttribute('aria-modal', 'false');
     banner.setAttribute('aria-labelledby', 'cookie-consent-title');
     banner.innerHTML = `
       <div class="cookie-consent__backdrop" aria-hidden="true"></div>
@@ -219,7 +219,6 @@ const websiteJsonLd = type === 'website'
       }),
     );
     document.body.appendChild(banner);
-    banner.querySelector('button')?.focus();
   }
 
   function addStyles() {
@@ -229,27 +228,29 @@ const websiteJsonLd = type === 'website'
     style.textContent = `
       .cookie-consent {
         position: fixed;
-        inset: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         z-index: 1000;
-        display: grid;
-        place-items: center;
         padding: 1rem;
+        pointer-events: none;
       }
       .cookie-consent__backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(1, 17, 12, 0.6);
-        backdrop-filter: blur(8px);
+        display: none;
       }
       .cookie-consent__panel {
         position: relative;
         width: min(470px, 100%);
+        max-height: calc(100vh - 2rem);
+        margin-left: auto;
+        overflow-y: auto;
         padding: 1.35rem;
         border: 1px solid rgba(224, 202, 118, 0.3);
         border-radius: 0;
         background: linear-gradient(145deg, rgba(8, 48, 37, 0.94), rgba(3, 29, 22, 0.92));
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
         color: #f1eee5;
+        pointer-events: auto;
       }
       .cookie-consent__eyebrow {
         margin: 0 0 0.45rem;
@@ -313,6 +314,13 @@ const websiteJsonLd = type === 'website'
         color: #f1eee5;
       }
       @media (max-width: 680px) {
+        .cookie-consent {
+          padding: 0.65rem;
+        }
+        .cookie-consent__panel {
+          max-height: min(72vh, 520px);
+          padding: 1rem;
+        }
         .cookie-consent__button {
           flex: 1 1 100%;
         }

@@ -113,7 +113,7 @@ const jsonLd = {
 				position: relative;
 				width: min(1120px, calc(100% - 2rem));
 				aspect-ratio: 3 / 2;
-				max-height: min(72vh, 740px);
+				max-height: min(56vh, 580px);
 				margin: 0 auto;
 				overflow: hidden;
 				border: 1px solid rgba(226, 206, 127, 0.22);
@@ -151,6 +151,32 @@ const jsonLd = {
 				font-weight: 680;
 				letter-spacing: 0.14em;
 				backdrop-filter: blur(8px);
+			}
+			.hero-image__read {
+				position: absolute;
+				right: 0.85rem;
+				bottom: 0.85rem;
+				z-index: 1;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				min-height: 2.55rem;
+				padding: 0.55rem 0.78rem;
+				border: 1px solid rgba(242, 232, 190, 0.48);
+				color: #f6efd2;
+				background: rgba(4, 30, 23, 0.84);
+				font-family: "Archivo Variable", "Atkinson", sans-serif;
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-decoration: none;
+				backdrop-filter: blur(8px);
+			}
+			.hero-image__read:hover,
+			.hero-image__read:focus-visible {
+				color: #061d18;
+				background: #e2ce7f;
+				outline: none;
 			}
 			.prose {
 				width: min(760px, calc(100% - 2rem));
@@ -248,6 +274,7 @@ const jsonLd = {
                         }
                         .article-content {
                                 font-size: clamp(1rem, 1.5vw, 1.08rem);
+                                scroll-margin-top: 6rem;
                         }
                         .article-content :global(h1:first-child) {
                                 display: none;
@@ -404,7 +431,7 @@ const jsonLd = {
                                 .hero-image__frame {
                                         width: 100%;
                                         aspect-ratio: 4 / 3;
-                                        max-height: 58vh;
+                                        max-height: 42vh;
                                         border-right: 0;
                                         border-left: 0;
                                 }
@@ -433,6 +460,7 @@ const jsonLd = {
 						<div class="hero-image__frame">
 							<img width={1536} height={1024} src={heroImage} alt={title} />
 							<span class="hero-image__label" aria-hidden="true">PI // ILUSTRACJA REDAKCYJNA</span>
+							<a class="hero-image__read" href="#article-content">Czytaj artykuł <span aria-hidden="true">↓</span></a>
 						</div>
 					</div>
 				)}
@@ -466,7 +494,7 @@ const jsonLd = {
                                                         <a href={`/tematy/${topic.slug}/`}>{topic.name}</a>
                                                 ))}
                                         </nav>
-                                        <div class="article-content">
+                                        <div class="article-content" id="article-content">
                                                 <slot />
                                         </div>
                                         <section class="article-next-step" aria-labelledby="article-next-step-title">
