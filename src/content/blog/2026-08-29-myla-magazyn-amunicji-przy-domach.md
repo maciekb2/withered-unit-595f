@@ -5,7 +5,7 @@ sourceUrl: "https://apnews.com/article/russia-ukraine-war-bucha-kyiv-4be42e27897
 pubDate: "2026-08-29"
 updatedDate: "2026-08-31"
 heroImage: "/blog-images/2026-08-29-myla-magazyn-amunicji-przy-domach.png"
-tags: ["wojna-i-bezpieczenstwo", "europa", "polityka-i-media"]
+tags: ["geopolityka", "europa-i-unia", "polityka-i-media"]
 views: 0
 likes: 0
 ---

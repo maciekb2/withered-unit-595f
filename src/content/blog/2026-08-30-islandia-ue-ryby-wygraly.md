@@ -5,7 +5,7 @@ sourceUrl: "https://apnews.com/article/iceland-european-union-election-referendu
 pubDate: "2026-08-30"
 updatedDate: "2026-08-31"
 heroImage: "/blog-images/2026-08-30-islandia-ue-ryby-wygraly.png"
-tags: ["europa", "geopolityka", "gospodarka-i-energia"]
+tags: ["europa-i-unia", "geopolityka", "gospodarka-i-energia"]
 views: 0
 likes: 0
 ---

@@ -5,7 +5,7 @@ sourceUrl: "https://apnews.com/article/stocks-markets-ipo-oil-rates-fed-future-0
 pubDate: "2026-08-31"
 updatedDate: "2026-08-31"
 heroImage: "/blog-images/2026-08-31-ormuz-ropa-pokoj-po-przerwie.png"
-tags: ["geopolityka", "wojna-i-bezpieczenstwo", "gospodarka-i-energia"]
+tags: ["geopolityka", "gospodarka-i-energia", "polityka-i-media"]
 views: 0
 likes: 0
 ---
