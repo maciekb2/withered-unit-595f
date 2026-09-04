@@ -1,7 +1,7 @@
 name: Legacy Cloudflare emergency deploy
 
 on:
-  # Production is self-hosted on mbprod behind Cloudflare Tunnel. Keep the
+  # Production runs on the private RKE2 cluster behind Cloudflare Tunnel. Keep the
   # Worker deployment only as an explicit break-glass operation.
   workflow_dispatch:
 

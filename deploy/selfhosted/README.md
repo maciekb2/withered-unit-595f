@@ -1,4 +1,8 @@
-# Self-hosted runtime
+# Self-hosted image build and retired Compose runtime
+
+> The `mbprod` deployment was retired on 2026-09-04. Production now runs on
+> the private RKE2 cluster defined in `maciekb2/mb-private-rke2`. Do not run
+> the historical host deployment scripts from this directory.
 
 This stack is the production target on `mbprod.s.sn`. Cloudflare remains the
 public edge through a Tunnel; the application and PostgreSQL run locally.
