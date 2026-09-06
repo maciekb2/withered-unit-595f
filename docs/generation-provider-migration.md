@@ -128,5 +128,7 @@ OpenAI docs wskazują `gpt-image-1-mini` jako kosztową wersję GPT Image, więc
 
 Publiczny gateway domowego Jetsona nie jest już zależnością generowania
 artykułów. Konfiguracja awaryjnego Workera nie zawiera jego adresu ani triggera
-cron, a sekrety dostępowe zostały przeznaczone do usunięcia z Workera.
-Produkcja RKE2 pozostaje niezależna od tej ścieżki i korzysta z gatewaya DC.
+cron, a sekrety dostępowe zostały usunięte z Workera. Alternatywne adresy
+`workers.dev` i preview są wyłączone; Worker pozostaje wyłącznie artefaktem
+break-glass do jawnego ponownego podpięcia pod trasę. Produkcja RKE2 pozostaje
+niezależna od tej ścieżki i korzysta z gatewaya DC.
