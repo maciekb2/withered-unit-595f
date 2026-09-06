@@ -48,8 +48,6 @@ interface Env {
         SENTRY_TEST_TOKEN?: string;
         GLITCHTIP_SENTRY_TEST_ENDPOINT?: string;
         GLITCHTIP_SENTRY_TEST_TOKEN?: string;
-        JETSON_ACCESS_CLIENT_ID?: string;
-        JETSON_ACCESS_CLIENT_SECRET?: string;
         CF_ACCESS_TEAM_DOMAIN?: string;
         CF_ACCESS_AUD?: string;
         CF_ACCESS_ALLOWED_EMAILS?: string;

@@ -1,8 +1,11 @@
 # Migration providerów generowania
 
-Ten dokument opisuje kolejny etap po zamknięciu pierwotnego backlogu technicznego:
+Ten dokument opisuje historię migracji providerów i aktualną granicę
+wdrożeniową:
 
-- tekst artykułów ma przejść na tokenowo autoryzowany gateway na domowym Jetsonie;
+- produkcja RKE2 korzysta z wewnętrznego gatewaya DC, a nie z domowego Jetsona;
+- awaryjny Cloudflare Worker używa Cloudflare AI z fallbackiem OpenAI i nie ma
+  już dostępu do domowego Jetsona;
 - obrazki hero mają przejść na nowszy, konfigurowalny model z powtarzalnym stylem.
 
 ## Stan obecny
@@ -21,26 +24,32 @@ Obrazki hero są generowane przez `src/modules/heroImageGenerator.ts`, a model i
 - `OPENAI_IMAGE_STYLE`
 - `OPENAI_IMAGE_QUALITY`
 
-## Docelowy kontrakt tekstu
+## Kontrakt tekstu w środowisku self-hosted
 
-Gateway Jetsona powinien być traktowany jako osobny provider tekstu, a OpenAI powinno zostać fallbackiem do czasu pełnej weryfikacji.
+Nazwa providera `jetson` pozostaje historyczną nazwą adaptera do zgodnego z
+Ollamą gatewaya. W produkcji RKE2 oznacza ona wewnętrzny gateway DC, nie
+urządzenie w mieszkaniu. OpenAI pozostaje fallbackiem.
 
 Planowane zmienne:
 
 - `TEXT_GENERATION_PROVIDER`: `openai` albo `jetson`
-- `JETSON_GATEWAY_URL`: publiczny URL gatewaya przez domenę Cloudflare, obecnie `https://jetson.senara-system.xyz`; nie używać prywatnego adresu ani lokalnego WARP jako produkcyjnego endpointu Workera
+- `JETSON_GATEWAY_URL`: wewnętrzny URL gatewaya DC, dostępny wyłącznie z
+  dozwolonych workloadów klastra
 - `JETSON_GATEWAY_TOKEN`: sekret Workera, nigdy wpisywany do repo
 - `JETSON_GATEWAY_MODEL`: domyślnie model zweryfikowany na gatewayu
 - `JETSON_GATEWAY_TIMEOUT_MS`: twardy timeout na jeden request
 - `JETSON_GATEWAY_DISABLE_THINKING`: przełącznik dla modeli, które potrafią wypisywać widoczne rozumowanie
 
-Oczekiwany transport do zweryfikowania przed przełączeniem produkcji:
+Transport używany w RKE2:
 
-- endpoint gatewaya: `/api/generate` pod domeną `https://jetson.senara-system.xyz`
+- endpoint gatewaya: `/api/generate` pod wewnętrznym adresem DC
 - autoryzacja: `Authorization: Bearer <JETSON_GATEWAY_TOKEN>`
-- Cloudflare Access/service headers, jeśli gateway wymaga ich oprócz bearer tokenu
 - payload zawiera `model`, `messages`, limit tokenów i opcjonalny wymóg JSON
 - odpowiedź musi dać się sprowadzić do jednego tekstu bez widocznego rozumowania
+
+Domowy adres `jetson.senara-system.xyz`, jego Cloudflare Access service tokeny
+i bearer gatewaya zostały wycofane z konfiguracji Pseudointelektu. Nie należy
+ich odtwarzać jako fallbacku.
 
 Nie wolno zapisywać tokenu, raw sekretów ani surowego stanu autoryzacji w dokumentach, logach lub backlogu.
 
@@ -115,12 +124,9 @@ Implementacja zostawia obrazy w OpenAI API i ustawia `OPENAI_IMAGE_MODEL=gpt-ima
 
 OpenAI docs wskazują `gpt-image-1-mini` jako kosztową wersję GPT Image, więc to jest preferowany fallback kosztowy zamiast wracania do legacy DALL-E.
 
-## Blokery przed przełączeniem
+## Stan wycofania domowego Jetsona
 
-Na tym etapie trzeba jeszcze odświeżyć live informacje o gatewayu Jetsona. Podczas rozpoczęcia migracji WARP był połączony, ale SSH do `jetson-home` (`192.168.1.41:22`) zakończył się timeoutem. Przed implementacją przełączenia tekstu trzeba sprawdzić:
-
-- aktywny publiczny URL gatewaya przez domenę `https://jetson.senara-system.xyz`, nie prywatny adres WARP;
-- aktualny domyślny model;
-- dokładny payload `/api/generate`;
-- wymagane nagłówki do wyłączenia widocznego rozumowania;
-- gdzie bezpiecznie pobrać i ustawić token jako sekret Workera.
+Publiczny gateway domowego Jetsona nie jest już zależnością generowania
+artykułów. Konfiguracja awaryjnego Workera nie zawiera jego adresu ani triggera
+cron, a sekrety dostępowe zostały przeznaczone do usunięcia z Workera.
+Produkcja RKE2 pozostaje niezależna od tej ścieżki i korzysta z gatewaya DC.

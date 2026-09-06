@@ -239,8 +239,6 @@ test('textGenerationProviderFromEnv defaults to OpenAI and reads Jetson config w
     disableThinking: false,
     fallback: 'none',
     fallbackModel: 'gpt-5.5',
-    accessClientId: undefined,
-    accessClientSecret: undefined,
   });
 });
 

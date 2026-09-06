@@ -45,8 +45,6 @@ export type TextGenerationProvider =
       disableThinking?: boolean;
       fallback?: 'openai' | 'none';
       fallbackModel?: string;
-      accessClientId?: string;
-      accessClientSecret?: string;
       disabled?: boolean;
       disabledReason?: string;
     };
@@ -80,8 +78,6 @@ export function textGenerationProviderFromEnv(env: Env): TextGenerationProvider 
     disableThinking: env.JETSON_GATEWAY_DISABLE_THINKING !== 'false',
     fallback: env.TEXT_GENERATION_FALLBACK === 'none' ? 'none' : 'openai',
     fallbackModel: env.TEXT_GENERATION_FALLBACK_MODEL || env.OPENAI_TEXT_MODEL || 'gpt-5',
-    accessClientId: env.JETSON_ACCESS_CLIENT_ID,
-    accessClientSecret: env.JETSON_ACCESS_CLIENT_SECRET,
   };
 }
 
@@ -549,11 +545,6 @@ async function chatJetson(
   if (provider.disableThinking) {
     headers['x-openclaw-disable-thinking'] = 'true';
   }
-  if (provider.accessClientId && provider.accessClientSecret) {
-    headers['CF-Access-Client-Id'] = provider.accessClientId;
-    headers['CF-Access-Client-Secret'] = provider.accessClientSecret;
-  }
-
   const timeoutMs = Math.min(provider.timeoutMs || 120000, JETSON_REQUEST_TIMEOUT_CAP_MS);
   const controller = new AbortController();
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
