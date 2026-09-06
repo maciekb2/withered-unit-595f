@@ -68,7 +68,7 @@ jobs:
         with:
           name: node-test-coverage
           path: test-results/
-          retention-days: 14
+          retention-days: 7
           if-no-files-found: ignore
 
   security-audit:
@@ -91,7 +91,7 @@ jobs:
         run: npm audit --audit-level=high || true
 
   build:
-    name: Build
+    name: Build and Smoke
     runs-on: ubuntu-latest
     needs: [type-check, unit-tests]
     steps:
@@ -110,54 +110,6 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
-          include-hidden-files: true
-
-  worker-dry-run:
-    name: Cloudflare Worker Dry Run
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-      - name: Validate Cloudflare Worker bundle
-        run: npm run cf:dry-run
-
-  static-smoke:
-    name: Static Smoke
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
       - name: Check generated site basics
         run: |
           test -f dist/index.html
@@ -165,3 +117,6 @@ jobs:
           grep -q 'data-site-header' dist/index.html
           grep -q '^_worker\.js$' dist/.assetsignore
           test -f dist/worker.js
+
+      - name: Validate Cloudflare Worker bundle
+        run: npm run cf:dry-run
