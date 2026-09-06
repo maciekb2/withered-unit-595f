@@ -23,6 +23,8 @@ COPY --from=build /app/scripts/social-outro.mjs ./scripts/social-outro.mjs
 COPY --from=build /app/scripts/social-motion.mjs ./scripts/social-motion.mjs
 COPY --from=build /app/scripts/social-carousel.mjs ./scripts/social-carousel.mjs
 COPY --from=build /app/scripts/social-buffer-assets.mjs ./scripts/social-buffer-assets.mjs
+RUN rm -rf /usr/local/lib/node_modules/npm \
+ && rm /usr/local/bin/npm /usr/local/bin/npx
 USER node
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]
