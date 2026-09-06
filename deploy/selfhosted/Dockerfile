@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build:node
+RUN npm run build:node && npm prune --omit=dev
 
 FROM node:22-bookworm-slim AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
@@ -23,7 +23,10 @@ COPY --from=build /app/scripts/social-outro.mjs ./scripts/social-outro.mjs
 COPY --from=build /app/scripts/social-motion.mjs ./scripts/social-motion.mjs
 COPY --from=build /app/scripts/social-carousel.mjs ./scripts/social-carousel.mjs
 COPY --from=build /app/scripts/social-buffer-assets.mjs ./scripts/social-buffer-assets.mjs
-RUN rm -rf /usr/local/lib/node_modules/npm \
+# Build tools are not used by the standalone Node runtime. Removing every
+# bundled esbuild copy avoids shipping its Go executable and its Go stdlib.
+RUN find /app/node_modules -type d \( -name esbuild -o -name @esbuild \) -prune -exec rm -rf '{}' + \
+ && rm -rf /usr/local/lib/node_modules/npm \
  && rm /usr/local/bin/npm /usr/local/bin/npx
 USER node
 EXPOSE 3000
