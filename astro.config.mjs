@@ -10,8 +10,6 @@ export default defineConfig({
   site: "https://pseudointelekt.pl",
   integrations: [mdx(), sitemap()],
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-    },
+    configPath: "wrangler.astro.json",
   }),
 });

@@ -123,7 +123,9 @@ export async function publishArticleToGitHub({ env, article, heroImage, date }: 
       throw new Error(`GitHub post upload failed: ${postRes.status} ${msg}`);
     }
 
-    const heroBase64 = heroImage.toString('base64');
+    // Workers types model Buffer as a Uint8Array, while both supported
+    // runtimes provide Node-compatible base64 encoding at runtime.
+    const heroBase64 = (heroImage as unknown as { toString(encoding: 'base64'): string }).toString('base64');
     logEvent({ type: 'github-upload-image', file: imageName });
     const imgRes = await retryFetch(`${repoUrl}/contents/${encodeURIComponent(`public/blog-images/${imageName}`)}`, {
       method: 'PUT',
