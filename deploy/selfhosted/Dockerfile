@@ -20,22 +20,24 @@ WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-scheduler.mjs
-COPY --from=build /app/scripts/selfhosted-scheduler-lib.mjs ./scripts/selfhosted-scheduler-lib.mjs
-COPY --from=build /app/scripts/social-worker.mjs ./scripts/social-worker.mjs
-COPY --from=build /app/scripts/social-weekly-client.mjs ./scripts/social-weekly-client.mjs
-COPY --from=build /app/scripts/social-metrics-sync.mjs ./scripts/social-metrics-sync.mjs
-COPY --from=build /app/scripts/social-buffer-state.mjs ./scripts/social-buffer-state.mjs
-COPY --from=build /app/scripts/social-copy.mjs ./scripts/social-copy.mjs
-COPY --from=build /app/scripts/social-outro.mjs ./scripts/social-outro.mjs
-COPY --from=build /app/scripts/social-motion.mjs ./scripts/social-motion.mjs
-COPY --from=build /app/scripts/social-carousel.mjs ./scripts/social-carousel.mjs
-COPY --from=build /app/scripts/social-buffer-assets.mjs ./scripts/social-buffer-assets.mjs
+COPY --from=build --chmod=0644 /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-scheduler.mjs
+COPY --from=build --chmod=0644 /app/scripts/selfhosted-scheduler-lib.mjs ./scripts/selfhosted-scheduler-lib.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-worker.mjs ./scripts/social-worker.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-weekly-client.mjs ./scripts/social-weekly-client.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-metrics-sync.mjs ./scripts/social-metrics-sync.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-buffer-state.mjs ./scripts/social-buffer-state.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-copy.mjs ./scripts/social-copy.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-outro.mjs ./scripts/social-outro.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-motion.mjs ./scripts/social-motion.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-carousel.mjs ./scripts/social-carousel.mjs
+COPY --from=build --chmod=0644 /app/scripts/social-buffer-assets.mjs ./scripts/social-buffer-assets.mjs
+RUN chmod 0755 /app /app/scripts
 # Build tools are not used by the standalone Node runtime. Removing every
 # bundled esbuild copy avoids shipping its Go executable and its Go stdlib.
 RUN find /app/node_modules -type d \( -name esbuild -o -name @esbuild \) -prune -exec rm -rf '{}' + \
  && rm -rf /usr/local/lib/node_modules/npm \
  && rm /usr/local/bin/npm /usr/local/bin/npx
 USER node
+RUN for script in /app/scripts/*.mjs; do test -r "$script"; done
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]
