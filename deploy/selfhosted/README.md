@@ -1,21 +1,21 @@
-# Self-hosted image build and retired Compose runtime
+# Self-hosted image build for private RKE2
 
 > The `mbprod` deployment was retired on 2026-09-04. Production now runs on
 > the private RKE2 cluster defined in `maciekb2/mb-private-rke2`. Do not run
 > the historical host deployment scripts from this directory.
 
-This stack is the production target on `mbprod.s.sn`. Cloudflare remains the
-public edge through a Tunnel; the application and PostgreSQL run locally.
+Cloudflare remains the public edge through a Tunnel. The application,
+PostgreSQL-backed services, scheduler and generators run in the private RKE2
+cluster managed from `maciekb2/mb-private-rke2`.
 
-The tunnel token and `.env` file are host-managed secrets and must never be
-committed. Ollama is reached through the authenticated Helpdesk Model Gateway
-at `10.2.11.58:8110`, which is the approved network path to Jetson1
-(`10.2.11.72:11434`).
+Runtime secrets are rendered from Vault and must never be committed. Ollama is
+reached through the authenticated Helpdesk Model Gateway; do not bypass that
+approved path or copy its credentials into this repository.
 
-The self-hosted Node runtime is now the production origin behind the
-`pseudointelekt-mbprod` Cloudflare Tunnel. The Cloudflare Worker remains the
-rollback artifact, but its wildcard route is disabled; restore it only through
-a controlled DNS/route change after verifying the mbprod origin.
+The Node runtime is the production origin behind Cloudflare Tunnel. The
+Cloudflare Worker remains a rollback artifact with automatic builds disabled;
+restore it only through a controlled route change after verifying the cluster
+origin.
 
 The Node build exposes the public Astro pages and PostgreSQL-backed engagement
 and contact endpoints. Article generation runs in the internal `generator`
@@ -33,15 +33,15 @@ break-glass operations. It is never placed in browser code. In production set
 `CF_ACCESS_TEAM_DOMAIN`, `CF_ACCESS_AUD` (comma-separated audiences for the
 private Access apps) and `CF_ACCESS_ALLOWED_EMAILS` in the host-managed env.
 
-`deploy.sh` is the host-side deploy entrypoint. The committed systemd poller
-checks GitHub `main` every five minutes and invokes it after a merge, without
-placing an SSH private key in GitHub Actions. It downloads the public repository tarball, preserves the
-host-managed `.env` and secrets, rebuilds the app image, and recreates the app
-and scheduler containers.
+Merges to GitHub `main` reach the cluster through the signed Flux Receiver
+webhook. The reusable release controller validates the source, builds the image
+with rootless BuildKit, scans it with Trivy and promotes it through the GitOps
+repository. GitHub Actions does not hold a cluster SSH key.
 
-## PostgreSQL backup and restore
+## Retired mbprod backup and restore reference
 
-Install the committed systemd units with `deploy/selfhosted/install-systemd-units.sh`.
+Do not install these units on the retired host. They are retained only as
+recovery evidence for the former Compose deployment.
 The daily 02:30 timer creates a compressed PostgreSQL dump and a social-media
 archive. When `/etc/pseudointelekt/backup.env` defines `RESTIC_REPOSITORY` and
 `RESTIC_PASSWORD_FILE`, both artifacts are encrypted and copied off host with
@@ -58,7 +58,5 @@ restore test.
 hostnames. The generator hostname must be protected by Cloudflare Access or a
 private WARP/VPN route before it is published.
 
-The GitHub workflow requires repository secrets `MBPROD_HOST`, `MBPROD_USER`,
-`MBPROD_SSH_KEY`, and `MBPROD_GITHUB_TOKEN`. The SSH key is intentionally not
-generated or committed by this repository; install its public half in the
-`macie` account on `mbprod` and store only the private half in GitHub Actions.
+The former `MBPROD_*` GitHub deployment secrets are not part of the active RKE2
+release path and must not be reintroduced.

@@ -1,12 +1,16 @@
 # Geopolityczny Blog
 
-Strona jest hostowana na Cloudflare Workers i rozwijana w Astro przy wsparciu Codexa. W planach jest mechanizm automatycznego generowania artykułów i hero zdjęć, tak aby maksymalnie zautomatyzować utrzymanie i zwiększyć zasięgi.
+Produkcja działa jako runtime Node w prywatnym klastrze RKE2, za Cloudflare
+Tunnel. Artykuły i obrazy hero generują usługi klastra zgodnie z procedurą
+opisaną w `deploy/selfhosted/README.md`. Cloudflare Worker nie jest aktywnym
+targetem produkcyjnym; pozostał wyłącznie jako ręczny artefakt break-glass.
 
 ## Rozwój lokalny
 - `npm install` – instalacja zależności
 - `npm run dev` – uruchomienie serwera developerskiego
-- `npm run build` – budowa wersji produkcyjnej
-- `npm run deploy` – publikacja na Cloudflare
+- `npm run build` – budowa aktywnej wersji Node dla klastra
+- `npm run build:worker` – budowa wycofanego wariantu Worker (break-glass)
+- `npm run deploy` – ręczna publikacja wariantu Worker; nie jest standardowym deployem
 
 ## Struktura projektu
 - `src/pages/` – pliki `.astro` lub `.md` reprezentujące strony
@@ -20,23 +24,18 @@ Strona jest hostowana na Cloudflare Workers i rozwijana w Astro przy wsparciu Co
 3. Dodaj treść w Markdown lub MDX i zacommituj – wpis pojawi się na stronie.
 
 ## Continuous deployment
-Repozytorium zawiera workflow GitHub Actions (`.github/workflows/deploy.yml`) który buduje i deployuje witrynę po zmianach w gałęzi `main`.
+
+Merge do `main` wysyła podpisany webhook przez dedykowany Cloudflare Tunnel do
+Flux. Prywatny kontroler klastra pobiera commit, uruchamia walidację, rootless
+BuildKit i skan Trivy, a następnie aktualizuje GitOps wyłącznie po przejściu
+bramek promocji. `.github/workflows/deploy.yml` jest tylko ręcznym wdrożeniem
+awaryjnego Workera i nie reaguje na push.
 
 ### Secrets configuration
 - `CF_API_TOKEN` – token API Cloudflare z uprawnieniami do Workers
 - `CF_ACCOUNT_ID` – identyfikator konta Cloudflare
 
-### Scheduled deployments
-Workflow ma też trigger `schedule`:
-
-```yaml
-schedule:
-  - cron: '0 3 * * *'
-```
-
-GitHub uruchamia automatyczny deploy codziennie o **03:00 UTC**, o ile włączone są scheduled workflows.
-
-### Worker secrets
+### Legacy Worker secrets
 Przed deployem skonfiguruj sekrety dla `wrangler secret`:
 
 ```bash
