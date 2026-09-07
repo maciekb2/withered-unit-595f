@@ -1,11 +1,12 @@
-FROM node:22-bookworm-slim AS build
+ARG NODE_IMAGE=node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5
+FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 RUN npm run build:node && npm prune --omit=dev
 
-FROM node:22-bookworm-slim AS runtime
+FROM ${NODE_IMAGE} AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
