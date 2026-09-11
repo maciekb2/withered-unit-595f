@@ -23,3 +23,10 @@ GHSA-rgj7-g3m4-5g8c: two transitive Cloudflare tool dependencies retained
 `sharp@0.35.2`. The package override uses the existing patched `sharp@0.35.4`
 for all consumers; the lockfile removes only duplicate vulnerable Sharp and
 libvips packages. The release scan remains enforced.
+
+Runtime verification then exposed a second migration defect: copied public
+assets had mode 0600 and root ownership. The unprivileged Node server returned
+EACCES for images even though the root build check found every file. The
+Dockerfile now copies `dist` with node ownership and verifies every
+public asset as USER node during the image build. Keep this runtime-identity
+check in addition to source and output completeness checks.

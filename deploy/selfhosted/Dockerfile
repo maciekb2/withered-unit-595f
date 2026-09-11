@@ -17,7 +17,9 @@ RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.l
  && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=build /app/dist ./dist
+# Flux source extraction can leave public assets readable only by root.
+# Assign ownership while copying, so USER node can read even mode 0600 files.
+COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 COPY --from=build --chmod=0644 /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-scheduler.mjs
@@ -39,5 +41,6 @@ RUN find /app/node_modules -type d \( -name esbuild -o -name @esbuild \) -prune 
  && rm /usr/local/bin/npm /usr/local/bin/npx
 USER node
 RUN for script in /app/scripts/*.mjs; do test -r "$script"; done
+RUN node --input-type=module -e 'import fs from "node:fs"; for (const file of fs.readdirSync("/app/dist/client", {recursive: true})) fs.accessSync("/app/dist/client/" + file, fs.constants.R_OK)'
 EXPOSE 3000
 CMD ["node", "./dist/server/entry.mjs"]
