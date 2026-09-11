@@ -1,4 +1,4 @@
-import { createServer } from 'node:http';
+import { createServer, request } from 'node:http';
 import { monitorEventLoopDelay } from 'node:perf_hooks';
 import { collectBusiness, createMetricsPool, metric, metricTypes } from './businessMetrics';
 import { HttpMetrics } from './httpMetrics';
@@ -7,6 +7,33 @@ type Article = { id: string; data: { pubDate: Date; heroImage?: string } };
 export const httpMetrics = new HttpMetrics();
 let started = false;
 const MAX_PROBE_BYTES = 512 * 1024;
+
+// Documentation-only IP: identifies internal synthetic traffic, never a visitor.
+export const GATEWAY_PROBE_HEADERS = { Host: 'pseudointelekt.pl', 'CF-Connecting-IP': '192.0.2.1' };
+
+// Node fetch does not reliably preserve a custom Host. The cluster gateway is
+// HTTP-only; use the native client with an explicit virtual host and no redirects.
+export async function probeGateway(url: URL): Promise<{ ok: number; seconds: number; status: number }> {
+  const start = performance.now();
+  return new Promise(resolve => {
+    const finish = (ok: number, status: number) => resolve({ ok, status, seconds: (performance.now()-start)/1000 });
+    if (url.protocol !== 'http:') { finish(0,0); return; }
+    const req = request(url, { headers: { ...GATEWAY_PROBE_HEADERS, 'user-agent': 'pseudointelekt-internal-probe/1' }, signal: AbortSignal.timeout(3000) }, res => {
+      const status = res.statusCode || 0;
+      if (status !== 200) { res.destroy(); finish(0,status); return; }
+      let bytes = 0;
+      const chunks: Buffer[] = [];
+      res.on('data', (chunk: Buffer) => {
+        bytes += chunk.length;
+        if (bytes > MAX_PROBE_BYTES) { res.destroy(); finish(0,status); }
+        else chunks.push(chunk);
+      });
+      res.on('end', () => finish(Number(Buffer.concat(chunks).toString('utf8').includes('<h1')),status));
+      res.on('error', () => finish(0,status));
+    });
+    req.on('error', () => finish(0,0)); req.end();
+  });
+}
 
 export async function probe(url: URL, method = 'GET', expected = '<h1', headers: Record<string, string> = {}): Promise<{ ok: number; seconds: number; status: number }> {
   const start = performance.now();
@@ -84,8 +111,8 @@ export function startObservability(getArticles: () => Promise<Article[]>): void 
         }
       }
       if (process.env.PROBE_GATEWAY_URL) {
-        const result = await probe(new URL(process.env.PROBE_GATEWAY_URL), 'GET', '<h1', { Host: 'pseudointelekt.pl' });
-        output += metric('probe_success', result.ok, 'route="gateway_home"') + metric('probe_duration_seconds', result.seconds, 'route="gateway_home"');
+        const result = await probeGateway(new URL(process.env.PROBE_GATEWAY_URL));
+        output += metric('probe_success', result.ok, 'route="gateway_home"') + metric('probe_duration_seconds', result.seconds, 'route="gateway_home"') + metric('probe_status_code', result.status, 'route="gateway_home"');
       }
       output += metric('event_loop_delay_p99_seconds', Number.isFinite(eventLoop.percentile(99)) ? eventLoop.percentile(99)/1e9 : 0);
       eventLoop.reset();
