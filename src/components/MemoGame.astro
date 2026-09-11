@@ -1,0 +1,176 @@
+<section class="memo-section" aria-labelledby="memo-title" id="memo">
+  <memo-game>
+    <div class="memo-intro">
+      <p class="memo-kicker">PO GODZINACH / MEMO</p>
+      <h2 id="memo-title">Znajdź wspólny mianownik.</h2>
+      <p id="memo-instructions">Nagłówki już za Tobą? Zrób krótką przerwę i znajdź osiem par symboli. Odsłaniaj po dwie karty. Czas ruszy przy pierwszej.</p>
+      <div class="memo-stats" aria-label="Wynik gry">
+        <div><span>Pary</span><strong data-pairs>0 / 8</strong></div>
+        <div><span>Ruchy</span><strong data-moves>0</strong></div>
+        <div><span>Czas</span><strong data-time role="timer" aria-live="off">00:00</strong></div>
+      </div>
+      <button class="memo-action" data-deal disabled type="button">Rozdaj karty <span aria-hidden="true">↗</span></button>
+      <p class="memo-note">Bez konta, rankingu i wysyłania wyników.</p>
+      <noscript><p>Do gry potrzebny jest JavaScript. Artykuły możesz czytać bez niego.</p></noscript>
+      <p class="memo-status" data-status role="status" aria-live="polite" aria-atomic="true">Osiem par. Chwila skupienia.</p>
+    </div>
+    <div class="memo-visual">
+      <div class="memo-preview" data-preview aria-hidden="true"><span>PI</span><span>↗</span><span>↗</span><span>PI</span></div>
+      <div class="memo-board" data-board role="group" aria-label="Plansza memo" aria-describedby="memo-instructions" hidden></div>
+    </div>
+  </memo-game>
+</section>
+
+<script>
+  import { MemoRound, MEMO_SYMBOLS, formatMemoTime } from '../utils/memo';
+
+  class MemoGame extends HTMLElement {
+    private round: MemoRound | null = null;
+    private timeout?: ReturnType<typeof setTimeout>;
+    private ticker?: ReturnType<typeof setInterval>;
+    private events?: AbortController;
+
+    connectedCallback() {
+      if (this.events) return;
+      this.events = new AbortController();
+      const options = { signal: this.events.signal };
+      this.querySelector<HTMLButtonElement>('[data-deal]')!.disabled = false;
+      this.querySelector('[data-deal]')!.addEventListener('click', () => this.deal(), options);
+      this.querySelector('[data-board]')!.addEventListener('click', event => {
+        const button = (event.target as Element).closest<HTMLButtonElement>('[data-card]');
+        if (button) this.pick(Number(button.dataset.card));
+      }, options);
+      this.querySelector('[data-board]')!.addEventListener('keydown', event => {
+        const key = (event as KeyboardEvent).key;
+        const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -4, ArrowDown: 4 };
+        if (!(key in steps) && key !== 'Home' && key !== 'End') return;
+        const buttons = [...this.querySelectorAll<HTMLButtonElement>('[data-card]')];
+        const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        if (index < 0) return;
+        event.preventDefault();
+        const next = key === 'Home' ? 0 : key === 'End' ? buttons.length - 1 : Math.max(0, Math.min(buttons.length - 1, index + steps[key]));
+        buttons[next]?.focus();
+      }, options);
+      // Reconnection must not leave a previously suspended mismatch locked.
+      if (this.round) {
+        this.round.resolve(); this.render();
+        if (this.round.startedAt !== null && !this.round.won) this.ticker = setInterval(() => this.clock(), 250);
+      }
+    }
+
+    disconnectedCallback() {
+      this.clearTimers();
+      this.events?.abort();
+      this.events = undefined;
+    }
+
+    private clearTimers() {
+      clearTimeout(this.timeout); clearInterval(this.ticker);
+      this.timeout = undefined; this.ticker = undefined;
+    }
+    private announce(message: string) { this.querySelector('[data-status]')!.textContent = message; }
+    private clock() { this.querySelector('[data-time]')!.textContent = formatMemoTime(this.round?.elapsed(performance.now()) ?? 0); }
+
+    private deal() {
+      this.clearTimers();
+      this.round = new MemoRound();
+      const board = this.querySelector<HTMLElement>('[data-board]')!;
+      board.replaceChildren();
+      for (let i = 0; i < this.round.deck.length; i++) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'memo-card';
+        button.dataset.card = String(i);
+        board.append(button);
+      }
+      board.hidden = false;
+      this.querySelector<HTMLElement>('[data-preview]')!.hidden = true;
+      this.querySelector('[data-deal]')!.textContent = 'Nowe rozdanie ↻';
+      this.announce('Plansza gotowa. Odsłoń pierwszą kartę.');
+      this.render();
+      board.querySelector<HTMLButtonElement>('button')!.focus({ preventScroll: true });
+    }
+
+    private pick(index: number) {
+      const round = this.round;
+      if (!round) return;
+      const result = round.select(index, performance.now());
+      if (result === 'ignored') return;
+      if (!this.ticker) this.ticker = setInterval(() => this.clock(), 250);
+      this.render();
+      if (result === 'first') { this.announce('Wybierz drugą kartę.'); return; }
+      this.announce(result === 'match' ? `Para znaleziona. ${round.matched.size / 2} z 8.` : 'To nie para. Zapamiętaj symbole.');
+      if (round.won) {
+        this.clearTimers();
+        this.announce(`Komplet! Osiem par w ${round.moves} ruchach. Czas: ${formatMemoTime(round.elapsed(performance.now()))}. Zagraj ponownie, wybierając nowe rozdanie.`);
+      }
+      this.timeout = setTimeout(() => {
+        if (this.round !== round) return;
+        round.resolve();
+        this.render();
+      }, result === 'match' ? 300 : 850);
+    }
+
+    private render() {
+      const round = this.round;
+      if (!round) return;
+      this.querySelector('[data-pairs]')!.textContent = `${round.matched.size / 2} / 8`;
+      this.querySelector('[data-moves]')!.textContent = String(round.moves);
+      this.clock();
+      this.querySelectorAll<HTMLButtonElement>('[data-card]').forEach((button, index) => {
+        const matched = round.matched.has(index);
+        const visible = matched || round.selected.includes(index);
+        button.setAttribute('aria-pressed', String(visible));
+        button.setAttribute('aria-disabled', String(round.locked || matched || round.won));
+        button.dataset.revealed = String(visible);
+        button.dataset.matched = String(matched);
+        button.setAttribute('aria-label', visible ? `Karta ${index + 1}: ${MEMO_SYMBOLS[round.deck[index]].name}${matched ? ', para znaleziona' : ''}` : `Ukryta karta ${index + 1}`);
+        button.replaceChildren();
+        if (visible) {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.setAttribute('aria-hidden', 'true');
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', MEMO_SYMBOLS[round.deck[index]].path);
+          svg.append(path); button.append(svg);
+        } else {
+          const back = document.createElement('span');
+          back.setAttribute('aria-hidden', 'true');
+          back.textContent = 'PI'; button.append(back);
+        }
+      });
+    }
+  }
+  if (!customElements.get('memo-game')) customElements.define('memo-game', MemoGame);
+</script>
+
+<style>
+  .memo-section { background: #e9e6da; color: #12372d; padding: 5rem 0; border-top: 1px solid #183e3026; }
+  memo-game { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; width: min(1180px, calc(100% - 4rem)); margin: auto; }
+  .memo-kicker { font: 600 .7rem monospace; letter-spacing: .16em; color: #496657; margin: 0 0 1.25rem; }
+  h2 { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; letter-spacing: -.04em; max-width: 12ch; margin: 0 0 1.5rem; }
+  #memo-instructions { max-width: 42ch; line-height: 1.7; color: #40584d; }
+  .memo-stats { display: flex; gap: 2rem; margin: 1.75rem 0; }
+  .memo-stats span { display: block; text-transform: uppercase; font: .65rem monospace; letter-spacing: .12em; margin-bottom: .5rem; }
+  .memo-stats strong { font: 500 1.55rem monospace; font-variant-numeric: tabular-nums; }
+  .memo-action { display: inline-flex; justify-content: space-between; gap: 2rem; align-items: center; min-height: 48px; padding: .85rem 1.25rem; border: 1px solid #12372d; background: #12372d; color: #fff8df; font: inherit; cursor: pointer; }
+  .memo-action:hover { background: #22533f; }
+  .memo-action:disabled { opacity: .5; cursor: default; }
+  .memo-action:focus-visible { outline: 3px solid #947019; outline-offset: 4px; }
+  .memo-note { font-size: .72rem; color: #526358; margin-top: .85rem; }
+  .memo-status { font-size: .9rem; line-height: 1.5; min-height: 3em; max-width: 42ch; margin-bottom: 0; }
+  .memo-visual { min-width: 0; }
+  .memo-preview { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; max-width: 300px; margin: auto; transform: rotate(-6deg); }
+  .memo-preview span { display: grid; place-items: center; aspect-ratio: 1; background: #12372d; color: #d8bc69; font: 2rem monospace; border: 1px solid #d8bc6955; }
+  .memo-preview span:nth-child(2), .memo-preview span:nth-child(3) { background: #d8bc69; color: #12372d; }
+  .memo-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; }
+  [hidden] { display: none !important; }
+  :global(memo-game .memo-card) { aspect-ratio: 1; min-width: 0; min-height: 48px; display: grid; place-items: center; border: 1px solid #47694e; border-radius: 3px; background: #12372d; color: #d8bc69; cursor: pointer; font: 500 1rem monospace; transition: background 150ms, color 150ms; }
+  :global(memo-game .memo-card:hover) { border-color: #a8893c; }
+  :global(memo-game .memo-card:focus-visible) { outline: 3px solid #947019; outline-offset: 3px; }
+  :global(memo-game .memo-card[data-revealed="true"]) { background: #f8f3df; color: #173e30; border-color: #947019; }
+  :global(memo-game .memo-card[data-matched="true"]) { background: #d8bc69; color: #173e30; cursor: default; }
+  :global(memo-game .memo-card svg) { width: 38%; height: 38%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  @media (max-width: 760px) { memo-game { grid-template-columns: 1fr; gap: 2rem; width: calc(100% - 2.5rem); } .memo-section { padding: 3rem 0; } .memo-preview { max-width: 220px; } .memo-board { gap: .5rem; } h2 { max-width: 16ch; } }
+  @media (prefers-reduced-motion: reduce) { :global(memo-game .memo-card) { transition: none; } }
+</style>
