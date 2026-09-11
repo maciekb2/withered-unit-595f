@@ -17,3 +17,9 @@ Release through the existing ApplicationRelease and Flux image automation.
 Verify the source revision, image digest, runtime readiness and image HTTP
 responses. Cloudflare may retain earlier 404 responses, so verify both the
 canonical URL and a fresh query string after rollout.
+
+The first repaired candidate passed validation but Trivy blocked promotion on
+GHSA-rgj7-g3m4-5g8c: two transitive Cloudflare tool dependencies retained
+`sharp@0.35.2`. The package override uses the existing patched `sharp@0.35.4`
+for all consumers; the lockfile removes only duplicate vulnerable Sharp and
+libvips packages. The release scan remains enforced.
