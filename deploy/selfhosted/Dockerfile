@@ -17,10 +17,9 @@ RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.l
  && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=build /app/dist ./dist
 # Flux source extraction can leave public assets readable only by root.
-# The standalone server serves these files as the unprivileged node user.
-RUN chmod -R a+rX /app/dist/client
+# Assign ownership while copying, so USER node can read even mode 0600 files.
+COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 COPY --from=build --chmod=0644 /app/scripts/selfhosted-scheduler.mjs ./scripts/selfhosted-scheduler.mjs

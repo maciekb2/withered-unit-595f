@@ -27,6 +27,6 @@ libvips packages. The release scan remains enforced.
 Runtime verification then exposed a second migration defect: copied public
 assets had mode 0600 and root ownership. The unprivileged Node server returned
 EACCES for images even though the root build check found every file. The
-Dockerfile now grants read/traverse access to `dist/client` and verifies every
+Dockerfile now copies `dist` with node ownership and verifies every
 public asset as USER node during the image build. Keep this runtime-identity
 check in addition to source and output completeness checks.
