@@ -1,0 +1,5 @@
+# Flux excludes PNG/JPEG/GIF by default; these are application assets.
+!/public/**/*.png
+!/public/**/*.jpg
+!/public/**/*.jpeg
+!/public/**/*.gif
