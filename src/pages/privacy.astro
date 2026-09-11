@@ -14,7 +14,7 @@ import { CONTACT_EMAIL } from '../consts';
 		<Header />
 		<main>
 			<h1>Polityka prywatności i cookies</h1>
-			<p>Ostatnia aktualizacja: 11 lipca 2026 r.</p>
+			<p>Ostatnia aktualizacja: 11 września 2026 r.</p>
 
 			<h2>Administrator i kontakt</h2>
 			<p>
@@ -33,8 +33,8 @@ import { CONTACT_EMAIL } from '../consts';
 
 			<h2>Odbiorcy danych i transfery</h2>
 			<p>
-				Dane mogą być przetwarzane przez dostawców infrastruktury i narzędzi używanych przez serwis:
-				Cloudflare (hosting, ochrona i przechowywanie techniczne), Google (Analytics 4 — wyłącznie po zgodzie)
+				Aplikacja i wiadomości są przechowywane we własnym centrum danych.
+				Dane mogą być również przetwarzane przez Cloudflare (ochrona i przekazywanie ruchu), Google (Analytics 4 — wyłącznie po zgodzie)
 				i Slack (powiadomienie o nowej wiadomości z formularza). Dostawcy ci mogą przetwarzać dane poza
 				Europejskim Obszarem Gospodarczym. W takim przypadku stosowane są mechanizmy przewidziane przez
 				RODO, w tym odpowiednie zabezpieczenia kontraktowe dostawców.
@@ -43,14 +43,14 @@ import { CONTACT_EMAIL } from '../consts';
 			<h2>Jak długo przechowujemy dane</h2>
 			<ul>
 				<li>Wiadomości z formularza są przechowywane w serwisie maksymalnie przez 12 miesięcy od ich wysłania.</li>
-				<li>Techniczny identyfikator sesji jest plikiem sesyjnym i wygasa po zakończeniu sesji przeglądarki.</li>
-				<li>Klucze ograniczające nadużycia są przechowywane przez 10 minut lub 1 godzinę — zależnie od rodzaju limitu.</li>
+				<li>Techniczny identyfikator <code>pi_session</code>, używany przy reakcjach na artykuły, pozostaje w przeglądarce do roku lub do usunięcia cookies.</li>
+				<li>Limity formularza wykorzystują skróty adresu e-mail i adresu IP, a nie ich jawne wartości. Limity wygasają po 10 minutach lub godzinie; wygasłe klucze są usuwane przy kolejnej poprawnej próbie wysyłki. Skróty są danymi pseudonimowymi, nie anonimowymi.</li>
 				<li>Wybór dotyczący analityki pozostaje w pamięci lokalnej przeglądarki do jego zmiany albo wyczyszczenia danych przeglądarki.</li>
 			</ul>
 
 			<h2>Cookies i ustawienia</h2>
 			<p>
-				Serwis używa niezbędnego pliku sesyjnego <code>sid</code> (ochrona formularza i ograniczanie nadużyć)
+				Serwis używa pliku <code>pi_session</code> (rozpoznawanie powtórnych reakcji na artykuły)
 				oraz zapisu ustawień prywatności w pamięci lokalnej przeglądarki. Te mechanizmy są potrzebne do działania
 				serwisu i nie służą reklamie.
 			</p>

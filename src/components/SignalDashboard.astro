@@ -66,7 +66,6 @@ const {
                         <time>{featured.dateLabel}</time>
                     </div>
                     <div class="featured-copy">
-                        <p>Najnowsza analiza redakcji</p>
                         <h3>{featured.title}</h3>
                         <span class="featured-description">{featured.description}</span>
                         <span class="featured-link">Przeczytaj analizę <b aria-hidden="true">↗</b></span>
@@ -77,7 +76,6 @@ const {
             <aside class="status-console" aria-label="Archiwum redakcji">
                 <div class="console-head">
                     <span>ARCHIWUM REDAKCJI</span>
-                    <span class="console-ok">AKTUALIZOWANE</span>
                 </div>
                 <dl class="console-metrics">
                     <div>
@@ -103,7 +101,7 @@ const {
             <div class="topic-console">
                 <div class="console-head">
                     <span>TEMATY</span>
-                    <a href="/tematy/">WSZYSTKIE DOSSIERS →</a>
+                    <a href="/tematy/">WSZYSTKIE TEMATY →</a>
                 </div>
                 <ol>
                     {topics.map((topic, index) => (
