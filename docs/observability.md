@@ -33,7 +33,8 @@ security/billing boundary. Test telemetry can be distinguished on dashboards.
 
 The collector runs at most once per minute, independently of HTTP scrapes.
 Queries use a separate one-connection PostgreSQL pool with read-only sessions,
-2-second statement/connection deadlines and a 500ms lock deadline. Missing
+2-second statement/connection deadlines, a 2.5-second client read deadline and
+a 500ms lock deadline. Missing
 optional tables emit collector_up=0, not fabricated zero business activity.
 Queries return aggregates only. The collector does not change data or schemas.
 

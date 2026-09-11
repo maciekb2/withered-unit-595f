@@ -27,6 +27,8 @@ test('monitoring connection is read-only and aggregates are available without le
   try {
     assert.equal((await metricsDb.query('SHOW default_transaction_read_only')).rows[0].default_transaction_read_only, 'on');
     assert.equal((await metricsDb.query('SHOW statement_timeout')).rows[0].statement_timeout, '2s');
+    assert.equal(metricsDb.options.query_timeout, 2500);
+    await assert.rejects(metricsDb.query('SELECT pg_sleep(5)'), /statement timeout|Query read timeout/);
     await assert.rejects(metricsDb.query("INSERT INTO contact_messages(name,email,message) VALUES('monitor','never@example.invalid','do not write')"), /read-only/);
     const text = await collectBusiness(metricsDb);
     assert.match(text, /pseudointelekt_database_up 1/);

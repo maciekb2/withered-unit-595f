@@ -2,7 +2,7 @@ import pg from 'pg';
 
 export function createMetricsPool(connectionString: string | undefined): pg.Pool {
   const pool = new pg.Pool({
-    connectionString, max: 1, connectionTimeoutMillis: 2000, idleTimeoutMillis: 10000,
+    connectionString, max: 1, connectionTimeoutMillis: 2000, query_timeout: 2500, idleTimeoutMillis: 10000,
     application_name: 'pseudointelekt-monitoring',
     options: '-c default_transaction_read_only=on -c statement_timeout=2000 -c lock_timeout=500',
   });
