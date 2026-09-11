@@ -5,6 +5,7 @@ import { logEvent, logError } from '../utils/logger';
 import type { FinalJson } from '../pipeline/types';
 import { validateFinalJson, yamlEscape, yamlStringArray } from '../utils/validators';
 import { tagsForArticle } from '../utils/topics';
+import { publicationDate } from '../utils/publicationDate';
 
 export interface AssembleOptions {
   article: FinalJson;
@@ -31,8 +32,10 @@ export async function assembleArticle({
     });
     throw new Error('Final JSON validation failed: ' + validation.errs.join('; '));
   }
-  const postDate = date || new Date().toISOString().split('T')[0];
+  const postDate = publicationDate(date);
   const slug = slugify(article.title);
+  if (!slug) throw new Error('Article title produces an empty slug');
+  if (!heroImage.length) throw new Error('Hero image is empty');
 
   await fs.mkdir(publicDir, { recursive: true });
   await fs.mkdir(blogDir, { recursive: true });
@@ -40,7 +43,7 @@ export async function assembleArticle({
 
   const imageName = `${postDate}-${slug}.png`;
   const imagePath = path.join(publicDir, imageName);
-  await fs.writeFile(imagePath, heroImage);
+  await fs.writeFile(imagePath, heroImage, { flag: 'wx', mode: 0o644 });
   const tags = article.tags?.length ? article.tags : tagsForArticle(article.title, article.description);
 
   const fm = [
@@ -60,7 +63,7 @@ export async function assembleArticle({
   const postName = `${postDate}-${slug}.md`;
   const postPath = path.join(blogDir, postName);
   try {
-    await fs.writeFile(postPath, fm + article.content);
+    await fs.writeFile(postPath, fm + article.content, { flag: 'wx', mode: 0o644 });
     logEvent({ type: 'assemble-files-written', postPath, imagePath });
     logEvent({ type: 'assemble-complete', postPath, imagePath });
     return { postPath, imagePath };

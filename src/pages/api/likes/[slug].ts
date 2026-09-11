@@ -10,9 +10,10 @@ export const POST: APIRoute = async ({ params, request }) => {
   const client = await db.connect();
   try {
     await client.query('BEGIN');
-    const seen = await client.query('SELECT 1 FROM engagement_like_sessions WHERE slug = $1 AND session_id = $2', [slug, session]);
-    if (!seen.rowCount) {
-      await client.query('INSERT INTO engagement_like_sessions (slug, session_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [slug, session]);
+    // The unique insert, not a preceding SELECT, must decide who increments.
+    // Concurrent requests from one session otherwise both observe "not seen".
+    const inserted = await client.query('INSERT INTO engagement_like_sessions (slug, session_id) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING slug', [slug, session]);
+    if (inserted.rowCount) {
       await client.query("INSERT INTO engagement_counters (kind, slug, value) VALUES ('like', $1, 1) ON CONFLICT (kind, slug) DO UPDATE SET value = engagement_counters.value + 1, updated_at = now()", [slug]);
     }
     const result = await client.query<{ value: number }>("SELECT value FROM engagement_counters WHERE kind = 'like' AND slug = $1", [slug]);

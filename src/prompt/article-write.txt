@@ -4,6 +4,8 @@ Wymagania:
 - Unikaj tytułów/tematów z listy ostatnich wpisów: {recent_titles}.
 - Trzymaj się konspektu: dokładnie 3 sekcje, nagłówki dokładnie jak w outline ("## ...") i w tej samej kolejności.
 - Każdy bullet rozwiń w spójny akapit 6–10 zdań (bez list wypunktowanych w treści).
+- Cel długości: 1100–1250 słów, po około 370–420 słów na sekcję; nie schodź poniżej 1050 słów. Rozwijaj mechanizm i warunkowe konsekwencje, nie dopisuj wydarzeń dla objętości.
+- Fakty z dostarczonego źródła streść własnymi słowami w maksymalnie 150 słowach łącznie. Reszta to autorska analiza i jawnie warunkowe scenariusze, nie dalsza parafraza źródła. Bez cytatów i niezweryfikowanych analogii historycznych.
 - Nie dodawaj nowych faktów poza tym, co wynika z kontekstu i ogólnej wiedzy; jeśli brak pewności, uogólnij (nie wstawiaj [[TODO-CLAIM]] w finalnym wyniku).
 - Nie wstawiaj URL do body. `leadSourceUrl` z KONTEKSTU zostanie zapisany osobno w metadanych i pokazany przez layout artykułu.
 - Zwróć wyłącznie właściwe body: zacznij od pierwszego nagłówka `##`. Nie powtarzaj tytułu jako `#`, nie wstawiaj opisu/ leadu z outline i nie dodawaj osobnego wiersza „Źródło tematu”. Źródło oraz lead wyświetla layout strony.

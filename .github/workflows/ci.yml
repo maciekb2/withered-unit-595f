@@ -71,6 +71,33 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+  postgres-integration:
+    name: PostgreSQL Integration
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: pseudointelekt_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test:integration
+        env:
+          TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/pseudointelekt_test
+
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
@@ -93,7 +120,7 @@ jobs:
   build:
     name: Build and Smoke
     runs-on: ubuntu-latest
-    needs: [type-check, unit-tests]
+    needs: [type-check, unit-tests, postgres-integration]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -129,3 +156,4 @@ jobs:
           test -s /tmp/pseudointelekt-home.html
           grep -q 'lang="pl"' /tmp/pseudointelekt-home.html
           grep -q 'data-site-header' /tmp/pseudointelekt-home.html
+          npm run test:smoke -- http://127.0.0.1:3100
