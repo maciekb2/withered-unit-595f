@@ -7,6 +7,7 @@ import { MEMO_PAIR_COUNT } from '../utils/memo';
       <p class="memo-kicker">PO GODZINACH / MEMO</p>
       <h2 id="memo-title">Znajdź wspólny mianownik.</h2>
       <p id="memo-instructions">Nagłówki już za Tobą? Zmień perspektywę: 40 kart, 20 par i chwila skupienia. Odsłaniaj po dwa symbole. Czas ruszy przy pierwszej karcie.</p>
+      <div class="memo-controls">
       <div class="memo-stats" aria-label="Wynik gry">
         <div><span>Pary</span><strong data-pairs>0 / {MEMO_PAIR_COUNT}</strong></div>
         <div><span>Ruchy</span><strong data-moves>0</strong></div>
@@ -16,6 +17,7 @@ import { MEMO_PAIR_COUNT } from '../utils/memo';
       <p class="memo-note">Bez konta, rankingu i wysyłania wyników.</p>
       <noscript><p>Do gry potrzebny jest JavaScript. Artykuły możesz czytać bez niego.</p></noscript>
       <p class="memo-status" data-status role="status" aria-live="polite" aria-atomic="true">Od globusu po pióro — znajdź połączenia.</p>
+      </div>
     </div>
     <div class="memo-visual">
       <div class="memo-preview" data-preview aria-hidden="true">{Array.from({ length: MEMO_PAIR_COUNT * 2 }, (_, index) => <span style={`--order: ${index}`}>{index % 7 === 0 ? '↗' : 'PI'}</span>)}</div>
@@ -164,11 +166,8 @@ import { MEMO_PAIR_COUNT } from '../utils/memo';
   .memo-section { background: #e9e6da; color: #12372d; padding: 5rem 0; border-top: 1px solid #183e3026; }
   memo-game { display: grid; grid-template-columns: 1fr; gap: 2.5rem; width: min(1180px, calc(100% - 4rem)); margin: auto; }
   .memo-intro { display: grid; grid-template-columns: 1.3fr 1fr; column-gap: 4rem; align-items: start; }
-  .memo-intro > * { grid-column: 1; }
-  .memo-stats { grid-column: 2; grid-row: 2; }
-  .memo-action { grid-column: 2; grid-row: 3; justify-self: start; }
-  .memo-note { grid-column: 2; grid-row: 4; }
-  .memo-status { grid-column: 2; grid-row: 5; }
+  .memo-kicker, h2, #memo-instructions { grid-column: 1; }
+  .memo-controls { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
   .memo-kicker { font: 600 .7rem monospace; letter-spacing: .16em; color: #496657; margin: 0 0 1.25rem; }
   h2 { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; letter-spacing: -.04em; max-width: 12ch; margin: 0 0 1.5rem; }
   #memo-instructions { max-width: 42ch; line-height: 1.7; color: #40584d; }
