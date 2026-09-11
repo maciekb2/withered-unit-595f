@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MemoRound, MEMO_SYMBOLS, formatMemoTime } from './memo';
 
+test('anchor lower arc joins the stem without clipping its stroke in the 24px viewBox', () => {
+  const anchor = MEMO_SYMBOLS.find(symbol => symbol.name === 'Kotwica')!;
+  // This half-ellipse starts at y=16; its lower bound is 16 + vertical radius.
+  const arc = anchor.path.match(/M3 14v2a9 ([\d.]+) 0 0 0 18 0/);
+  assert.ok(arc, 'Expected the anchor lower half-ellipse');
+  const bottom = 16 + Number(arc[1]);
+  assert.equal(bottom, 21, 'Lower arc should meet the stem at y=21');
+  assert.ok(bottom + 1.6 / 2 < 24, 'Leave room for the full stroke');
+});
+
 test('memo deals two of every symbol and shuffles without changing the collection', () => {
   const a = new MemoRound(() => 0);
   const b = new MemoRound(() => 0.999);
