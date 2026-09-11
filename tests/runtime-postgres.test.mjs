@@ -17,6 +17,7 @@ const contact = await import('../src/pages/api/contact.ts');
 const db = getPool();
 before(async () => {
   await db.query(await fs.readFile(new URL('../deploy/selfhosted/migrations/001_initial.sql', import.meta.url), 'utf8'));
+  await db.query(await fs.readFile(new URL('../deploy/selfhosted/migrations/005_generation_runs.sql', import.meta.url), 'utf8'));
   const protection = await fs.readFile(new URL('../deploy/selfhosted/migrations/006_contact_protection.sql', import.meta.url), 'utf8');
   await db.query(protection);
   await db.query(protection); // The migration runner is deliberately repeatable.
@@ -99,6 +100,22 @@ test('IP and global quotas reject new identities without saving messages', async
     assert.equal(globalResult.headers.get('retry-after'), '60');
     assert.equal((await db.query('SELECT id FROM contact_messages WHERE email=$1', [email])).rowCount, 0);
   } finally { await db.query("UPDATE contact_rate_limits SET hits=$1 WHERE bucket='global'", [original]); }
+});
+
+test('monitoring connection is read-only and aggregates are available without leaking content', async () => {
+  const { collectBusiness, createMetricsPool } = await import('../src/server/businessMetrics.ts');
+  const metricsDb = createMetricsPool(connection);
+  try {
+    assert.equal((await metricsDb.query('SHOW default_transaction_read_only')).rows[0].default_transaction_read_only, 'on');
+    assert.equal((await metricsDb.query('SHOW statement_timeout')).rows[0].statement_timeout, '2s');
+    assert.equal(metricsDb.options.query_timeout, 2500);
+    await assert.rejects(metricsDb.query('SELECT pg_sleep(5)'), /statement timeout|Query read timeout/);
+    await assert.rejects(metricsDb.query("INSERT INTO contact_messages(name,email,message) VALUES('monitor','never@example.invalid','do not write')"), /read-only/);
+    const text = await collectBusiness(metricsDb);
+    assert.match(text, /pseudointelekt_database_up 1/);
+    assert.match(text, /pseudointelekt_collector_up{collector="generation"} 1/);
+    assert.doesNotMatch(text, /never@example|do not write|DATABASE_URL/);
+  } finally { await metricsDb.end(); }
 });
 
 test('parallel likes from one session increment exactly once, another session increments again', async () => {
