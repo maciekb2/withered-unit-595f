@@ -43,8 +43,9 @@ export async function generateOutline({ apiKey, baseTopic, topicContext, model =
     'Naglowki sekcji h2 maja byc krotkimi etykietami watku, nie moga powtarzac finalTitle ani jego duzych fragmentow.\n' +
     'Kazdy bullet musi bezposrednio nawiazywac do tematu bazowego; kazda sekcja rozwija ten sam watek, bez nowych osi narracji.\n' +
     'Kazdy bullet ma wskazac konkretnego aktora, miejsce, instrument polityki, koszt, element logistyki albo bezposredni skutek. Bez ogolnikow o swiecie i historii.\n' +
-    'W 1-2 bulletach wplec analogie z ostatnich 2 lat.\n' +
-    'W calym artykule 3-5 zrodel, maks 1 na sekcje; jesli podajesz zrodlo, podaj je jako pelny URL http(s)://... w tym samym bullecie.\n' +
+    (topicContext
+      ? 'Dostarczony kontekst jest jedynym zrodlem faktow o wydarzeniu. Nie dodawaj nowych URL, historycznych analogii ani szczegolow spoza kontekstu. Pozostale bullety rozwijaja autorska analize mechanizmu i jawnie warunkowe scenariusze.\n'
+      : 'Analogie historyczne tylko z potwierdzonym zrodlem; nie wymyslaj URL ani danych.\n') +
     'Gdy brak pewnych danych – wstaw dokladnie [[TODO-CLAIM]].\n' +
     'Dodaj liste guardrails (avoid) 3-6 pozycji.';
   const systemPrompt = `${guardrails()} Zwracaj wylacznie poprawny JSON { "finalTitle", "description", "sections": [{ "h2", "bullets": [string] }], "guardrails": [string] } bez markdownu i komentarzy.`;

@@ -9,6 +9,7 @@ import { logEvent } from '../utils/logger';
 import { buildContextPack } from '../pipeline/contextPack';
 import { ensurePolishArticleLanguage } from '../pipeline/languageGuard';
 import type { GenerateHeroOptions } from './heroImageGenerator';
+import { validateArticleQuality } from '../pipeline/validators/quality';
 
 export interface GenerateArticleAssetsOptions {
   apiKey: string;
@@ -67,8 +68,6 @@ export async function generateArticleAssets({
     recentTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')
   );
 
-  const outlineRes = await generateOutline({ apiKey, baseTopic, model: outlineModelFinal, maxTokens: 2000 });
-  const outline = outlineRes.outline;
   const fallbackUrl = 'https://example.com';
   const finalLeadUrl = leadSourceUrl || fallbackUrl;
   if (!leadSourceUrl) {
@@ -78,6 +77,8 @@ export async function generateArticleAssets({
     selectedTopic: { title: baseTopic, url: finalLeadUrl, description: topicDescription },
     hotTopics: [],
   });
+  const outlineRes = await generateOutline({ apiKey, baseTopic, topicContext: contextPack, model: outlineModelFinal, maxTokens: 3000 });
+  const outline = outlineRes.outline;
   const writeRes = await writeArticle({
     apiKey,
     outline,
@@ -141,6 +142,8 @@ export async function generateArticleAssets({
 
   const article = formatFinal(edited);
   if (leadSourceUrl) article.sourceUrl = leadSourceUrl;
+  const quality = validateArticleQuality(article, outline);
+  if (!quality.ok) throw new Error(`Article quality validation failed: ${quality.errors.join('; ')}`);
   const heroPrompt = heroTemplate.replace('{title}', article.title);
   const heroImage = await generateHeroImage({
     apiKey,

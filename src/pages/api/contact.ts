@@ -26,7 +26,9 @@ async function notifySlack(name: string, email: string, message: string): Promis
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  const form = await request.formData();
+  let form: FormData;
+  try { form = await request.formData(); }
+  catch { return new Response('Invalid input', { status: 400 }); }
   const name = String(form.get('name') || '').trim();
   const email = String(form.get('email') || '').trim();
   const message = String(form.get('message') || '').trim();

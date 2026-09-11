@@ -83,3 +83,30 @@ test('assembleArticle removes an orphan hero when markdown persistence fails', a
     await fs.rm(root, { recursive: true, force: true });
   }
 });
+
+test('assembleArticle never overwrites an existing article or image', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pseudointelekt-collision-'));
+  const options = { article, heroImage: Buffer.from('original'), blogDir: path.join(root, 'blog'), publicDir: path.join(root, 'images'), date: '2026-09-01' };
+  try {
+    const result = await assembleArticle(options);
+    const originalPost = await fs.readFile(result.postPath, 'utf8');
+    await assert.rejects(assembleArticle({ ...options, heroImage: Buffer.from('replacement') }), /EEXIST/);
+    assert.equal(await fs.readFile(result.imagePath, 'utf8'), 'original');
+    assert.equal(await fs.readFile(result.postPath, 'utf8'), originalPost);
+    // Even if the old image is absent, the article is preserved and the new orphan removed.
+    await fs.rm(result.imagePath);
+    await assert.rejects(assembleArticle(options), /EEXIST/);
+    assert.equal(await fs.readFile(result.postPath, 'utf8'), originalPost);
+    assert.deepEqual(await fs.readdir(options.publicDir), []);
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
+
+test('assembleArticle rejects unsafe dates and empty images before creating directories', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'pseudointelekt-unsafe-'));
+  const options = { article, heroImage: Buffer.from('image'), blogDir: path.join(root, 'blog'), publicDir: path.join(root, 'images') };
+  try {
+    await assert.rejects(assembleArticle({ ...options, date: '../outside' }), /date/i);
+    await assert.rejects(assembleArticle({ ...options, heroImage: Buffer.alloc(0) }), /empty/);
+    assert.deepEqual(await fs.readdir(root), []);
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
