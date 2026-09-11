@@ -1,28 +1,34 @@
+---
+import { MEMO_PAIR_COUNT } from '../utils/memo';
+---
 <section class="memo-section" aria-labelledby="memo-title" id="memo">
   <memo-game>
     <div class="memo-intro">
       <p class="memo-kicker">PO GODZINACH / MEMO</p>
       <h2 id="memo-title">Znajdź wspólny mianownik.</h2>
-      <p id="memo-instructions">Nagłówki już za Tobą? Zrób krótką przerwę i znajdź osiem par symboli. Odsłaniaj po dwie karty. Czas ruszy przy pierwszej.</p>
+      <p id="memo-instructions">Nagłówki już za Tobą? Zmień perspektywę: 40 kart, 20 par i chwila skupienia. Odsłaniaj po dwa symbole. Czas ruszy przy pierwszej karcie.</p>
+      <div class="memo-controls">
       <div class="memo-stats" aria-label="Wynik gry">
-        <div><span>Pary</span><strong data-pairs>0 / 8</strong></div>
+        <div><span>Pary</span><strong data-pairs>0 / {MEMO_PAIR_COUNT}</strong></div>
         <div><span>Ruchy</span><strong data-moves>0</strong></div>
         <div><span>Czas</span><strong data-time role="timer" aria-live="off">00:00</strong></div>
       </div>
       <button class="memo-action" data-deal disabled type="button">Rozdaj karty <span aria-hidden="true">↗</span></button>
       <p class="memo-note">Bez konta, rankingu i wysyłania wyników.</p>
       <noscript><p>Do gry potrzebny jest JavaScript. Artykuły możesz czytać bez niego.</p></noscript>
-      <p class="memo-status" data-status role="status" aria-live="polite" aria-atomic="true">Osiem par. Chwila skupienia.</p>
+      <p class="memo-status" data-status role="status" aria-live="polite" aria-atomic="true">Od globusu po pióro — znajdź połączenia.</p>
+      </div>
     </div>
     <div class="memo-visual">
-      <div class="memo-preview" data-preview aria-hidden="true"><span>PI</span><span>↗</span><span>↗</span><span>PI</span></div>
+      <div class="memo-preview" data-preview aria-hidden="true">{Array.from({ length: MEMO_PAIR_COUNT * 2 }, (_, index) => <span style={`--order: ${index}`}>{index % 7 === 0 ? '↗' : 'PI'}</span>)}</div>
       <div class="memo-board" data-board role="group" aria-label="Plansza memo" aria-describedby="memo-instructions" hidden></div>
+      <div class="memo-progress" aria-hidden="true"><span data-progress></span></div>
     </div>
   </memo-game>
 </section>
 
 <script>
-  import { MemoRound, MEMO_SYMBOLS, formatMemoTime } from '../utils/memo';
+  import { MemoRound, MEMO_SYMBOLS, MEMO_PAIR_COUNT, formatMemoTime } from '../utils/memo';
 
   class MemoGame extends HTMLElement {
     private round: MemoRound | null = null;
@@ -42,7 +48,9 @@
       }, options);
       this.querySelector('[data-board]')!.addEventListener('keydown', event => {
         const key = (event as KeyboardEvent).key;
-        const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -4, ArrowDown: 4 };
+        const board = this.querySelector<HTMLElement>('[data-board]')!;
+        const columns = getComputedStyle(board).gridTemplateColumns.split(' ').length;
+        const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -columns, ArrowDown: columns };
         if (!(key in steps) && key !== 'Home' && key !== 'End') return;
         const buttons = [...this.querySelectorAll<HTMLButtonElement>('[data-card]')];
         const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
@@ -81,6 +89,17 @@
         button.type = 'button';
         button.className = 'memo-card';
         button.dataset.card = String(i);
+        button.style.setProperty('--order', String(i));
+        const inner = document.createElement('span');
+        inner.className = 'memo-card-inner';
+        inner.setAttribute('aria-hidden', 'true');
+        const back = document.createElement('span');
+        back.className = 'memo-card-back';
+        back.textContent = 'PI';
+        const front = document.createElement('span');
+        front.className = 'memo-card-front';
+        inner.append(back, front);
+        button.append(inner);
         board.append(button);
       }
       board.hidden = false;
@@ -99,10 +118,10 @@
       if (!this.ticker) this.ticker = setInterval(() => this.clock(), 250);
       this.render();
       if (result === 'first') { this.announce('Wybierz drugą kartę.'); return; }
-      this.announce(result === 'match' ? `Para znaleziona. ${round.matched.size / 2} z 8.` : 'To nie para. Zapamiętaj symbole.');
+      this.announce(result === 'match' ? `Para znaleziona. ${round.matched.size / 2} z ${MEMO_PAIR_COUNT}.` : 'To nie para. Zapamiętaj symbole.');
       if (round.won) {
         this.clearTimers();
-        this.announce(`Komplet! Osiem par w ${round.moves} ruchach. Czas: ${formatMemoTime(round.elapsed(performance.now()))}. Zagraj ponownie, wybierając nowe rozdanie.`);
+        this.announce(`Komplet! ${MEMO_PAIR_COUNT} par w ${round.moves} ruchach. Czas: ${formatMemoTime(round.elapsed(performance.now()))}. Zagraj ponownie, wybierając nowe rozdanie.`);
       }
       this.timeout = setTimeout(() => {
         if (this.round !== round) return;
@@ -114,8 +133,10 @@
     private render() {
       const round = this.round;
       if (!round) return;
-      this.querySelector('[data-pairs]')!.textContent = `${round.matched.size / 2} / 8`;
+      this.querySelector('[data-pairs]')!.textContent = `${round.matched.size / 2} / ${MEMO_PAIR_COUNT}`;
       this.querySelector('[data-moves]')!.textContent = String(round.moves);
+      this.dataset.won = String(round.won);
+      this.querySelector<HTMLElement>('[data-progress]')!.style.transform = `scaleX(${round.matched.size / round.deck.length})`;
       this.clock();
       this.querySelectorAll<HTMLButtonElement>('[data-card]').forEach((button, index) => {
         const matched = round.matched.has(index);
@@ -125,18 +146,15 @@
         button.dataset.revealed = String(visible);
         button.dataset.matched = String(matched);
         button.setAttribute('aria-label', visible ? `Karta ${index + 1}: ${MEMO_SYMBOLS[round.deck[index]].name}${matched ? ', para znaleziona' : ''}` : `Ukryta karta ${index + 1}`);
-        button.replaceChildren();
-        if (visible) {
+        const front = button.querySelector('.memo-card-front')!;
+        // Mount a face only after its first reveal; keep nodes stable for flips.
+        if (visible && !front.firstChild) {
           const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           svg.setAttribute('viewBox', '0 0 24 24');
           svg.setAttribute('aria-hidden', 'true');
           const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
           path.setAttribute('d', MEMO_SYMBOLS[round.deck[index]].path);
-          svg.append(path); button.append(svg);
-        } else {
-          const back = document.createElement('span');
-          back.setAttribute('aria-hidden', 'true');
-          back.textContent = 'PI'; button.append(back);
+          svg.append(path); front.append(svg);
         }
       });
     }
@@ -146,11 +164,14 @@
 
 <style>
   .memo-section { background: #e9e6da; color: #12372d; padding: 5rem 0; border-top: 1px solid #183e3026; }
-  memo-game { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; width: min(1180px, calc(100% - 4rem)); margin: auto; }
+  memo-game { display: grid; grid-template-columns: 1fr; gap: 2.5rem; width: min(1180px, calc(100% - 4rem)); margin: auto; }
+  .memo-intro { display: grid; grid-template-columns: 1.3fr 1fr; column-gap: 4rem; align-items: start; }
+  .memo-kicker, h2, #memo-instructions { grid-column: 1; }
+  .memo-controls { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
   .memo-kicker { font: 600 .7rem monospace; letter-spacing: .16em; color: #496657; margin: 0 0 1.25rem; }
   h2 { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; letter-spacing: -.04em; max-width: 12ch; margin: 0 0 1.5rem; }
   #memo-instructions { max-width: 42ch; line-height: 1.7; color: #40584d; }
-  .memo-stats { display: flex; gap: 2rem; margin: 1.75rem 0; }
+  .memo-stats { display: flex; gap: 2rem; margin: 0 0 1.75rem; }
   .memo-stats span { display: block; text-transform: uppercase; font: .65rem monospace; letter-spacing: .12em; margin-bottom: .5rem; }
   .memo-stats strong { font: 500 1.55rem monospace; font-variant-numeric: tabular-nums; }
   .memo-action { display: inline-flex; justify-content: space-between; gap: 2rem; align-items: center; min-height: 48px; padding: .85rem 1.25rem; border: 1px solid #12372d; background: #12372d; color: #fff8df; font: inherit; cursor: pointer; }
@@ -159,18 +180,28 @@
   .memo-action:focus-visible { outline: 3px solid #947019; outline-offset: 4px; }
   .memo-note { font-size: .72rem; color: #526358; margin-top: .85rem; }
   .memo-status { font-size: .9rem; line-height: 1.5; min-height: 3em; max-width: 42ch; margin-bottom: 0; }
-  .memo-visual { min-width: 0; }
-  .memo-preview { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; max-width: 300px; margin: auto; transform: rotate(-6deg); }
-  .memo-preview span { display: grid; place-items: center; aspect-ratio: 1; background: #12372d; color: #d8bc69; font: 2rem monospace; border: 1px solid #d8bc6955; }
-  .memo-preview span:nth-child(2), .memo-preview span:nth-child(3) { background: #d8bc69; color: #12372d; }
-  .memo-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; }
+  .memo-visual { min-width: 0; padding: 1.25rem; border: 1px solid #12372d26; border-radius: 12px; background: #dedfce; transition: background 500ms, box-shadow 500ms; }
+  memo-game[data-won="true"] .memo-visual { background: #dfd5af; box-shadow: 0 0 0 3px #a8893c55, 0 18px 48px #12372d16; }
+  .memo-preview, .memo-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .7rem; }
+  .memo-preview span { display: grid; place-items: center; aspect-ratio: 1.1; background: #12372d; color: #d8bc69; font: 1.2rem monospace; border: 1px solid #d8bc6955; border-radius: 5px; }
+  .memo-preview span:nth-child(7n + 1) { background: #d8bc69; color: #12372d; }
+  .memo-progress { height: 3px; margin-top: 1.25rem; background: #12372d15; overflow: hidden; }
+  .memo-progress span { display: block; height: 100%; background: #947019; transform: scaleX(0); transform-origin: left; transition: transform 400ms ease; }
   [hidden] { display: none !important; }
-  :global(memo-game .memo-card) { aspect-ratio: 1; min-width: 0; min-height: 48px; display: grid; place-items: center; border: 1px solid #47694e; border-radius: 3px; background: #12372d; color: #d8bc69; cursor: pointer; font: 500 1rem monospace; transition: background 150ms, color 150ms; }
-  :global(memo-game .memo-card:hover) { border-color: #a8893c; }
+  :global(memo-game .memo-card) { position: relative; aspect-ratio: 1.1; min-width: 0; min-height: 48px; padding: 0; border: 0; border-radius: 5px; background: transparent; cursor: pointer; font: 500 1.2rem monospace; perspective: 700px; animation: memo-deal 420ms both; animation-delay: calc(var(--order) * 12ms); }
+  :global(memo-game .memo-card-inner) { position: absolute; inset: 0; display: block; transform-style: preserve-3d; transition: transform 420ms cubic-bezier(.2,.7,.2,1); }
+  :global(memo-game .memo-card-back), :global(memo-game .memo-card-front) { position: absolute; inset: 0; display: grid; place-items: center; border: 1px solid #47694e; border-radius: 5px; backface-visibility: hidden; box-shadow: 0 3px 5px #12372d12; transition: background 250ms, box-shadow 250ms, border-color 250ms; }
+  :global(memo-game .memo-card-back) { background: linear-gradient(145deg, #214d3d, #12372d); color: #d8bc69; }
+  :global(memo-game .memo-card-front) { transform: rotateY(180deg); background: #f8f3df; color: #173e30; border-color: #947019; }
+  :global(memo-game .memo-card[data-revealed="true"] .memo-card-inner) { transform: rotateY(180deg); }
+  @media (hover: hover) { :global(memo-game .memo-card[aria-disabled="false"]:hover .memo-card-back) { border-color: #d8bc69; box-shadow: 0 6px 16px #12372d35; background: #285541; } }
   :global(memo-game .memo-card:focus-visible) { outline: 3px solid #947019; outline-offset: 3px; }
-  :global(memo-game .memo-card[data-revealed="true"]) { background: #f8f3df; color: #173e30; border-color: #947019; }
-  :global(memo-game .memo-card[data-matched="true"]) { background: #d8bc69; color: #173e30; cursor: default; }
+  :global(memo-game .memo-card[data-matched="true"]) { cursor: default; }
+  :global(memo-game .memo-card[data-matched="true"] .memo-card-front) { background: #d8bc69; border-color: #947019; animation: memo-match 600ms ease-out; }
   :global(memo-game .memo-card svg) { width: 38%; height: 38%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  @media (max-width: 760px) { memo-game { grid-template-columns: 1fr; gap: 2rem; width: calc(100% - 2.5rem); } .memo-section { padding: 3rem 0; } .memo-preview { max-width: 220px; } .memo-board { gap: .5rem; } h2 { max-width: 16ch; } }
-  @media (prefers-reduced-motion: reduce) { :global(memo-game .memo-card) { transition: none; } }
+  @keyframes memo-deal { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes memo-match { 40% { box-shadow: 0 0 0 5px #d8bc6960, 0 0 22px #d8bc6970; } }
+  @media (max-width: 1023px) { .memo-board, .memo-preview { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  @media (max-width: 639px) { memo-game { gap: 1.5rem; width: calc(100% - 2rem); } .memo-intro { display: block; } .memo-section { padding: 3rem 0; } .memo-visual { padding: .65rem; } .memo-board, .memo-preview { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; } h2 { max-width: 16ch; } .memo-stats { margin: 1.5rem 0; } }
+  @media (prefers-reduced-motion: reduce) { .memo-visual, .memo-progress span, :global(memo-game .memo-card), :global(memo-game .memo-card-inner), :global(memo-game .memo-card-back), :global(memo-game .memo-card-front) { transition: none !important; animation: none !important; } }
 </style>
