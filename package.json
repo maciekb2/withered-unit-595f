@@ -41,7 +41,7 @@
   "scripts": {
     "astro": "astro",
     "build": "npm run build:node",
-    "build:node": "astro build --config astro.config.node.mjs",
+    "build:node": "node scripts/check-blog-images.mjs && astro build --config astro.config.node.mjs && node scripts/check-blog-images.mjs dist/client",
     "build:worker": "astro build && esbuild src/worker.ts --format=esm --bundle --platform=neutral --main-fields=module,main --conditions=worker,browser --external:./_worker.js --outfile=dist/worker.js",
     "start:node": "node ./dist/server/entry.mjs",
     "cf:dry-run": "wrangler deploy --dry-run",
