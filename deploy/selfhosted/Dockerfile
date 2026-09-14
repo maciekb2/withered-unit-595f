@@ -14,7 +14,7 @@ ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=ca-bootstrap /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
  && apt-get update \
- && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates \
+ && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates libpcre2-8-0 \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # Flux source extraction can leave public assets readable only by root.
