@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { SITE_TITLE, STATUS_PAGE_URL } from '../consts';
 const today = new Date();
 ---
 
@@ -15,6 +15,7 @@ const today = new Date();
                         <a href="/blog">Blog</a>
                         <a href="/about">O mnie</a>
                         <a href="/contact">Kontakt</a>
+                        {STATUS_PAGE_URL && <a href={STATUS_PAGE_URL}>Status</a>}
                         <a href="/privacy">Prywatność</a>
                         <button type="button" data-cookie-consent-open>Ustawienia cookies</button>
                 </nav>
