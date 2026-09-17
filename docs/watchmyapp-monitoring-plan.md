@@ -5,18 +5,25 @@ Prepared 2026-09-17. Owner: Maciej; application repository:
 context `home-mb-dev`, namespace `pseudointelekt`. This is a proposal, not evidence
 that WatchMyApp monitors, alert routes or heartbeat integrations are configured.
 
-## Footer destination — awaiting owner confirmation
+## Footer destination and active baseline
 
 The shared footer has a conditional **Status** link configured by
 `STATUS_PAGE_URL` in `src/consts.ts`. It opens in the same tab and loads no widget,
 tracking script or external request until the visitor follows the link.
 
-The value remains empty until the owner supplies the exact published page URL.
-Do not guess a slug or link to the WatchMyApp homepage: the candidate
-`https://app.watchmyapp.io/s/pseudointelekt` returned 404 during this review.
-Confirm title, ownership, selected public components and HTTP 200 before setting
-the constant. Build, review, and follow the private RKE2 release procedure; a
-source change or merged PR alone does not prove the footer is live.
+After the owner explicitly requested creation with slug `pseudointelekt`, a
+dedicated workspace was created under `admin@watchmyapp.io`. Its published page
+is `https://app.watchmyapp.io/s/pseudointelekt`, titled
+**Pseudointelekt — status serwisu**. Public API readback verifies the page,
+homepage backlink and green/gold appearance. History starts with real data only.
+
+One baseline HTTP monitor, **Strona główna**, checks `https://pseudointelekt.pl/`
+from Kraków every 900 seconds (Free plan), with a 10-second timeout, expected
+HTTP 200 and body marker `Pseudointelekt`, three failures to open an incident
+and two successes to recover. No notification channels were created or tests sent.
+All other monitors below remain proposals. The footer constant now points to this
+verified published page. A source change or merged PR alone does not prove the
+footer is deployed; production rollout is verified separately.
 
 ## Proposed first monitors
 
@@ -121,13 +128,14 @@ incidents to real subscribers without explicit approval. Never falsify history.
 - Before a footer deployment, preserve the previous image digest, validate/scan
   the candidate and verify the actual public footer and destination after rollout.
 
-No monitor creation, generation, notification, subscription, secret, database or
-deployment changes were performed while preparing this plan.
+The initial plan did not mutate the services. The subsequently authorized
+workspace, baseline monitor and public page were created as described above.
+No generation, notification, subscription or secret changes were made.
 
 ## Local verification
 
 `npm run typecheck`, `npm run test:ci` and `npm run build:node` passed on the
 dedicated branch. The Node build verified all 164 article image references in
 the built output. Tests cover the optional destination contract and conditional
-footer link. This does not verify a configured destination or production rollout;
-those remain blocked on the exact status-page URL.
+footer link. After setting the destination, re-run validation and verify the
+public footer after the private RKE2 release; local success is not rollout proof.
