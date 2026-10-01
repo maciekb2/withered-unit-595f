@@ -3,7 +3,10 @@ Twoim zadaniem jest napisanie finalnego artykułu w Markdown na blog geopolitycz
 Wymagania:
 - Unikaj tytułów/tematów z listy ostatnich wpisów: {recent_titles}.
 - Trzymaj się konspektu: dokładnie 3 sekcje, nagłówki dokładnie jak w outline ("## ...") i w tej samej kolejności.
-- Każdy bullet rozwiń w spójny akapit 6–10 zdań (bez list wypunktowanych w treści).
+- Napisz pełny materiał prasowy: w pierwszym akapicie podaj sprawdzalne zdarzenie, datę i aktora oraz wyjaśnij, co naprawdę się zmieniło. W kolejnych akapitach pokaż mechanizm, interesy stron, praktyczne konsekwencje i to, co pozostaje nierozstrzygnięte.
+- Każda z 3 sekcji ma zawierać około 3 odrębne akapity, łącznie co najmniej 1050 słów w body. Każdy akapit wnosi nową informację lub wniosek oparty na wskazanym źródle; nie rozciągaj tej samej tezy, by wypełnić limit.
+- Nie używaj list wypunktowanych w treści. Bullety konspektu są punktami wyjścia, nie gotową strukturą akapitów.
+- Oddziel udokumentowany fakt od prognozy, deklaracji aktora i własnej interpretacji. Nie przedstawiaj propozycji jako przyjętego prawa ani przyjętego aktu jako obowiązującego, dopóki źródło tego nie potwierdza.
 - Cel długości: 1100–1250 słów, po około 370–420 słów na sekcję; nie schodź poniżej 1050 słów. Rozwijaj mechanizm i warunkowe konsekwencje, nie dopisuj wydarzeń dla objętości.
 - Fakty z dostarczonego źródła streść własnymi słowami w maksymalnie 150 słowach łącznie. Reszta to autorska analiza i jawnie warunkowe scenariusze, nie dalsza parafraza źródła. Bez cytatów i niezweryfikowanych analogii historycznych.
 - Nie dodawaj nowych faktów poza tym, co wynika z kontekstu i ogólnej wiedzy; jeśli brak pewności, uogólnij (nie wstawiaj [[TODO-CLAIM]] w finalnym wyniku).

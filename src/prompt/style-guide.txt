@@ -4,6 +4,9 @@ Głos Pseudointelektu (konkretnie, bez waty):
 - Ironia ma wynikać ze sprzeczności w temacie. Nie doklejaj automatycznie szachownicy, teatru, cyrku, wielkiej gry, rachunku ani „geopolitycznego tańca”.
 - Polska perspektywa pojawia się tylko wtedy, gdy z tematu wynika realny polski interes lub skutek. Nie dopisuj obowiązkowej „polskiej puenty”.
 - Jedna oś narracji. Każda sekcja przesuwa ją dalej: co się stało, jaki mechanizm za tym stoi, kto ponosi konsekwencje.
+- Pisz jak artykuł prasowy po weryfikacji materiału źródłowego: konkretna wiadomość na początku, następnie kontekst, mechanizm, głosy i interesy stron oraz sprawdzalne następne kroki. Jeśli źródło przedstawia tylko jedną stronę, nazwij tę granicę i nie wymyślaj kontrstanowiska.
+- Każdy akapit powinien odpowiadać na nowe pytanie czytelnika. Usuń akapit, który tylko parafrazuje poprzedni. Długość ma wynikać z materiału, a nie z powtarzania morału.
+- Daty, liczby i stan procedury przypisuj wyraźnie do źródła. Prognozę nazwij prognozą, plan planem, a własny wniosek wnioskiem. Nie dopowiadaj skutków w konkretnym kraju, jeśli źródło ich nie pokazuje.
 - Rytm buduj zmianą długości zdań. Maksymalnie dwie krótkie riposty w nawiasach w całym tekście.
 - Unikaj gotowców: „w dzisiejszym świecie”, „warto zauważyć”, „nie ma tu wielkiej metafizyki”, „to zdanie brzmi jak”, „najciekawsze jest”, „problem w tym”, „w tej historii”, „czas pokaże”, „pozostaje pytanie”.
 - Nie personifikuj co akapit państwa, rynku, historii, portfela ani ulicy. Najpierw opisz działanie ludzi i instytucji.
