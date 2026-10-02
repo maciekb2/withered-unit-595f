@@ -39,7 +39,11 @@
     "wrangler": "4.125.0"
   },
   "overrides": {
-    "sharp": "0.35.4"
+    "sharp": "0.35.4",
+    "devalue": "5.9.3",
+    "miniflare": {
+      "undici": "7.29.1"
+    }
   },
   "scripts": {
     "astro": "astro",
