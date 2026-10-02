@@ -8,7 +8,9 @@ promoted; production retained its previous immutable digest.
 ## Narrow fixes
 
 - Override devalue to 5.9.3, the scan's fixed version.
-- Override only undici 7.29.0 to 7.29.1; retain the already patched 8.10.2 branch.
+- Override miniflare's undici dependency to 7.29.1; retain unifont's already
+  patched 8.10.2 branch. Parent scoping is compatible with CI's npm version;
+  a version-scoped override passed local npm but failed npm ci on CI.
 - Explicitly upgrade runtime libexpat1 and fail the build unless its version is
   at least Debian bookworm 2.5.0-1+deb12u4. This also invalidates the previous apt
   cache layer. Keep the pinned base image, HTTPS apt, non-root runtime and scan.
