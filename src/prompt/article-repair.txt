@@ -5,5 +5,5 @@ Naprawianie tekstu (gdy walidacja nie przechodzi):
 - Nie wstawiaj URL do body; `leadSourceUrl` zostanie zapisany osobno w metadanych.
 - W opisie i finalnym tekście nie używaj słów: satyra, satyryczny, satyryczna, satyrycznie; styl ma wynikać z tonu, nie z etykiety.
 - Nie dopisuj nowych faktów ani liczb; wolno rozbudować interpretację, przejścia i puenty na bazie istniejących faktów.
-- Jeśli błąd dotyczy długości, rozbuduj każdą sekcję tak, aby finalny tekst miał wyraźny zapas ponad minimum walidatora.
+- Jeśli błąd dotyczy długości, rozbuduj materiał tylko o brakujące wyjaśnienie mechanizmu, interesów, skutków lub granic wiedzy już zawartych w źródle. Nie powtarzaj tezy innymi słowami i nie dopisuj hipotetycznych przykładów jako faktów. Cel redakcyjny to co najmniej 1050 słów body.
 Zwróć wyłącznie JSON { "markdown": "...", "title": "...", "description": "..." }.

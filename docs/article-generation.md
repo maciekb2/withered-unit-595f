@@ -1,5 +1,11 @@
 # Generowanie artykułów – ścieżki ręczna, automatyczna i CLI
 
+## Standard materiału prasowego
+
+Przed publikacją potwierdź datę i treść jednego źródła pierwotnego wskazanego w `sourceUrl`. Artykuł ma podać wiadomość w pierwszym akapicie, rozwinąć jej mechanizm, interesy stron i praktyczne skutki oraz jasno nazwać niepewność i kolejne etapy. Oddziel fakt, wypowiedź, prognozę i wniosek redakcyjny. Trzy sekcje H2 powinny prowadzić jedną opowieść; cel to co najmniej 1050 słów body i około trzy akapity w każdej sekcji, bez powtórzeń służących tylko długości. Gdy źródło jest zbyt skąpe, wybierz inny temat zamiast dorabiać fakty. Ilustracja hero zachowuje paletę leśnej zieleni, teal, kości słoniowej i przygaszonego złota, format 3:2, jedną czytelną metaforę oraz brak ludzi, tekstu, logotypów i fotorealizmu.
+
+Data `pubDate` oznacza datę wpisu. Jeśli materiał źródłowy ukazał się wcześniej, podaj w tekście jego prawdziwą datę; nie antydatuj zdarzenia. Przy aktach prawnych odróżnij przyjęcie, publikację i wejście w życie. Weryfikacja redakcyjna wymaga przeczytania całego artykułu i porównania wszystkich konkretnych twierdzeń ze źródłem; sam licznik słów nie stanowi akceptacji.
+
 | Etap / element | Manual (SSE w przeglądarce) | Automatyczny (CRON) | Manual CLI |
 | --- | --- | --- | --- |
 | Start | `GET /api/generate-stream` z `src/worker.ts` | `src/cron-worker.ts` (wywołuje `generateAndPublish` wg crona w `wrangler.json`) | `scripts/publish-article.ts` |
