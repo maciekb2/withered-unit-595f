@@ -1,7 +1,9 @@
 {
   "name": "pseudointelekt2137-blog",
   "compatibility_date": "2024-11-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "main": "./dist/worker.js",
   "assets": {
     "directory": "./dist",
@@ -40,13 +42,31 @@
     "OPENAI_EDIT_MODEL": "",
     "OPENAI_REPAIR_MODEL": "",
     "OPENAI_IMAGE_STYLE": "vivid",
-    "OPENAI_IMAGE_QUALITY": "hd"
+    "OPENAI_IMAGE_QUALITY": "hd",
+    "SENTRY_DSN": "https://c00de1d72e4c1e94c024a12bb31b45e4@o4510385780031488.ingest.de.sentry.io/4511257724977233",
+    "SENTRY_ENVIRONMENT": "production",
+    "SENTRY_RELEASE": "pseudointelekt2137-blog@manual",
+    "SENTRY_TRACES_SAMPLE_RATE": "0.1"
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
   },
   "upload_source_maps": true,
   "triggers": {
-    "crons": ["0 10 * * *"]
+    "crons": [
+      "0 10 * * *"
+    ]
   }
 }

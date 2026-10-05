@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/cloudflare";
 import server from './_worker.js';
 import cron from './cron-worker';
 import { generateAndPublish } from './modules/generateAndPublish';
@@ -6,6 +7,24 @@ import { initLogger, logRequest, logEvent, logError } from './utils/logger';
 import { getSessionInfo, appendSessionCookie } from './utils/session';
 import writeTemplate from './prompt/article-write.txt?raw';
 import { getRecentTitlesFromGitHub } from './utils/recentTitlesGitHub';
+
+
+type SentryEnv = {
+  SENTRY_DSN?: string;
+  SENTRY_ENVIRONMENT?: string;
+  SENTRY_RELEASE?: string;
+  SENTRY_TRACES_SAMPLE_RATE?: string;
+};
+
+function createSentryOptions(env: SentryEnv) {
+  return {
+    dsn: env.SENTRY_DSN,
+    environment: env.SENTRY_ENVIRONMENT,
+    release: env.SENTRY_RELEASE,
+    enableLogs: true,
+    tracesSampleRate: Number(env.SENTRY_TRACES_SAMPLE_RATE ?? "0.1") || 0.1,
+  };
+}
 
 const pendingPrompts = new Map<
   string,
@@ -186,7 +205,7 @@ async function handleClientLog(request: Request, sessionId: string) {
   }
 }
 
-export default {
+const handler = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     initLogger(env.pseudointelekt_logs_db, ctx, env.WORKER_ID);
     const session = getSessionInfo(request);
@@ -302,3 +321,5 @@ export default {
   },
   scheduled: cron.scheduled,
 };
+
+export default Sentry.withSentry(createSentryOptions, handler);
