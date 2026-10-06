@@ -14,8 +14,10 @@ ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=ca-bootstrap /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
  && apt-get update \
- && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates libpcre2-8-0 libexpat1 \
+ && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core ca-certificates libpcre2-8-0 libexpat1 perl-base \
  && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libexpat1)" ge 2.5.0-1+deb12u4 \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge 10.42-1+deb12u2 \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' perl-base)" ge 5.36.0-7+deb12u4 \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # Flux source extraction can leave public assets readable only by root.
