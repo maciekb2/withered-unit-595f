@@ -43,7 +43,8 @@
     "devalue": "5.9.3",
     "miniflare": {
       "undici": "7.29.1"
-    }
+    },
+    "source-map-js": "1.2.2"
   },
   "scripts": {
     "astro": "astro",
