@@ -41,11 +41,12 @@ export function observeArticleMeasurement(): () => void {
   const article = document.querySelector<HTMLElement>('[data-article-page]');
   const content = document.querySelector<HTMLElement>('#article-content');
   if (!article || !content) return () => {};
+  const publishedAt = Date.parse(article.dataset.articlePublishedAt || '');
   const track = (window as Window & { pseudointelektTrack?: (name: string, params: Record<string, unknown>) => void });
   const measure = articleMeasurement((name, extra) => track.pseudointelektTrack?.(name, {
     article_slug: article.dataset.articleSlug,
     article_year: Number(article.dataset.articleYear || 0),
-    article_age_days: Number(article.dataset.articleAgeDays || 0),
+    article_age_days: Number.isFinite(publishedAt) ? Math.max(0, Math.floor((Date.now() - publishedAt) / 86400000)) : 0,
     ...extra,
   }));
   const sample = (scrolled = false) => {

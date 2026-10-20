@@ -47,3 +47,25 @@ The live release controller currently uses Automatic promotion from main;
 older skill/runbook Shadow statements are historical. Feature-branch work does
 not constitute deployment. Require candidate identity, DEV acceptance, source/
 GitOps/native/public receipt before reporting this measurement as deployed.
+
+## Sitemap coverage and acquisition audit,21 October
+
+Google Search Console showed0clicks/23impressions,CTR0%,average position8 for
+21September–18October. Its indexing snapshot dated12October reports100indexed
+and66excluded URLs (2server errors,1not found,1redirect,31crawled not indexed,
+17discovered not indexed,14canonical duplicates). These historical exclusions
+are not all current application failures. The two5xx examples are topic pages
+geopolityka/2 and/3,last crawled July/August; both now return200 with self canonical.
+
+The Node build's sitemap contained26URLs and no blog articles,while201public
+Markdown articles already existed. Astro warned that getStaticPaths was ignored
+in the SSR blog route. The route now explicitly prerenders its committed content;
+interactive counters remain client API requests. Article age is calculated in
+the browser from the public publication date,not frozen at build time.
+
+Node build now verifies every committed article rendered as static HTML with a
+canonical in the sitemap and no noindex. It checks201articles/237total URLs;
+the guard failed on the old build with0rendered articles against201sources.
+This is build evidence,not deployed sitemap coverage or Google indexing proof.
+Official integration limitation: https://docs.astro.build/en/guides/integrations-guide/sitemap/ .
+Source changes and release acceptance must remain separate from crawl/index results.

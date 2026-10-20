@@ -453,7 +453,7 @@ const jsonLd = {
                                 data-article-page
                                 data-article-slug={slug}
                                 data-article-year={pubDate.getFullYear()}
-                                data-article-age-days={Math.max(0, Math.floor((Date.now() - pubDate.getTime()) / 86400000))}
+                                data-article-published-at={pubDate.toISOString()}
                         >
 				{heroImage && (
 					<div class="hero-image">
@@ -544,10 +544,11 @@ const jsonLd = {
                 <script type="module" define:vars={{ slug }}>
                         const currentSlug = slug;
                         const article = document.querySelector('[data-article-page]');
+                        const publishedAt = Date.parse(article?.dataset.articlePublishedAt || '');
                         const articleParams = {
                                 article_slug: currentSlug,
                                 article_year: Number(article?.dataset.articleYear || 0),
-                                article_age_days: Number(article?.dataset.articleAgeDays || 0),
+                                article_age_days: Number.isFinite(publishedAt) ? Math.max(0, Math.floor((Date.now() - publishedAt) / 86400000)) : 0,
                         };
                         document.body.dataset.pageSection = 'article';
                         fetch(`/api/views/${currentSlug}`, { method: 'POST' })

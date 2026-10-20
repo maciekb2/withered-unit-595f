@@ -5,6 +5,10 @@ import BlogArchivePage from '../../layouts/BlogArchivePage.astro';
 import BlogPost from '../../layouts/BlogPost.astro';
 import { getRelatedPosts } from '../../utils/topics';
 
+// Articles come from committed Markdown, with live counters fetched by the UI.
+// getStaticPaths is ignored in server mode unless this route opts into rendering.
+export const prerender = true;
+
 export async function getStaticPaths() {
 	const posts = (await getCollection('blog')).sort(
 		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.id.localeCompare(a.id),
