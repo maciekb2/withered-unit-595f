@@ -453,7 +453,7 @@ const jsonLd = {
                                 data-article-page
                                 data-article-slug={slug}
                                 data-article-year={pubDate.getFullYear()}
-                                data-article-age-days={Math.max(0, Math.floor((Date.now() - pubDate.getTime()) / 86400000))}
+                                data-article-published-at={pubDate.toISOString()}
                         >
 				{heroImage && (
 					<div class="hero-image">
@@ -537,42 +537,20 @@ const jsonLd = {
                         </article>
                 </main>
                 <Footer />
+                <script>
+                        import { observeArticleMeasurement } from '../utils/articleMeasurement';
+                        observeArticleMeasurement();
+                </script>
                 <script type="module" define:vars={{ slug }}>
                         const currentSlug = slug;
                         const article = document.querySelector('[data-article-page]');
+                        const publishedAt = Date.parse(article?.dataset.articlePublishedAt || '');
                         const articleParams = {
                                 article_slug: currentSlug,
                                 article_year: Number(article?.dataset.articleYear || 0),
-                                article_age_days: Number(article?.dataset.articleAgeDays || 0),
+                                article_age_days: Number.isFinite(publishedAt) ? Math.max(0, Math.floor((Date.now() - publishedAt) / 86400000)) : 0,
                         };
                         document.body.dataset.pageSection = 'article';
-                        window.pseudointelektTrack?.('article_read_start', articleParams);
-
-                        const scrollThresholds = [25, 50, 75, 90];
-                        const seenThresholds = new Set();
-                        let readCompleteSent = false;
-                        function trackScrollDepth() {
-                                const doc = document.documentElement;
-                                const scrollable = doc.scrollHeight - window.innerHeight;
-                                if (scrollable <= 0) return;
-                                const percent = Math.min(100, Math.round((window.scrollY / scrollable) * 100));
-                                scrollThresholds.forEach((threshold) => {
-                                        if (percent >= threshold && !seenThresholds.has(threshold)) {
-                                                seenThresholds.add(threshold);
-                                                window.pseudointelektTrack?.('article_scroll_depth', {
-                                                        ...articleParams,
-                                                        scroll_percent: threshold,
-                                                });
-                                        }
-                                });
-                                if (percent >= 90 && !readCompleteSent) {
-                                        readCompleteSent = true;
-                                        window.pseudointelektTrack?.('article_read_complete', articleParams);
-                                }
-                        }
-                        window.addEventListener('scroll', trackScrollDepth, { passive: true });
-                        window.addEventListener('load', trackScrollDepth);
-
                         fetch(`/api/views/${currentSlug}`, { method: 'POST' })
                                 .then((r) => r.ok ? r.json() : { views: 0 })
                                 .then((d) => {
@@ -593,24 +571,26 @@ const jsonLd = {
                                                 likeBtn.classList.add('liked');
                                         }
                                 });
-                        likeBtn?.addEventListener('click', () => {
-                                fetch(`/api/likes/${currentSlug}`, { method: 'POST' })
-                                        .then((r) => r.json().catch(() => ({})))
-                                        .then((d) => {
-                                                const el = document.getElementById('like-count');
-                                                if (el && d.likes != null) el.textContent = d.likes;
-                                                if (likeBtn) {
-                                                        likeBtn.disabled = true;
-                                                        const icon = likeBtn.querySelector('[aria-hidden="true"]');
-                                                        if (icon) icon.textContent = '♥';
-                                                        likeBtn.classList.add('liked', 'heartbeat');
-                                                        likeBtn.addEventListener('animationend', () => {
-                                                                likeBtn.classList.remove('heartbeat');
-                                                        }, { once: true });
-                                                }
-                                                sessionStorage.setItem(likeStorageKey, '1');
-                                                window.pseudointelektTrack?.('article_like', articleParams);
-                                        });
+                        likeBtn?.addEventListener('click', async () => {
+                                if (likeBtn.disabled) return;
+                                likeBtn.disabled = true;
+                                const allowedAtStart = document.documentElement.dataset.analyticsConsent === 'granted';
+                                try {
+                                        const response = await fetch(`/api/likes/${currentSlug}`, { method: 'POST' });
+                                        if (!response.ok) throw new Error('Like was not accepted');
+                                        const d = await response.json();
+                                        if (!Number.isInteger(d?.likes) || d.likes < 0) throw new Error('Invalid like receipt');
+                                        const el = document.getElementById('like-count');
+                                        if (el) el.textContent = d.likes;
+                                        const icon = likeBtn.querySelector('[aria-hidden="true"]');
+                                        if (icon) icon.textContent = '♥';
+                                        likeBtn.classList.add('liked', 'heartbeat');
+                                        likeBtn.addEventListener('animationend', () => {
+                                                likeBtn.classList.remove('heartbeat');
+                                        }, { once: true });
+                                        sessionStorage.setItem(likeStorageKey, '1');
+                                        if (allowedAtStart) window.pseudointelektTrack?.('article_like', articleParams);
+                                } catch { likeBtn.disabled = false; }
                         });
                         document.querySelectorAll('.post-nav a').forEach((link) => {
                                 link.addEventListener('click', () => {
