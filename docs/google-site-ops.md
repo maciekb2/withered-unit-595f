@@ -71,3 +71,22 @@ node ~/.codex/skills/google-site-ops/scripts/google-site-ops.mjs \
 
 Nie przenosimy tokenów, kluczy OAuth ani danych logowania do repozytorium,
 Workera ani zmiennych publicznego frontendu.
+
+## Ruch testowy operatora
+
+Aby sprawdzić analitykę, otwórz docelowy publiczny artykuł z `?measurement_test=1`.
+Dopiero zwykła zgoda na analitykę pozwala dodać `debug_mode:true` w GA4. Query i
+fragment nigdy nie trafiają do page_location; nie tworzymy dodatkowego cookie
+ani local/session storage. Znacznik żyje w pamięci bieżącego dokumentu. Pseudointelekt
+ma pełne nawigacje: następny link bez flagi tworzy zwykły dokument. Nie dodajemy
+flagi do linków czytelników. Nie rozpoznajemy operatora po IP ani wspólnym NAT.
+
+Zwykłe wejście nie wysyła debug_mode. Google jest dopuszczone wyłącznie na HTTPS
+pseudointelekt.pl/www.pseudointelekt.pl, po zgodzie. DEV, localhost, fałszywy host
+lub HTTP nie mogą załadować produkcyjnego tagu nawet z parametrem testowym.
+Retencja/zgoda180dni, Signals/reklamy i zakres zdarzeń pozostają bez zmian.
+
+Filtr usługi GA4 536130452: Operator QA, Developer Traffic, Exclude, **Testing**.
+Najpierw potwierdzić zapis filtra oraz debug_mode w natywnym DebugView, potem
+przetworzoną klasyfikację Test data filter name. Nie aktywować wykluczenia bez
+osobnego odbioru; samo zapisanie filtra nie oznacza jeszcze ruchu.
