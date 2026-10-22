@@ -103,7 +103,9 @@ const websiteJsonLd = type === 'website'
 (() => {
   const consentKey = 'pseudointelekt_cookie_consent_v2';
   const consentVersion = 2;
-  const hasGa4 = typeof ga4Id === 'string' && /^G-[A-Z0-9]+$/i.test(ga4Id);
+  const hasGa4 = typeof ga4Id === 'string' && /^G-[A-Z0-9]+$/i.test(ga4Id)
+    && location.protocol === 'https:' && ['pseudointelekt.pl', 'www.pseudointelekt.pl'].includes(location.hostname);
+  let operatorQaVisit;
   let analyticsGranted = false;
 
   window.dataLayer = window.dataLayer || [];
@@ -194,7 +196,9 @@ const websiteJsonLd = type === 'website'
   }
 
   function loadGa4() {
-    if (!hasGa4 || document.querySelector('script[data-ga4-loader]')) return;
+    if (!analyticsGranted || !hasGa4 || document.querySelector('script[data-ga4-loader]')) return;
+    // Read only after consent; QA lasts for this document and never persists.
+    operatorQaVisit ??= new URLSearchParams(location.search).get('measurement_test') === '1';
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id)}`;
@@ -204,6 +208,7 @@ const websiteJsonLd = type === 'website'
     window.gtag('config', ga4Id, {
       allow_google_signals: false, allow_ad_personalization_signals: false,
       cookie_domain: 'none', cookie_expires: 15552000, cookie_update: false,
+      ...(operatorQaVisit ? { debug_mode: true } : {}),
       page_location: location.origin + location.pathname, page_referrer: safeReferrer(),
     });
   }
